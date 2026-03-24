@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Scoop N Go Arizona | Dog Waste Removal Service</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Open+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&family=Open+Sans:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -23,16 +23,22 @@
     }
     html { scroll-behavior: smooth; }
     body { font-family: 'Open Sans', sans-serif; color: var(--dark); line-height: 1.6; }
+
+    /* TOP BAR */
     .top-bar { background: var(--green-dark); color: #fff; text-align: center; padding: .5rem 5%; font-size: .85rem; font-weight: 600; }
     .top-bar a { color: #fff; text-decoration: none; }
     .top-bar a:hover { text-decoration: underline; }
+
+    /* NAV */
     nav { background: var(--white); border-bottom: 3px solid var(--green); padding: 0 5%; display: flex; align-items: center; justify-content: space-between; height: 70px; position: sticky; top: 0; z-index: 200; box-shadow: 0 2px 12px rgba(0,0,0,.08); }
     .nav-logo { font-family: 'Montserrat', sans-serif; font-size: 1.25rem; font-weight: 900; color: var(--green-dark); text-decoration: none; }
     .nav-links { display: flex; gap: 1.8rem; list-style: none; }
     .nav-links a { text-decoration: none; color: var(--dark); font-size: .9rem; font-weight: 600; transition: color .2s; }
     .nav-links a:hover { color: var(--green); }
-    .nav-cta { background: var(--green); color: #fff !important; padding: .5rem 1.3rem; border-radius: 6px; }
-    .nav-cta:hover { background: var(--green-dark) !important; }
+    .nav-cta { background: var(--green) !important; color: #fff !important; padding: .5rem 1.3rem; border-radius: 6px; }
+    .nav-cta:hover { background: var(--green-dark) !important; color: #fff !important; }
+
+    /* HERO */
     .hero { background: linear-gradient(135deg, var(--green-dark) 0%, var(--green-mid) 100%); color: #fff; padding: 90px 5% 80px; text-align: center; position: relative; overflow: hidden; }
     .hero::before { content: ''; position: absolute; inset: 0; background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/svg%3E") repeat; }
     .hero-inner { position: relative; max-width: 760px; margin: 0 auto; }
@@ -41,10 +47,12 @@
     .hero h1 { font-family: 'Montserrat', sans-serif; font-size: clamp(2.2rem,5vw,3.6rem); font-weight: 900; line-height: 1.1; margin-bottom: 1.2rem; text-shadow: 0 2px 12px rgba(0,0,0,.2); }
     .hero p { font-size: 1.1rem; opacity: .92; max-width: 560px; margin: 0 auto 2.2rem; }
     .hero-btns { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; }
-    .btn-white { background: #fff; color: var(--green-dark); padding: .85rem 2rem; border-radius: 8px; font-size: 1rem; font-weight: 800; text-decoration: none; font-family: 'Montserrat', sans-serif; transition: transform .2s, box-shadow .2s; box-shadow: 0 4px 16px rgba(0,0,0,.2); }
+    .btn-white { background: #fff; color: var(--green-dark); padding: .85rem 2rem; border-radius: 8px; font-size: 1rem; font-weight: 800; text-decoration: none; font-family: 'Montserrat', sans-serif; transition: transform .2s, box-shadow .2s; box-shadow: 0 4px 16px rgba(0,0,0,.2); display: inline-block; }
     .btn-white:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,.25); }
-    .btn-outline-white { background: transparent; color: #fff; padding: .85rem 2rem; border-radius: 8px; font-size: 1rem; font-weight: 700; text-decoration: none; border: 2px solid rgba(255,255,255,.7); font-family: 'Montserrat', sans-serif; transition: background .2s; }
+    .btn-outline-white { background: transparent; color: #fff; padding: .85rem 2rem; border-radius: 8px; font-size: 1rem; font-weight: 700; text-decoration: none; border: 2px solid rgba(255,255,255,.7); font-family: 'Montserrat', sans-serif; transition: background .2s; display: inline-block; }
     .btn-outline-white:hover { background: rgba(255,255,255,.12); }
+
+    /* GUARANTEES */
     .guarantees { background: var(--tan); border-bottom: 1px solid var(--border); padding: 55px 5%; }
     .guarantees-inner { max-width: 1100px; margin: 0 auto; }
     .guarantees h2 { font-family: 'Montserrat', sans-serif; font-size: 1.6rem; font-weight: 800; text-align: center; margin-bottom: 2rem; color: var(--green-dark); }
@@ -54,10 +62,14 @@
     .guarantee-icon { font-size: 2.5rem; margin-bottom: .8rem; }
     .guarantee-card h3 { font-family: 'Montserrat', sans-serif; font-size: 1rem; font-weight: 800; margin-bottom: .6rem; color: var(--green-dark); }
     .guarantee-card p { font-size: .9rem; color: var(--mid); }
+
+    /* SHARED */
     .section-inner { max-width: 1100px; margin: 0 auto; }
     .section-header { text-align: center; margin-bottom: 3rem; }
     .section-label { display: inline-block; background: var(--green-lt); color: var(--green-dark); font-size: .75rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; padding: .3rem .9rem; border-radius: 20px; margin-bottom: .7rem; }
     .section-header h2 { font-family: 'Montserrat', sans-serif; font-size: clamp(1.7rem,3vw,2.3rem); font-weight: 900; color: var(--dark); }
+
+    /* SERVICES */
     .services { background: var(--white); padding: 70px 5%; }
     .service-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1.5rem; }
     .service-card { border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border); transition: box-shadow .2s, transform .2s; }
@@ -69,27 +81,98 @@
     .service-body { padding: 1.5rem; }
     .service-body h3 { font-family: 'Montserrat', sans-serif; font-size: 1.05rem; font-weight: 800; margin-bottom: .6rem; color: var(--dark); }
     .service-body p { font-size: .9rem; color: var(--mid); }
+
+    /* ── INSTANT QUOTE CALCULATOR ── */
     .pricing { background: var(--tan); padding: 70px 5%; }
-    .pricing-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1.5rem; margin-top: 3rem; }
-    .plan { background: var(--white); border: 2px solid var(--border); border-radius: var(--radius); padding: 2rem; display: flex; flex-direction: column; transition: transform .2s, box-shadow .2s; }
-    .plan:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(0,0,0,.1); }
-    .plan.popular { background: var(--green-dark); border-color: var(--green-dark); color: #fff; }
-    .popular-badge { background: var(--yellow); color: var(--dark); font-size: .72rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; border-radius: 20px; padding: .2rem .8rem; display: inline-block; margin-bottom: .8rem; align-self: flex-start; }
-    .plan-name { font-family: 'Montserrat', sans-serif; font-size: 1.1rem; font-weight: 800; margin-bottom: .2rem; }
-    .plan-freq { font-size: .85rem; opacity: .6; margin-bottom: 1.2rem; }
-    .plan-price { font-family: 'Montserrat', sans-serif; font-size: 2.6rem; font-weight: 900; line-height: 1; margin-bottom: .3rem; }
-    .plan-price sup { font-size: 1.3rem; vertical-align: top; margin-top: .4rem; }
-    .plan-note { font-size: .8rem; opacity: .55; margin-bottom: 1.5rem; }
-    .plan-divider { border: none; border-top: 1px solid rgba(0,0,0,.1); margin-bottom: 1.2rem; }
-    .plan.popular .plan-divider { border-color: rgba(255,255,255,.2); }
-    .plan ul { list-style: none; flex: 1; margin-bottom: 1.8rem; }
-    .plan ul li { font-size: .9rem; padding: .35rem 0; display: flex; align-items: flex-start; gap: .5rem; }
-    .plan ul li::before { content: '✓'; font-weight: 800; color: var(--green); flex-shrink: 0; }
-    .plan.popular ul li::before { color: #81c784; }
-    .plan-btn { display: block; text-align: center; background: var(--green); color: #fff; padding: .8rem; border-radius: 7px; font-weight: 700; text-decoration: none; font-family: 'Montserrat', sans-serif; font-size: .95rem; transition: background .2s; }
-    .plan-btn:hover { background: var(--green-mid); }
-    .plan.popular .plan-btn { background: #fff; color: var(--green-dark); }
-    .plan.popular .plan-btn:hover { background: #e8f5e9; }
+    .quote-calc {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 4px 24px rgba(0,0,0,.07);
+    }
+    .qc-controls { background: var(--white); padding: 2rem; }
+    .qc-group { margin-bottom: 1.6rem; }
+    .qc-group:last-child { margin-bottom: 0; }
+    .qc-label { display: block; font-size: .85rem; font-weight: 700; color: var(--dark); margin-bottom: .65rem; }
+    .qc-sublabel { font-weight: 400; color: var(--mid); font-size: .8rem; }
+    .qc-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: .5rem; }
+    .qc-grid2 { display: grid; grid-template-columns: repeat(4,1fr); gap: .5rem; }
+
+    /* THE KEY PART — selector buttons */
+    .qc-btn {
+      padding: .6rem .2rem;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      background: var(--white);
+      color: var(--mid);
+      font-size: .82rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: center;
+      transition: border-color .15s, background .15s, color .15s;
+      font-family: 'Open Sans', sans-serif;
+      line-height: 1.3;
+    }
+    .qc-btn:hover { border-color: var(--green-mid); color: var(--green-dark); background: var(--green-lt); }
+    .qc-btn.active {
+      border: 2px solid var(--green);
+      background: var(--green-lt);
+      color: var(--green-dark);
+      font-weight: 700;
+    }
+
+    /* deodorizer toggle */
+    .qc-toggle-wrap { display: flex; align-items: center; gap: .75rem; }
+    .toggle-track {
+      position: relative; width: 44px; height: 24px; flex-shrink: 0;
+      background: var(--border); border-radius: 24px; cursor: pointer;
+      transition: background .2s;
+    }
+    .toggle-track.on { background: var(--green); }
+    .toggle-thumb {
+      position: absolute; width: 18px; height: 18px; border-radius: 50%;
+      background: #fff; top: 3px; left: 3px;
+      transition: transform .2s;
+      box-shadow: 0 1px 3px rgba(0,0,0,.2);
+    }
+    .toggle-track.on .toggle-thumb { transform: translateX(20px); }
+    .qc-toggle-label { font-size: .88rem; color: var(--dark); user-select: none; cursor: pointer; }
+
+    /* zip */
+    .qc-zip {
+      width: 100%; padding: .65rem .9rem;
+      border: 1.5px solid var(--border); border-radius: 8px;
+      font-size: .9rem; font-family: 'Open Sans', sans-serif;
+      color: var(--dark); background: var(--white); transition: border .2s;
+    }
+    .qc-zip:focus { outline: none; border-color: var(--green); }
+
+    /* result panel */
+    .qc-result {
+      background: var(--green-dark); color: #fff;
+      padding: 2rem; display: flex; flex-direction: column;
+    }
+    .qc-result-label { font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; opacity: .6; margin-bottom: .3rem; }
+    .qc-big-price { font-family: 'Montserrat', sans-serif; font-size: 3.2rem; font-weight: 900; line-height: 1; margin-bottom: .4rem; }
+    .qc-desc { font-size: .85rem; opacity: .72; margin-bottom: 1.5rem; min-height: 2.4em; }
+    .qc-breakdown { border-top: 1px solid rgba(255,255,255,.15); padding-top: 1rem; flex: 1; }
+    .qc-line { display: flex; justify-content: space-between; font-size: .88rem; padding: .28rem 0; opacity: .8; }
+    .qc-line.total { border-top: 1px solid rgba(255,255,255,.15); margin-top: .5rem; padding-top: .6rem; opacity: 1; font-weight: 700; font-size: .95rem; }
+    .qc-line.monthly { opacity: .6; font-size: .82rem; }
+    .qc-cta-btn {
+      display: block; text-align: center; margin-top: 1.5rem;
+      background: #fff; color: var(--green-dark);
+      padding: .9rem; border-radius: 8px;
+      font-family: 'Montserrat', sans-serif; font-weight: 800;
+      font-size: .95rem; text-decoration: none;
+      transition: background .2s, transform .15s;
+    }
+    .qc-cta-btn:hover { background: #e8f5e9; transform: translateY(-1px); }
+    .qc-fine { text-align: center; font-size: .73rem; opacity: .45; margin-top: .5rem; }
+
+    /* ABOUT */
     .about { background: var(--white); padding: 70px 5%; }
     .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; }
     .about-visual { background: var(--green-lt); border-radius: 16px; padding: 3rem; text-align: center; font-size: 7rem; line-height: 1; }
@@ -99,6 +182,8 @@
     .stat { text-align: center; background: var(--tan); border-radius: 10px; padding: 1.2rem .8rem; }
     .stat-num { font-family: 'Montserrat', sans-serif; font-size: 1.8rem; font-weight: 900; color: var(--green-dark); }
     .stat-lbl { font-size: .75rem; color: var(--mid); font-weight: 600; margin-top: .2rem; }
+
+    /* WHY US */
     .why { background: var(--green-dark); color: #fff; padding: 70px 5%; }
     .why .section-header h2 { color: #fff; }
     .why-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1.5rem; margin-top: 3rem; }
@@ -107,6 +192,8 @@
     .why-icon { font-size: 2rem; margin-bottom: .8rem; }
     .why-card h3 { font-family: 'Montserrat', sans-serif; font-size: .95rem; font-weight: 800; margin-bottom: .5rem; }
     .why-card p { font-size: .88rem; opacity: .8; }
+
+    /* TESTIMONIALS */
     .testimonials { background: var(--tan); padding: 70px 5%; }
     .reviews-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1.5rem; margin-top: 3rem; }
     .review-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.8rem; transition: box-shadow .2s; }
@@ -114,6 +201,8 @@
     .stars { color: var(--yellow); font-size: 1.1rem; margin-bottom: .8rem; }
     .review-text { font-size: .9rem; color: var(--mid); font-style: italic; margin-bottom: 1rem; line-height: 1.6; }
     .review-author { font-weight: 700; font-size: .9rem; color: var(--dark); }
+
+    /* FAQ */
     .faq { background: var(--white); padding: 70px 5%; }
     .faq-list { max-width: 780px; margin: 3rem auto 0; }
     .faq-item { border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: .8rem; overflow: hidden; }
@@ -124,6 +213,8 @@
     .faq-q.open .faq-arrow { transform: rotate(180deg); }
     .faq-a { display: none; padding: 0 1.5rem 1.2rem; font-size: .9rem; color: var(--mid); background: var(--green-lt); }
     .faq-a.open { display: block; }
+
+    /* CONTACT */
     .contact { background: var(--green-dark); color: #fff; padding: 70px 5%; }
     .contact .section-header h2 { color: #fff; }
     .contact-inner { max-width: 680px; margin: 3rem auto 0; }
@@ -147,10 +238,14 @@
     .form-success p { font-size: .95rem; opacity: .85; }
     .form-error { display: none; background: rgba(220,53,69,.25); border: 1px solid rgba(220,53,69,.5); border-radius: 8px; padding: 1rem; margin-top: .8rem; font-size: .88rem; text-align: center; }
     .form-error.show { display: block; }
+
+    /* SERVICE AREAS */
     .areas { background: var(--tan); padding: 60px 5%; text-align: center; }
     .areas-list { display: flex; flex-wrap: wrap; justify-content: center; gap: .6rem; max-width: 900px; margin: 2rem auto 0; }
     .area-chip { background: var(--white); border: 1px solid var(--border); border-radius: 20px; padding: .4rem 1.1rem; font-size: .88rem; font-weight: 600; color: var(--dark); transition: background .2s, border-color .2s; }
     .area-chip:hover { background: var(--green-lt); border-color: var(--green); }
+
+    /* FOOTER */
     footer { background: #111; color: #ccc; padding: 50px 5% 30px; }
     .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 3rem; max-width: 1100px; margin: 0 auto 3rem; }
     .footer-brand .nav-logo { color: #fff; display: block; margin-bottom: .8rem; }
@@ -161,40 +256,8 @@
     footer ul a { color: #ccc; text-decoration: none; font-size: .88rem; transition: color .2s; }
     footer ul a:hover { color: #81c784; }
     .footer-bottom { border-top: 1px solid #333; padding-top: 1.5rem; text-align: center; font-size: .82rem; color: #888; max-width: 1100px; margin: 0 auto; }
-    /* QUOTE CALCULATOR */
-    .quote-calc { display: grid; grid-template-columns: 1fr 1fr; gap: 0; background: var(--white); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
-    .qc-controls { padding: 2rem; }
-    .qc-group { margin-bottom: 1.5rem; }
-    .qc-label { display: block; font-size: .85rem; font-weight: 700; color: var(--dark); margin-bottom: .6rem; }
-    .qc-note { font-weight: 400; color: var(--mid); font-size: .8rem; }
-    .qc-grid4 { display: grid; grid-template-columns: repeat(4,1fr); gap: .5rem; }
-    .qc-btn { padding: .6rem .3rem; border: 1.5px solid var(--border); border-radius: 8px; background: var(--white); color: var(--dark); font-size: .85rem; font-weight: 600; cursor: pointer; text-align: center; transition: all .15s; font-family: 'Open Sans', sans-serif; }
-    .qc-btn:hover { border-color: var(--green); color: var(--green); }
-    .qc-btn.active { border: 2px solid var(--green); background: var(--green-lt); color: var(--green-dark); }
-    .qc-toggle-row { display: flex; align-items: center; gap: .75rem; }
-    .qc-toggle { position: relative; width: 42px; height: 24px; flex-shrink: 0; }
-    .qc-toggle input { opacity: 0; width: 0; height: 0; }
-    .qc-slider { position: absolute; inset: 0; background: var(--border); border-radius: 24px; cursor: pointer; transition: .2s; }
-    .qc-slider::before { content: ''; position: absolute; width: 18px; height: 18px; border-radius: 50%; background: #fff; left: 3px; top: 3px; transition: .2s; }
-    .qc-toggle input:checked + .qc-slider { background: var(--green); }
-    .qc-toggle input:checked + .qc-slider::before { transform: translateX(18px); }
-    .qc-toggle-label { font-size: .88rem; color: var(--dark); }
-    .qc-zip { width: 100%; padding: .65rem .9rem; border: 1.5px solid var(--border); border-radius: 8px; font-size: .9rem; font-family: 'Open Sans', sans-serif; color: var(--dark); background: var(--white); transition: border .2s; }
-    .qc-zip:focus { outline: none; border-color: var(--green); }
-    .qc-result { background: var(--green-dark); color: #fff; padding: 2rem; display: flex; flex-direction: column; }
-    .qc-result-top { margin-bottom: 1.5rem; }
-    .qc-per-visit-label { font-size: .75rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; opacity: .6; margin-bottom: .3rem; }
-    .qc-price { font-family: 'Montserrat', sans-serif; font-size: 3rem; font-weight: 900; line-height: 1; margin-bottom: .4rem; }
-    .qc-desc { font-size: .85rem; opacity: .75; }
-    .qc-breakdown { border-top: 1px solid rgba(255,255,255,.15); padding-top: 1rem; flex: 1; }
-    .qc-row-line { display: flex; justify-content: space-between; font-size: .88rem; padding: .3rem 0; opacity: .8; }
-    .qc-row-line strong { font-weight: 700; }
-    .qc-total { border-top: 1px solid rgba(255,255,255,.15); margin-top: .4rem; padding-top: .6rem; opacity: 1; font-size: .95rem; }
-    .qc-monthly { opacity: .65; font-size: .82rem; }
-    .qc-cta { display: block; text-align: center; margin-top: 1.5rem; background: #fff; color: var(--green-dark); padding: .85rem; border-radius: 8px; font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: .95rem; text-decoration: none; transition: background .2s, transform .15s; }
-    .qc-cta:hover { background: #e8f5e9; transform: translateY(-1px); }
-    .qc-cta-note { text-align: center; font-size: .75rem; opacity: .5; margin-top: .5rem; }
 
+    /* RESPONSIVE */
     @media (max-width: 900px) {
       .guarantee-grid, .service-grid, .why-grid, .reviews-grid { grid-template-columns: 1fr; }
       .about-grid { grid-template-columns: 1fr; }
@@ -203,17 +266,22 @@
       .nav-links { display: none; }
       .form-row { grid-template-columns: 1fr; }
       .quote-calc { grid-template-columns: 1fr; }
-      .qc-grid4 { grid-template-columns: repeat(2,1fr); }
+      .qc-grid, .qc-grid2 { grid-template-columns: repeat(2,1fr); }
     }
-    @media (max-width: 600px) { .footer-grid { grid-template-columns: 1fr; } .hero { padding: 60px 5%; } }
+    @media (max-width: 600px) {
+      .footer-grid { grid-template-columns: 1fr; }
+      .hero { padding: 60px 5%; }
+    }
   </style>
 </head>
 <body>
 
+<!-- TOP BAR -->
 <div class="top-bar">
   📞 <a href="tel:+16025550000">(602) 555-0000</a> &nbsp;|&nbsp; Serving the Greater Phoenix Valley &nbsp;|&nbsp; <a href="#contact">Get a Free Quote →</a>
 </div>
 
+<!-- NAV -->
 <nav>
   <a href="#" class="nav-logo">🐾 Scoop N Go Arizona</a>
   <ul class="nav-links">
@@ -225,6 +293,7 @@
   </ul>
 </nav>
 
+<!-- HERO -->
 <section class="hero">
   <div class="hero-inner">
     <div class="hero-badges">
@@ -241,6 +310,7 @@
   </div>
 </section>
 
+<!-- GUARANTEES -->
 <section class="guarantees">
   <div class="guarantees-inner">
     <h2>We Stand Behind Every Scoop!</h2>
@@ -252,6 +322,7 @@
   </div>
 </section>
 
+<!-- SERVICES -->
 <section class="services" id="services">
   <div class="section-inner">
     <div class="section-header"><span class="section-label">Our Most Popular Services</span><h2>What We Offer</h2></div>
@@ -263,76 +334,79 @@
   </div>
 </section>
 
+<!-- INSTANT QUOTE CALCULATOR -->
 <section class="pricing" id="pricing">
   <div class="section-inner">
-    <div class="section-header"><span class="section-label">Instant Pricing</span><h2>Get Your Exact Quote in Seconds</h2></div>
+    <div class="section-header">
+      <span class="section-label">Instant Pricing</span>
+      <h2>Get Your Exact Quote in Seconds</h2>
+    </div>
 
     <div class="quote-calc">
-      <!-- LEFT: controls -->
+
+      <!-- LEFT: Controls -->
       <div class="qc-controls">
 
         <div class="qc-group">
-          <label class="qc-label">How often would you like service?</label>
-          <div class="qc-grid4">
-            <button class="qc-btn freq-btn active" onclick="setFreq('2x',this)">2x / Week</button>
-            <button class="qc-btn freq-btn" onclick="setFreq('weekly',this)">Weekly</button>
-            <button class="qc-btn freq-btn" onclick="setFreq('biweekly',this)">Bi-Weekly</button>
-            <button class="qc-btn freq-btn" onclick="setFreq('monthly',this)">Monthly</button>
+          <label class="qc-label">Service frequency</label>
+          <div class="qc-grid" id="freqBtns">
+            <button class="qc-btn active" data-freq="2x">2x / Week<br><small style="font-weight:400;opacity:.7">$12.50/visit</small></button>
+            <button class="qc-btn" data-freq="weekly">Weekly<br><small style="font-weight:400;opacity:.7">$15/visit</small></button>
+            <button class="qc-btn" data-freq="biweekly">Bi-Weekly<br><small style="font-weight:400;opacity:.7">$25/visit</small></button>
+            <button class="qc-btn" data-freq="monthly">Monthly<br><small style="font-weight:400;opacity:.7">$50/visit</small></button>
           </div>
         </div>
 
         <div class="qc-group">
-          <label class="qc-label">How many dogs?</label>
-          <div class="qc-grid4">
-            <button class="qc-btn dog-btn active" onclick="setDogs(1,this)">1</button>
-            <button class="qc-btn dog-btn" onclick="setDogs(2,this)">2</button>
-            <button class="qc-btn dog-btn" onclick="setDogs(3,this)">3</button>
-            <button class="qc-btn dog-btn" onclick="setDogs(4,this)">4+</button>
+          <label class="qc-label">Number of dogs</label>
+          <div class="qc-grid2" id="dogBtns">
+            <button class="qc-btn active" data-dogs="1">1</button>
+            <button class="qc-btn" data-dogs="2">2</button>
+            <button class="qc-btn" data-dogs="3">3</button>
+            <button class="qc-btn" data-dogs="4">4+</button>
           </div>
         </div>
 
         <div class="qc-group">
-          <label class="qc-label">Add deodorizer treatment? <span class="qc-note">(+$6/visit)</span></label>
-          <div class="qc-toggle-row">
-            <label class="qc-toggle">
-              <input type="checkbox" id="deodorizer" onchange="calcQuote()">
-              <span class="qc-slider"></span>
-            </label>
+          <label class="qc-label">Add deodorizer? <span class="qc-sublabel">(+$6/visit)</span></label>
+          <div class="qc-toggle-wrap" id="deodWrap" onclick="toggleDeod()">
+            <div class="toggle-track" id="toggleTrack">
+              <div class="toggle-thumb"></div>
+            </div>
             <span class="qc-toggle-label">Yes, keep my yard smelling fresh</span>
           </div>
         </div>
 
         <div class="qc-group">
           <label class="qc-label">Your zip code</label>
-          <input type="text" id="zipInput" class="qc-zip" maxlength="5" placeholder="e.g. 85281" oninput="calcQuote()"/>
+          <input type="text" class="qc-zip" id="zipInput" maxlength="5" placeholder="e.g. 85281"/>
         </div>
 
       </div>
 
-      <!-- RIGHT: result -->
+      <!-- RIGHT: Result -->
       <div class="qc-result">
-        <div class="qc-result-top">
-          <div class="qc-per-visit-label">Per visit</div>
-          <div class="qc-price" id="qcPrice">$12.50</div>
-          <div class="qc-desc" id="qcDesc">Twice a week · 1 dog · no deodorizer</div>
-        </div>
+        <div class="qc-result-label">Per visit</div>
+        <div class="qc-big-price" id="qcPrice">$12.50</div>
+        <div class="qc-desc" id="qcDesc">Twice a week &middot; 1 dog &middot; no deodorizer</div>
 
         <div class="qc-breakdown">
-          <div class="qc-row-line"><span>Base rate</span><strong id="qcBase">$12.50</strong></div>
-          <div class="qc-row-line"><span>Additional dogs</span><strong id="qcDogs">$0.00</strong></div>
-          <div class="qc-row-line"><span>Deodorizer</span><strong id="qcDeod">$0.00</strong></div>
-          <div class="qc-row-line qc-total"><span>Per visit total</span><strong id="qcTotal">$12.50</strong></div>
-          <div class="qc-row-line qc-monthly"><span>Est. monthly cost</span><strong id="qcMonthly">$100.00</strong></div>
+          <div class="qc-line"><span>Base rate</span><span id="qcBase">$12.50</span></div>
+          <div class="qc-line"><span>Additional dogs</span><span id="qcExtraDogs">$0.00</span></div>
+          <div class="qc-line"><span>Deodorizer</span><span id="qcDeod">$0.00</span></div>
+          <div class="qc-line total"><span>Per visit total</span><span id="qcTotal">$12.50</span></div>
+          <div class="qc-line monthly"><span>Est. monthly cost</span><span id="qcMonthly">$100.00</span></div>
         </div>
 
-        <a href="#contact" class="qc-cta" id="qcCta">Get Started with This Quote →</a>
-        <p class="qc-cta-note">No contracts. Cancel anytime.</p>
+        <a href="#contact" class="qc-cta-btn">Get Started with This Quote →</a>
+        <p class="qc-fine">No contracts. Cancel anytime.</p>
       </div>
-    </div>
 
+    </div>
   </div>
 </section>
 
+<!-- ABOUT -->
 <section class="about" id="about">
   <div class="section-inner">
     <div class="about-grid">
@@ -353,6 +427,7 @@
   </div>
 </section>
 
+<!-- WHY US -->
 <section class="why">
   <div class="section-inner">
     <div class="section-header">
@@ -370,6 +445,7 @@
   </div>
 </section>
 
+<!-- TESTIMONIALS -->
 <section class="testimonials" id="testimonials">
   <div class="section-inner">
     <div class="section-header"><span class="section-label">Testimonials</span><h2>What Our Customers Are Saying</h2></div>
@@ -381,20 +457,22 @@
   </div>
 </section>
 
+<!-- FAQ -->
 <section class="faq">
   <div class="section-inner">
     <div class="section-header"><span class="section-label">FAQ</span><h2>Frequently Asked Questions</h2></div>
     <div class="faq-list">
-      <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">How often do you visit? <span class="faq-arrow">▼</span></button><div class="faq-a">We offer weekly, bi-weekly, and one-time cleanups. Most customers love weekly service to keep the yard consistently clean and odor-free.</div></div>
+      <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">How often do you visit? <span class="faq-arrow">▼</span></button><div class="faq-a">We offer twice a week, weekly, bi-weekly, and one-time cleanups. Most customers love weekly service to keep the yard consistently clean and odor-free.</div></div>
       <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">Do I need to be home when you come? <span class="faq-arrow">▼</span></button><div class="faq-a">Not at all! As long as we can access your yard, we'll take care of everything. You'll get a text when we're on our way and when we're finished.</div></div>
       <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">What do you do with the waste? <span class="faq-arrow">▼</span></button><div class="faq-a">We bag all waste and remove it from your property entirely. You don't have to deal with it — that's the whole point!</div></div>
-      <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">Is the price different for more than one dog? <span class="faq-arrow">▼</span></button><div class="faq-a">Yes — we charge a small additional fee per dog, typically $5/dog per visit. Contact us for an exact quote based on your yard and number of dogs.</div></div>
+      <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">Is the price different for more than one dog? <span class="faq-arrow">▼</span></button><div class="faq-a">Yes — the additional dog rate varies by plan. Use our instant quote calculator above to see your exact price.</div></div>
       <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">What areas do you serve? <span class="faq-arrow">▼</span></button><div class="faq-a">We currently serve the greater Phoenix Valley including Tempe, Chandler, Gilbert, Mesa, Scottsdale, and surrounding areas. Reach out to confirm we cover your zip code!</div></div>
       <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">Is there a contract or long-term commitment? <span class="faq-arrow">▼</span></button><div class="faq-a">No contracts required! You can start or stop service at any time. We believe in earning your business with great service, not locking you in.</div></div>
     </div>
   </div>
 </section>
 
+<!-- CONTACT FORM -->
 <section class="contact" id="contact">
   <div class="section-inner">
     <div class="section-header">
@@ -402,13 +480,11 @@
       <h2>Get Your Free Quote!</h2>
     </div>
     <div class="contact-inner">
-      <!-- Success State -->
       <div class="form-success" id="formSuccess">
         <div class="form-success-icon">🎉</div>
         <h3>Quote Request Received!</h3>
         <p>Thanks! We'll reach out within 24 hours with your free quote. Talk soon! 🐾</p>
       </div>
-      <!-- Form -->
       <div id="quoteForm">
         <div class="form-row">
           <div class="form-group"><label>First Name *</label><input type="text" id="firstName" placeholder="Jane"/></div>
@@ -426,7 +502,7 @@
         </div>
         <div class="form-row">
           <div class="form-group full"><label>Preferred Service *</label>
-            <select id="frequency"><option value="">Select...</option><option>Weekly</option><option>Bi-Weekly</option><option>One-Time Cleanup</option></select>
+            <select id="frequency"><option value="">Select...</option><option>Twice a Week</option><option>Weekly</option><option>Bi-Weekly</option><option>Monthly</option><option>One-Time Cleanup</option></select>
           </div>
         </div>
         <div class="form-row">
@@ -440,6 +516,7 @@
   </div>
 </section>
 
+<!-- SERVICE AREAS -->
 <section class="areas">
   <div class="section-inner">
     <div class="section-header"><span class="section-label">Service Areas</span><h2>Proudly Serving the Phoenix Valley</h2></div>
@@ -453,6 +530,7 @@
   </div>
 </section>
 
+<!-- FOOTER -->
 <footer>
   <div class="footer-grid">
     <div class="footer-brand">
@@ -463,56 +541,78 @@
     <div><h4>Navigation</h4><ul><li><a href="#">Home</a></li><li><a href="#about">About Us</a></li><li><a href="#pricing">Pricing</a></li><li><a href="#testimonials">Reviews</a></li><li><a href="#contact">Contact Us</a></li></ul></div>
     <div><h4>Contact</h4><ul>
       <li><a href="tel:+16025550000">(602) 555-0000</a></li>
-      <li><a href="/cdn-cgi/l/email-protection#3b685854544b755c545a49524154555a7b5c565a525715585456"><span class="__cf_email__" data-cfemail="386b5b575748765f57594a5142575659785f55595154165b5755">[email&#160;protected]</span></a></li>
+      <li><a href="mailto:ScoopNgoarizona@gmail.com">ScoopNgoarizona@gmail.com</a></li>
       <li style="color:#888;font-size:.85rem;margin-top:.3rem;">Mon–Sat: 6am – 6pm</li>
     </ul></div>
   </div>
   <div class="footer-bottom"><p>© 2026 Scoop N Go Arizona. All Rights Reserved.</p></div>
 </footer>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
-  // ── QUOTE CALCULATOR ──
+<script>
+  // ================================================================
+  // INSTANT QUOTE CALCULATOR
+  // ================================================================
   var qFreq = '2x';
   var qDogs = 1;
-  var baseRates      = { '2x': 12.50, 'weekly': 15,  'biweekly': 25, 'monthly': 50 };
-  var addlDogRates   = { '2x': 4,     'weekly': 5,   'biweekly': 5,  'monthly': 10 };
-  var freqLabels     = { '2x': 'Twice a week', 'weekly': 'Weekly', 'biweekly': 'Bi-weekly', 'monthly': 'Monthly' };
-  var visitsPerMonth = { '2x': 8,     'weekly': 4,   'biweekly': 2,  'monthly': 1  };
+  var qDeod = false;
 
-  function setFreq(f, el) {
-    qFreq = f;
-    document.querySelectorAll('.freq-btn').forEach(function(b){ b.classList.remove('active'); });
-    el.classList.add('active');
-    calcQuote();
-  }
-  function setDogs(d, el) {
-    qDogs = d;
-    document.querySelectorAll('.dog-btn').forEach(function(b){ b.classList.remove('active'); });
-    el.classList.add('active');
-    calcQuote();
-  }
+  var BASE       = { '2x': 12.50, 'weekly': 15.00, 'biweekly': 25.00, 'monthly': 50.00 };
+  var EXTRA_DOG  = { '2x':  4.00, 'weekly':  5.00, 'biweekly':  5.00, 'monthly': 10.00 };
+  var FREQ_LABEL = { '2x': 'Twice a week', 'weekly': 'Weekly', 'biweekly': 'Bi-weekly', 'monthly': 'Monthly' };
+  var VISITS_MO  = { '2x':  8,    'weekly':  4,    'biweekly':  2,    'monthly':  1    };
+
   function calcQuote() {
-    var deod = document.getElementById('deodorizer') && document.getElementById('deodorizer').checked;
-    var base = baseRates[qFreq];
-    var extraDogs = (qDogs - 1) * addlDogRates[qFreq];
-    var deodCost = deod ? 6 : 0;
-    var perVisit = base + extraDogs + deodCost;
-    var monthly = perVisit * visitsPerMonth[qFreq];
-    var dogLabel = qDogs === 1 ? '1 dog' : qDogs + ' dogs';
-    var deodLabel = deod ? 'with deodorizer' : 'no deodorizer';
-    document.getElementById('qcPrice').textContent = '$' + perVisit.toFixed(2);
-    document.getElementById('qcDesc').textContent = freqLabels[qFreq] + ' \u00b7 ' + dogLabel + ' \u00b7 ' + deodLabel;
-    document.getElementById('qcBase').textContent = '$' + base.toFixed(2);
-    document.getElementById('qcDogs').textContent = '$' + extraDogs.toFixed(2);
-    document.getElementById('qcDeod').textContent = '$' + deodCost.toFixed(2);
-    document.getElementById('qcTotal').textContent = '$' + perVisit.toFixed(2);
-    document.getElementById('qcMonthly').textContent = '$' + monthly.toFixed(2);
+    var base      = BASE[qFreq];
+    var extraDogs = (qDogs - 1) * EXTRA_DOG[qFreq];
+    var deodCost  = qDeod ? 6 : 0;
+    var perVisit  = base + extraDogs + deodCost;
+    var monthly   = perVisit * VISITS_MO[qFreq];
+    var dogLabel  = qDogs === 1 ? '1 dog' : qDogs + ' dogs';
+    var deodLabel = qDeod ? 'with deodorizer' : 'no deodorizer';
+
+    document.getElementById('qcPrice').textContent      = '$' + perVisit.toFixed(2);
+    document.getElementById('qcDesc').textContent       = FREQ_LABEL[qFreq] + ' \u00b7 ' + dogLabel + ' \u00b7 ' + deodLabel;
+    document.getElementById('qcBase').textContent       = '$' + base.toFixed(2);
+    document.getElementById('qcExtraDogs').textContent  = '$' + extraDogs.toFixed(2);
+    document.getElementById('qcDeod').textContent       = '$' + deodCost.toFixed(2);
+    document.getElementById('qcTotal').textContent      = '$' + perVisit.toFixed(2);
+    document.getElementById('qcMonthly').textContent    = '$' + monthly.toFixed(2);
   }
+
+  // Frequency buttons
+  document.getElementById('freqBtns').addEventListener('click', function(e) {
+    var btn = e.target.closest('.qc-btn');
+    if (!btn) return;
+    qFreq = btn.getAttribute('data-freq');
+    document.querySelectorAll('#freqBtns .qc-btn').forEach(function(b) { b.classList.remove('active'); });
+    btn.classList.add('active');
+    calcQuote();
+  });
+
+  // Dog buttons
+  document.getElementById('dogBtns').addEventListener('click', function(e) {
+    var btn = e.target.closest('.qc-btn');
+    if (!btn) return;
+    qDogs = parseInt(btn.getAttribute('data-dogs'));
+    document.querySelectorAll('#dogBtns .qc-btn').forEach(function(b) { b.classList.remove('active'); });
+    btn.classList.add('active');
+    calcQuote();
+  });
+
+  // Deodorizer toggle
+  function toggleDeod() {
+    qDeod = !qDeod;
+    var track = document.getElementById('toggleTrack');
+    if (qDeod) { track.classList.add('on'); } else { track.classList.remove('on'); }
+    calcQuote();
+  }
+
+  // Run on load
   calcQuote();
 
-  // ── STEP 1: Paste your Google Apps Script Web App URL below ──
-  var APPS_SCRIPT_URL = "PASTE_YOUR_APPS_SCRIPT_URL_HERE";
-
+  // ================================================================
+  // FAQ ACCORDION
+  // ================================================================
   function toggleFaq(btn) {
     var answer = btn.nextElementSibling;
     var isOpen = btn.classList.contains('open');
@@ -520,6 +620,11 @@
     document.querySelectorAll('.faq-a').forEach(function(a) { a.classList.remove('open'); });
     if (!isOpen) { btn.classList.add('open'); answer.classList.add('open'); }
   }
+
+  // ================================================================
+  // CONTACT FORM — paste your Google Apps Script URL below
+  // ================================================================
+  var APPS_SCRIPT_URL = "PASTE_YOUR_APPS_SCRIPT_URL_HERE";
 
   function handleSubmit() {
     var firstName = document.getElementById('firstName').value.trim();
@@ -532,7 +637,6 @@
     var details   = document.getElementById('details').value.trim();
     var errorEl   = document.getElementById('formError');
 
-    // Validate required fields
     if (!firstName || !lastName || !phone || !email || !zip || !dogs || !frequency) {
       errorEl.textContent = 'Please fill out all required fields marked with *.';
       errorEl.classList.add('show');
@@ -540,22 +644,27 @@
     }
     errorEl.classList.remove('show');
 
-    // Show loading state
     var btn = document.getElementById('submitBtn');
     btn.disabled = true;
     btn.textContent = '⏳ Sending your request...';
 
-    // POST to Google Apps Script
     fetch(APPS_SCRIPT_URL, {
       method: 'POST',
-      mode: 'no-cors', // required — Apps Script doesn't return CORS headers
+      mode: 'no-cors',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ firstName, lastName, phone, email, zip, dogs, frequency, details })
     })
     .then(function() {
-      // With no-cors we can't read the response body, but no error = success
       document.getElementById('quoteForm').style.display = 'none';
       document.getElementById('formSuccess').classList.add('show');
     })
     .catch(function() {
-      btn.dis
+      btn.disabled = false;
+      btn.textContent = '🐾 Submit My Quote Request';
+      errorEl.textContent = 'Something went wrong. Please try again or call us at (602) 555-0000.';
+      errorEl.classList.add('show');
+    });
+  }
+</script>
+</body>
+</html>
