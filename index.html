@@ -161,13 +161,49 @@
     footer ul a { color: #ccc; text-decoration: none; font-size: .88rem; transition: color .2s; }
     footer ul a:hover { color: #81c784; }
     .footer-bottom { border-top: 1px solid #333; padding-top: 1.5rem; text-align: center; font-size: .82rem; color: #888; max-width: 1100px; margin: 0 auto; }
+    /* QUOTE CALCULATOR */
+    .quote-calc { display: grid; grid-template-columns: 1fr 1fr; gap: 0; background: var(--white); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
+    .qc-controls { padding: 2rem; }
+    .qc-group { margin-bottom: 1.5rem; }
+    .qc-label { display: block; font-size: .85rem; font-weight: 700; color: var(--dark); margin-bottom: .6rem; }
+    .qc-note { font-weight: 400; color: var(--mid); font-size: .8rem; }
+    .qc-grid4 { display: grid; grid-template-columns: repeat(4,1fr); gap: .5rem; }
+    .qc-btn { padding: .6rem .3rem; border: 1.5px solid var(--border); border-radius: 8px; background: var(--white); color: var(--dark); font-size: .85rem; font-weight: 600; cursor: pointer; text-align: center; transition: all .15s; font-family: 'Open Sans', sans-serif; }
+    .qc-btn:hover { border-color: var(--green); color: var(--green); }
+    .qc-btn.active { border: 2px solid var(--green); background: var(--green-lt); color: var(--green-dark); }
+    .qc-toggle-row { display: flex; align-items: center; gap: .75rem; }
+    .qc-toggle { position: relative; width: 42px; height: 24px; flex-shrink: 0; }
+    .qc-toggle input { opacity: 0; width: 0; height: 0; }
+    .qc-slider { position: absolute; inset: 0; background: var(--border); border-radius: 24px; cursor: pointer; transition: .2s; }
+    .qc-slider::before { content: ''; position: absolute; width: 18px; height: 18px; border-radius: 50%; background: #fff; left: 3px; top: 3px; transition: .2s; }
+    .qc-toggle input:checked + .qc-slider { background: var(--green); }
+    .qc-toggle input:checked + .qc-slider::before { transform: translateX(18px); }
+    .qc-toggle-label { font-size: .88rem; color: var(--dark); }
+    .qc-zip { width: 100%; padding: .65rem .9rem; border: 1.5px solid var(--border); border-radius: 8px; font-size: .9rem; font-family: 'Open Sans', sans-serif; color: var(--dark); background: var(--white); transition: border .2s; }
+    .qc-zip:focus { outline: none; border-color: var(--green); }
+    .qc-result { background: var(--green-dark); color: #fff; padding: 2rem; display: flex; flex-direction: column; }
+    .qc-result-top { margin-bottom: 1.5rem; }
+    .qc-per-visit-label { font-size: .75rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; opacity: .6; margin-bottom: .3rem; }
+    .qc-price { font-family: 'Montserrat', sans-serif; font-size: 3rem; font-weight: 900; line-height: 1; margin-bottom: .4rem; }
+    .qc-desc { font-size: .85rem; opacity: .75; }
+    .qc-breakdown { border-top: 1px solid rgba(255,255,255,.15); padding-top: 1rem; flex: 1; }
+    .qc-row-line { display: flex; justify-content: space-between; font-size: .88rem; padding: .3rem 0; opacity: .8; }
+    .qc-row-line strong { font-weight: 700; }
+    .qc-total { border-top: 1px solid rgba(255,255,255,.15); margin-top: .4rem; padding-top: .6rem; opacity: 1; font-size: .95rem; }
+    .qc-monthly { opacity: .65; font-size: .82rem; }
+    .qc-cta { display: block; text-align: center; margin-top: 1.5rem; background: #fff; color: var(--green-dark); padding: .85rem; border-radius: 8px; font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: .95rem; text-decoration: none; transition: background .2s, transform .15s; }
+    .qc-cta:hover { background: #e8f5e9; transform: translateY(-1px); }
+    .qc-cta-note { text-align: center; font-size: .75rem; opacity: .5; margin-top: .5rem; }
+
     @media (max-width: 900px) {
-      .guarantee-grid, .service-grid, .why-grid, .reviews-grid, .pricing-grid { grid-template-columns: 1fr; }
+      .guarantee-grid, .service-grid, .why-grid, .reviews-grid { grid-template-columns: 1fr; }
       .about-grid { grid-template-columns: 1fr; }
       .about-visual { display: none; }
       .footer-grid { grid-template-columns: 1fr 1fr; }
       .nav-links { display: none; }
       .form-row { grid-template-columns: 1fr; }
+      .quote-calc { grid-template-columns: 1fr; }
+      .qc-grid4 { grid-template-columns: repeat(2,1fr); }
     }
     @media (max-width: 600px) { .footer-grid { grid-template-columns: 1fr; } .hero { padding: 60px 5%; } }
   </style>
@@ -229,32 +265,71 @@
 
 <section class="pricing" id="pricing">
   <div class="section-inner">
-    <div class="section-header"><span class="section-label">Transparent Pricing</span><h2>Simple, Affordable Plans</h2></div>
-    <div class="pricing-grid">
-      <div class="plan">
-        <div class="plan-name">Bi-Weekly</div><div class="plan-freq">Every 2 weeks</div>
-        <div class="plan-price"><sup>$</sup>30</div><div class="plan-note">per visit · 1 dog</div>
-        <hr class="plan-divider"/>
-        <ul><li>Full yard scoop</li><li>Waste bagged &amp; removed</li><li>Gate closed &amp; secured</li><li>Service notification text</li></ul>
-        <a href="#contact" class="plan-btn">Get Started</a>
+    <div class="section-header"><span class="section-label">Instant Pricing</span><h2>Get Your Exact Quote in Seconds</h2></div>
+
+    <div class="quote-calc">
+      <!-- LEFT: controls -->
+      <div class="qc-controls">
+
+        <div class="qc-group">
+          <label class="qc-label">How often would you like service?</label>
+          <div class="qc-grid4">
+            <button class="qc-btn freq-btn active" onclick="setFreq('2x',this)">2x / Week</button>
+            <button class="qc-btn freq-btn" onclick="setFreq('weekly',this)">Weekly</button>
+            <button class="qc-btn freq-btn" onclick="setFreq('biweekly',this)">Bi-Weekly</button>
+            <button class="qc-btn freq-btn" onclick="setFreq('monthly',this)">Monthly</button>
+          </div>
+        </div>
+
+        <div class="qc-group">
+          <label class="qc-label">How many dogs?</label>
+          <div class="qc-grid4">
+            <button class="qc-btn dog-btn active" onclick="setDogs(1,this)">1</button>
+            <button class="qc-btn dog-btn" onclick="setDogs(2,this)">2</button>
+            <button class="qc-btn dog-btn" onclick="setDogs(3,this)">3</button>
+            <button class="qc-btn dog-btn" onclick="setDogs(4,this)">4+</button>
+          </div>
+        </div>
+
+        <div class="qc-group">
+          <label class="qc-label">Add deodorizer treatment? <span class="qc-note">(+$6/visit)</span></label>
+          <div class="qc-toggle-row">
+            <label class="qc-toggle">
+              <input type="checkbox" id="deodorizer" onchange="calcQuote()">
+              <span class="qc-slider"></span>
+            </label>
+            <span class="qc-toggle-label">Yes, keep my yard smelling fresh</span>
+          </div>
+        </div>
+
+        <div class="qc-group">
+          <label class="qc-label">Your zip code</label>
+          <input type="text" id="zipInput" class="qc-zip" maxlength="5" placeholder="e.g. 85281" oninput="calcQuote()"/>
+        </div>
+
       </div>
-      <div class="plan popular">
-        <span class="popular-badge">⭐ Most Popular</span>
-        <div class="plan-name">Weekly</div><div class="plan-freq">Every week</div>
-        <div class="plan-price"><sup>$</sup>20</div><div class="plan-note">per visit · 1 dog</div>
-        <hr class="plan-divider"/>
-        <ul><li>Full yard scoop</li><li>Waste bagged &amp; removed</li><li>Gate closed &amp; secured</li><li>Service notification text</li><li>Satisfaction guarantee</li></ul>
-        <a href="#contact" class="plan-btn">Get Started</a>
-      </div>
-      <div class="plan">
-        <div class="plan-name">One-Time</div><div class="plan-freq">Single visit</div>
-        <div class="plan-price"><sup>$</sup>50</div><div class="plan-note">starting price · varies by yard</div>
-        <hr class="plan-divider"/>
-        <ul><li>Full yard deep clean</li><li>Waste bagged &amp; removed</li><li>Great for move-ins &amp; events</li><li>No commitment required</li></ul>
-        <a href="#contact" class="plan-btn">Get Started</a>
+
+      <!-- RIGHT: result -->
+      <div class="qc-result">
+        <div class="qc-result-top">
+          <div class="qc-per-visit-label">Per visit</div>
+          <div class="qc-price" id="qcPrice">$12.50</div>
+          <div class="qc-desc" id="qcDesc">Twice a week · 1 dog · no deodorizer</div>
+        </div>
+
+        <div class="qc-breakdown">
+          <div class="qc-row-line"><span>Base rate</span><strong id="qcBase">$12.50</strong></div>
+          <div class="qc-row-line"><span>Additional dogs</span><strong id="qcDogs">$0.00</strong></div>
+          <div class="qc-row-line"><span>Deodorizer</span><strong id="qcDeod">$0.00</strong></div>
+          <div class="qc-row-line qc-total"><span>Per visit total</span><strong id="qcTotal">$12.50</strong></div>
+          <div class="qc-row-line qc-monthly"><span>Est. monthly cost</span><strong id="qcMonthly">$100.00</strong></div>
+        </div>
+
+        <a href="#contact" class="qc-cta" id="qcCta">Get Started with This Quote →</a>
+        <p class="qc-cta-note">No contracts. Cancel anytime.</p>
       </div>
     </div>
-    <p style="text-align:center;margin-top:1.5rem;font-size:.85rem;color:var(--mid);">Additional dogs: +$5/dog per visit. Contact us for a custom quote.</p>
+
   </div>
 </section>
 
@@ -388,14 +463,53 @@
     <div><h4>Navigation</h4><ul><li><a href="#">Home</a></li><li><a href="#about">About Us</a></li><li><a href="#pricing">Pricing</a></li><li><a href="#testimonials">Reviews</a></li><li><a href="#contact">Contact Us</a></li></ul></div>
     <div><h4>Contact</h4><ul>
       <li><a href="tel:+16025550000">(602) 555-0000</a></li>
-      <li><a href="mailto:ScoopNgoarizona@gmail.com">ScoopNgoarizona@gmail.com</a></li>
+      <li><a href="/cdn-cgi/l/email-protection#3b685854544b755c545a49524154555a7b5c565a525715585456"><span class="__cf_email__" data-cfemail="386b5b575748765f57594a5142575659785f55595154165b5755">[email&#160;protected]</span></a></li>
       <li style="color:#888;font-size:.85rem;margin-top:.3rem;">Mon–Sat: 6am – 6pm</li>
     </ul></div>
   </div>
   <div class="footer-bottom"><p>© 2026 Scoop N Go Arizona. All Rights Reserved.</p></div>
 </footer>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+  // ── QUOTE CALCULATOR ──
+  var qFreq = '2x';
+  var qDogs = 1;
+  var baseRates      = { '2x': 12.50, 'weekly': 15,  'biweekly': 25, 'monthly': 50 };
+  var addlDogRates   = { '2x': 4,     'weekly': 5,   'biweekly': 5,  'monthly': 10 };
+  var freqLabels     = { '2x': 'Twice a week', 'weekly': 'Weekly', 'biweekly': 'Bi-weekly', 'monthly': 'Monthly' };
+  var visitsPerMonth = { '2x': 8,     'weekly': 4,   'biweekly': 2,  'monthly': 1  };
+
+  function setFreq(f, el) {
+    qFreq = f;
+    document.querySelectorAll('.freq-btn').forEach(function(b){ b.classList.remove('active'); });
+    el.classList.add('active');
+    calcQuote();
+  }
+  function setDogs(d, el) {
+    qDogs = d;
+    document.querySelectorAll('.dog-btn').forEach(function(b){ b.classList.remove('active'); });
+    el.classList.add('active');
+    calcQuote();
+  }
+  function calcQuote() {
+    var deod = document.getElementById('deodorizer') && document.getElementById('deodorizer').checked;
+    var base = baseRates[qFreq];
+    var extraDogs = (qDogs - 1) * addlDogRates[qFreq];
+    var deodCost = deod ? 6 : 0;
+    var perVisit = base + extraDogs + deodCost;
+    var monthly = perVisit * visitsPerMonth[qFreq];
+    var dogLabel = qDogs === 1 ? '1 dog' : qDogs + ' dogs';
+    var deodLabel = deod ? 'with deodorizer' : 'no deodorizer';
+    document.getElementById('qcPrice').textContent = '$' + perVisit.toFixed(2);
+    document.getElementById('qcDesc').textContent = freqLabels[qFreq] + ' \u00b7 ' + dogLabel + ' \u00b7 ' + deodLabel;
+    document.getElementById('qcBase').textContent = '$' + base.toFixed(2);
+    document.getElementById('qcDogs').textContent = '$' + extraDogs.toFixed(2);
+    document.getElementById('qcDeod').textContent = '$' + deodCost.toFixed(2);
+    document.getElementById('qcTotal').textContent = '$' + perVisit.toFixed(2);
+    document.getElementById('qcMonthly').textContent = '$' + monthly.toFixed(2);
+  }
+  calcQuote();
+
   // ── STEP 1: Paste your Google Apps Script Web App URL below ──
   var APPS_SCRIPT_URL = "PASTE_YOUR_APPS_SCRIPT_URL_HERE";
 
@@ -444,12 +558,4 @@
       document.getElementById('formSuccess').classList.add('show');
     })
     .catch(function() {
-      btn.disabled = false;
-      btn.textContent = '🐾 Submit My Quote Request';
-      errorEl.textContent = 'Something went wrong. Please try again or call us directly at (602) 555-0000.';
-      errorEl.classList.add('show');
-    });
-  }
-</script>
-</body>
-</html>
+      btn.dis
