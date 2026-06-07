@@ -28,7 +28,7 @@ Reply to this email or call/text them to close the deal! 🐾
       },
       body: JSON.stringify({
         from:     'Scoop N Go Arizona <onboarding@resend.dev>',
-        to:       'ScoopNgoarizona@gmail.com',
+        to:       'scoopngoarizona@gmail.com',
         reply_to: email,
         subject:  `🐾 New Quote Request — ${first_name} ${last_name} (${service_type})`,
         text:     emailBody,
