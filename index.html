@@ -394,11 +394,9 @@
   <div class="footer-bottom"><p>© 2026 Scoop N Go Arizona. All Rights Reserved.</p></div>
 </footer>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-  const SUPABASE_URL  = 'https://emvqtgsjdbyaionxguhq.supabase.co';
-  const SUPABASE_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVtdnF0Z3NqZGJ5YWlvbnhndWhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA4NDU3NjYsImV4cCI6MjA5NjQyMTc2Nn0.kBq_axQYLZOsbUl12vIJdnYLI5RCSRZh5bVz9mz-6jQ';
-  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  const SUPABASE_URL = 'https://emvqtgsjdbyaionxguhq.supabase.co';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVtdnF0Z3NqZGJ5YWlvbnhndWhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA4NDU3NjYsImV4cCI6MjA5NjQyMTc2Nn0.kBq_axQYLZOsbUl12vIJdnYLI5RCSRZh5bVz9mz-6jQ';
 
   function toggleFaq(btn) {
     var answer = btn.nextElementSibling;
@@ -430,19 +428,28 @@
     btn.disabled = true;
     btn.textContent = '⏳ Sending your request...';
 
-    const { error } = await supabase.from('leads').insert({
-      first_name:   firstName,
-      last_name:    lastName,
-      phone:        phone,
-      email:        email,
-      zip:          zip,
-      dogs:         dogs,
-      service_type: frequency,
-      notes:        details,
-      status:       'new'
+    const response = await fetch(SUPABASE_URL + '/rest/v1/leads', {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': 'Bearer ' + SUPABASE_KEY,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify({
+        first_name:   firstName,
+        last_name:    lastName,
+        phone:        phone,
+        email:        email,
+        zip:          zip,
+        dogs:         dogs,
+        service_type: frequency,
+        notes:        details,
+        status:       'new'
+      })
     });
 
-    if (error) {
+    if (!response.ok) {
       btn.disabled = false;
       btn.textContent = '🐾 Submit My Quote Request';
       errorEl.textContent = 'Something went wrong. Please try again or call us directly at 602-622-0238.';
