@@ -455,6 +455,13 @@
       errorEl.textContent = 'Something went wrong. Please try again or call us directly at 602-622-0238.';
       errorEl.classList.add('show');
     } else {
+      // Also send email notification (fire and forget — don't block success screen)
+      fetch('/api/notify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ first_name: firstName, last_name: lastName, phone, email, zip, dogs, service_type: frequency, notes: details })
+      }).catch(() => {}); // silent fail — Supabase already has the data
+
       document.getElementById('quoteForm').style.display = 'none';
       document.getElementById('formSuccess').classList.add('show');
     }
