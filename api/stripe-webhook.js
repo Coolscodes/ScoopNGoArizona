@@ -1,5 +1,7 @@
-// Stripe webhook — marks invoices paid in Supabase when payment completes
+// Stripe webhook — handles payment completion events
 export const config = { api: { bodyParser: false } };
+
+const SUPABASE_URL = 'https://emvqtgsjdbyaionxguhq.supabase.co';
 
 async function getRawBody(req) {
   return new Promise((resolve, reject) => {
@@ -10,6 +12,19 @@ async function getRawBody(req) {
   });
 }
 
+async function supabase(path, method, body) {
+  return fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
+    method,
+    headers: {
+      'apikey': process.env.SUPABASE_SERVICE_KEY,
+      'Authorization': `Bearer ${process.env.SUPABASE_SERVICE_KEY}`,
+      'Content-Type': 'application/json',
+      'Prefer': method === 'POST' ? 'return=representation' : 'return=minimal',
+    },
+    body: body ? JSON.stringify(body) : undefined,
+  });
+}
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end();
 
@@ -17,15 +32,18 @@ export default async function handler(req, res) {
   const sig = req.headers['stripe-signature'];
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
-  // Verify signature if webhook secret is set
+  // Verify Stripe signature
   if (webhookSecret) {
     try {
-      // Simple HMAC verification without the full Stripe SDK
       const crypto = await import('crypto');
-      const [, timestampPart, , signaturePart] = sig.split(/[=,]/);
-      const payload = `${timestampPart}.${rawBody}`;
+      const parts = sig.split(',').reduce((acc, part) => {
+        const [k, v] = part.split('=');
+        acc[k] = v;
+        return acc;
+      }, {});
+      const payload = `${parts.t}.${rawBody}`;
       const expected = crypto.createHmac('sha256', webhookSecret).update(payload).digest('hex');
-      if (expected !== signaturePart) return res.status(400).json({ error: 'Invalid signature' });
+      if (expected !== parts.v1) return res.status(400).json({ error: 'Invalid signature' });
     } catch {
       return res.status(400).json({ error: 'Signature verification failed' });
     }
@@ -36,17 +54,84 @@ export default async function handler(req, res) {
 
   if (event.type === 'checkout.session.completed') {
     const session = event.data.object;
-    const invoiceId = session.metadata?.invoice_id;
+    const { invoice_id, plan, dogs, deodorizer, customer_name } = session.metadata || {};
 
-    if (invoiceId) {
-      await fetch(`https://emvqtgsjdbyaionxguhq.supabase.co/rest/v1/invoices?id=eq.${invoiceId}`, {
-        method: 'PATCH',
+    // 1. Mark invoice paid (admin-generated payment links)
+    if (invoice_id) {
+      await supabase(`invoices?id=eq.${invoice_id}`, 'PATCH', { status: 'paid' });
+    }
+
+    // 2. Auto-create customer when someone subscribes online
+    if (plan && !invoice_id) {
+      const stripeCustomerId = session.customer;
+      const email = session.customer_details?.email || '';
+      const phone = session.customer_details?.phone || '';
+      const name = session.customer_details?.name || customer_name || '';
+      const [firstName, ...rest] = name.split(' ');
+      const lastName = rest.join(' ');
+
+      const planLabel = { weekly: 'Weekly', biweekly: 'Bi-Weekly', monthly: 'Monthly' }[plan] || plan;
+      const dogCount = parseInt(dogs) || 1;
+      const hasDeod = deodorizer === 'true';
+
+      // Create customer record
+      const custRes = await supabase('customers', 'POST', {
+        first_name: firstName || 'Online',
+        last_name: lastName || 'Subscriber',
+        email,
+        phone,
+        address: '',
+        city: '',
+        zip: '',
+        service_type: planLabel,
+        status: 'active',
+        stripe_customer_id: stripeCustomerId || '',
+        notes: `Subscribed online via Stripe. ${dogCount} dog${dogCount > 1 ? 's' : ''}${hasDeod ? ' + deodorizer' : ''}.`,
+      });
+
+      const custData = await custRes.json();
+      const customerId = Array.isArray(custData) ? custData[0]?.id : null;
+
+      // Create dog record(s)
+      if (customerId) {
+        for (let i = 0; i < dogCount; i++) {
+          await supabase('dogs', 'POST', {
+            customer_id: customerId,
+            name: dogCount === 1 ? 'Dog' : `Dog ${i + 1}`,
+            breed: '',
+            notes: '',
+          });
+        }
+      }
+
+      // Send owner notification email
+      await fetch('https://api.resend.com/emails', {
+        method: 'POST',
         headers: {
-          'apikey': process.env.SUPABASE_SERVICE_KEY,
-          'Authorization': `Bearer ${process.env.SUPABASE_SERVICE_KEY}`,
+          'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ status: 'paid' }),
+        body: JSON.stringify({
+          from: 'Scoop N Go Arizona <onboarding@resend.dev>',
+          to: 'scoopngoarizona@gmail.com',
+          reply_to: email || 'noreply@stripe.com',
+          subject: `💳 New Online Subscriber — ${name || 'New Client'} (${planLabel})`,
+          text: `
+New subscription payment received!
+
+Name:     ${name || 'Unknown'}
+Email:    ${email || 'Not provided'}
+Phone:    ${phone || 'Not provided'}
+Plan:     ${planLabel}
+Dogs:     ${dogCount}
+Deod:     ${hasDeod ? 'Yes' : 'No'}
+
+This client has been automatically added to your Customers tab in the admin dashboard.
+Log in at https://scoopngoarizona.com/admin to schedule their first service.
+
+Stripe Customer ID: ${stripeCustomerId || 'N/A'}
+          `.trim(),
+        }),
       });
     }
   }
