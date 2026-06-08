@@ -449,13 +449,17 @@
     </div>
     <div class="ba-container">
       <div class="ba-card">
-        <div class="ba-label ba-label-before">Before</div>
-        <img src="before.jpg" alt="Yard before dog waste removal service" loading="lazy" width="4284" height="5712"/>
+        <div class="ba-img-wrap">
+          <div class="ba-label ba-label-before">Before</div>
+          <img src="before.jpg" alt="Yard before dog waste removal service" loading="lazy" width="4284" height="5712"/>
+        </div>
         <div class="ba-caption">❌ Waste scattered throughout the yard</div>
       </div>
       <div class="ba-card">
-        <div class="ba-label ba-label-after">After</div>
-        <img src="after.jpg" alt="Clean yard after Scoop N Go Arizona service" loading="lazy" width="4284" height="5712"/>
+        <div class="ba-img-wrap">
+          <div class="ba-label ba-label-after">After</div>
+          <img src="after.jpg" alt="Clean yard after Scoop N Go Arizona service" loading="lazy" width="4284" height="5712"/>
+        </div>
         <div class="ba-caption">✅ Completely clean, gate secured and photo sent</div>
       </div>
     </div>
@@ -467,18 +471,18 @@
   .section-sub { color: var(--mid); font-size: .95rem; margin-top: .5rem; }
   .ba-container { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; max-width: 780px; margin: 3rem auto 0; }
   .ba-card { border-radius: 16px; overflow: hidden; box-shadow: 0 8px 32px rgba(0,0,0,.13); position: relative; background: #000; }
-  .ba-card img { width: 100%; aspect-ratio: 3/4; object-fit: cover; object-position: center top; display: block; opacity: .97; }
-  .ba-label { position: absolute; top: 12px; left: 12px; padding: .35rem .85rem; border-radius: 20px; font-family: 'Montserrat', sans-serif; font-size: .78rem; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; box-shadow: 0 2px 8px rgba(0,0,0,.2); }
+  .ba-img-wrap { width: 100%; height: 320px; overflow: hidden; position: relative; }
+  .ba-img-wrap img { width: 100%; height: 100%; object-fit: cover; object-position: center 30%; display: block; opacity: .97; }
+  .ba-label { position: absolute; top: 12px; left: 12px; padding: .35rem .85rem; border-radius: 20px; font-family: 'Montserrat', sans-serif; font-size: .78rem; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; box-shadow: 0 2px 8px rgba(0,0,0,.2); z-index: 1; }
   .ba-label-before { background: #e53935; color: #fff; }
   .ba-label-after  { background: var(--green); color: #fff; }
-  .ba-caption { padding: .75rem .6rem; font-size: .78rem; color: var(--mid); background: var(--white); text-align: center; font-weight: 600; line-height: 1.4; }
+  .ba-caption { padding: .85rem 1rem; font-size: .83rem; color: var(--mid); background: var(--white); text-align: center; font-weight: 600; line-height: 1.4; }
   @media (max-width: 700px) {
     .before-after { padding: 50px 4%; }
-    .ba-container { grid-template-columns: 1fr 1fr; gap: .75rem; max-width: 100%; margin: 1.5rem auto 0; }
-    .ba-card { border-radius: 10px; }
-    .ba-card img { aspect-ratio: 2/3; }
-    .ba-label { font-size: .68rem; padding: .25rem .6rem; top: 8px; left: 8px; }
-    .ba-caption { font-size: .72rem; padding: .6rem .4rem; }
+    .ba-container { gap: .75rem; }
+    .ba-img-wrap { height: 180px; }
+    .ba-label { font-size: .65rem; padding: .2rem .55rem; top: 8px; left: 8px; }
+    .ba-caption { font-size: .72rem; padding: .6rem .5rem; }
   }
 </style>
 
