@@ -46,7 +46,6 @@ export default async function handler(req, res) {
     'metadata[plan]': plan,
     'metadata[dogs]': String(dogs),
     'metadata[deodorizer]': String(deodorizer),
-    'custom_text[submit_button][message]': 'You\'ll receive a confirmation text within 24 hours to schedule your first visit. Cancel anytime — no questions asked.',
     'phone_number_collection[enabled]': 'true',
   });
 
