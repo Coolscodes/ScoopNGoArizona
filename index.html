@@ -465,15 +465,20 @@
 <style>
   .before-after { background: var(--tan); padding: 70px 5%; }
   .section-sub { color: var(--mid); font-size: .95rem; margin-top: .5rem; }
-  .ba-container { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; max-width: 780px; margin: 3rem auto 0; }
+  .ba-container { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; max-width: 780px; margin: 3rem auto 0; }
   .ba-card { border-radius: 16px; overflow: hidden; box-shadow: 0 8px 32px rgba(0,0,0,.13); position: relative; background: #000; }
-  .ba-card img { width: 100%; aspect-ratio: 3/4; object-fit: cover; object-position: center; display: block; opacity: .97; }
-  .ba-label { position: absolute; top: 14px; left: 14px; padding: .4rem 1rem; border-radius: 20px; font-family: 'Montserrat', sans-serif; font-size: .82rem; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; box-shadow: 0 2px 8px rgba(0,0,0,.2); }
+  .ba-card img { width: 100%; aspect-ratio: 3/4; object-fit: cover; object-position: center top; display: block; opacity: .97; }
+  .ba-label { position: absolute; top: 12px; left: 12px; padding: .35rem .85rem; border-radius: 20px; font-family: 'Montserrat', sans-serif; font-size: .78rem; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; box-shadow: 0 2px 8px rgba(0,0,0,.2); }
   .ba-label-before { background: #e53935; color: #fff; }
   .ba-label-after  { background: var(--green); color: #fff; }
-  .ba-caption { padding: 1rem; font-size: .85rem; color: var(--mid); background: var(--white); text-align: center; font-weight: 600; }
-  @media (max-width: 600px) {
-    .ba-container { grid-template-columns: 1fr; max-width: 380px; }
+  .ba-caption { padding: .75rem .6rem; font-size: .78rem; color: var(--mid); background: var(--white); text-align: center; font-weight: 600; line-height: 1.4; }
+  @media (max-width: 700px) {
+    .before-after { padding: 50px 4%; }
+    .ba-container { grid-template-columns: 1fr 1fr; gap: .75rem; max-width: 100%; margin: 1.5rem auto 0; }
+    .ba-card { border-radius: 10px; }
+    .ba-card img { aspect-ratio: 2/3; }
+    .ba-label { font-size: .68rem; padding: .25rem .6rem; top: 8px; left: 8px; }
+    .ba-caption { font-size: .72rem; padding: .6rem .4rem; }
   }
 </style>
 
