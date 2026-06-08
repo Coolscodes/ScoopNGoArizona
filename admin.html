@@ -70,7 +70,7 @@
     .btn-sm { padding: .35rem .7rem; font-size: .76rem; }
 
     /* ── TABLE ── */
-    .table-wrap { background: var(--white); border-radius: var(--radius); border: 1px solid var(--border); overflow: hidden; }
+    .table-wrap { background: var(--white); border-radius: var(--radius); border: 1px solid var(--border); overflow-x: auto; }
     table { width: 100%; border-collapse: collapse; font-size: .875rem; }
     th { background: var(--tan); padding: .75rem 1rem; text-align: left; font-family: 'Montserrat', sans-serif; font-size: .75rem; font-weight: 700; color: var(--mid); text-transform: uppercase; letter-spacing: .05em; white-space: nowrap; }
     td { padding: .85rem 1rem; border-top: 1px solid var(--border); vertical-align: middle; }
@@ -205,10 +205,10 @@
       <div class="table-wrap">
         <table>
           <thead><tr>
-            <th>Name</th><th>Phone</th><th>Email</th><th>Address</th>
-            <th>Gate Code</th><th>Dogs</th><th>Service</th><th>Price/Visit</th><th>Status</th><th></th>
+            <th>Name</th><th>Phone</th><th>Address</th>
+            <th>Gate Code</th><th>Notes</th><th>Service</th><th>Price/Visit</th><th>Status</th><th style="min-width:140px;"></th>
           </tr></thead>
-          <tbody id="customersBody"><tr class="empty-row"><td colspan="10"><div class="loading">Loading customers...</div></td></tr></tbody>
+          <tbody id="customersBody"><tr class="empty-row"><td colspan="9"><div class="loading">Loading customers...</div></td></tr></tbody>
         </table>
       </div>
     </div>
@@ -502,17 +502,16 @@
     tbody.innerHTML = allCustomers.map(c => `
       <tr>
         <td><strong>${c.first_name} ${c.last_name}</strong></td>
-        <td><a href="tel:${c.phone}" style="color:var(--green);font-weight:600;">${c.phone}</a></td>
-        <td style="font-size:.8rem;">${c.email||'—'}</td>
-        <td style="font-size:.82rem;max-width:140px;">${c.address||'—'}</td>
+        <td><a href="tel:${c.phone}" style="color:var(--green);font-weight:600;white-space:nowrap;">${c.phone}</a></td>
+        <td style="font-size:.82rem;max-width:130px;">${c.address||'—'}</td>
         <td>${c.gate_code||'—'}</td>
-        <td>${c.yard_notes||'—'}</td>
+        <td style="font-size:.8rem;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${c.yard_notes||''}">${c.yard_notes||'—'}</td>
         <td>${c.service_type||'—'}</td>
         <td>${c.price_per_visit ? '$'+c.price_per_visit : '—'}</td>
         <td><span class="badge badge-${c.active?'active':'inactive'}">${c.active?'Active':'Inactive'}</span></td>
-        <td style="white-space:nowrap;display:flex;gap:.4rem;flex-wrap:wrap;">
+        <td style="white-space:nowrap;">
           <button class="btn btn-outline btn-sm" onclick="editCustomer('${c.id}')">Edit</button>
-          <button class="btn btn-sm" style="background:#635bff;color:#fff;border:none;" onclick="sendCardSetupLink('${c.id}','${c.first_name} ${c.last_name}','${c.email||''}','${c.stripe_customer_id||''}')">💳 Card Link</button>
+          <button class="btn btn-sm" style="background:#635bff;color:#fff;border:none;margin-left:.3rem;" onclick="sendCardSetupLink('${c.id}','${c.first_name} ${c.last_name}','${c.email||''}','${c.stripe_customer_id||''}')">💳 Card Link</button>
         </td>
       </tr>
     `).join('');
