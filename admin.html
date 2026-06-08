@@ -679,7 +679,10 @@
             <option value="overdue" ${i.status==='overdue'?'selected':''}>🔴 Overdue</option>
           </select>
         </td>
-        <td><button class="btn btn-red btn-sm" onclick="deleteInvoice('${i.id}')">Delete</button></td>
+        <td style="display:flex;gap:.4rem;flex-wrap:wrap;">
+          <button class="btn btn-green btn-sm" onclick="sendPaymentLink('${i.id}','${(c.first_name||'') + ' ' + (c.last_name||'')}',${i.amount},'${c.email||''}')">💳 Payment Link</button>
+          <button class="btn btn-red btn-sm" onclick="deleteInvoice('${i.id}')">Delete</button>
+        </td>
       </tr>`;
     }).join('');
   }
@@ -726,6 +729,35 @@
     const opts = allCustomers.map(c => `<option value="${c.id}">${c.first_name} ${c.last_name}</option>`).join('');
     document.getElementById('appt-customer').innerHTML = '<option value="">-- Select customer --</option>' + opts;
     document.getElementById('inv-customer').innerHTML  = '<option value="">-- Select customer --</option>' + opts;
+  }
+
+  async function sendPaymentLink(invoiceId, customerName, amount, customerEmail) {
+    const btn = event.target;
+    btn.disabled = true;
+    btn.textContent = '⏳ Generating...';
+    try {
+      const r = await fetch('/api/stripe-checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-admin-password': PW },
+        body: JSON.stringify({
+          invoice_id: invoiceId,
+          customer_name: customerName.trim(),
+          customer_email: customerEmail || undefined,
+          amount: amount,
+          description: `Invoice — ${customerName.trim()}`
+        })
+      });
+      const data = await r.json();
+      if (data.url) {
+        await navigator.clipboard.writeText(data.url);
+        btn.textContent = '✅ Link Copied!';
+        setTimeout(() => { btn.disabled = false; btn.textContent = '💳 Payment Link'; }, 3000);
+      } else throw new Error(data.error);
+    } catch (err) {
+      btn.disabled = false;
+      btn.textContent = '💳 Payment Link';
+      alert('Error: ' + err.message);
+    }
   }
 
   function fmtDate(d) {

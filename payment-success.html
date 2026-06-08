@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Payment Successful — Scoop N Go Arizona</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Open Sans', sans-serif; background: linear-gradient(135deg, #1b5e20, #388e3c); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 2rem; }
+    .card { background: #fff; border-radius: 20px; padding: 3rem 2.5rem; max-width: 480px; width: 100%; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,.2); }
+    .icon { font-size: 4rem; margin-bottom: 1rem; }
+    h1 { font-family: 'Montserrat', sans-serif; font-size: 1.8rem; font-weight: 900; color: #1b5e20; margin-bottom: .8rem; }
+    p { color: #555; font-size: .95rem; line-height: 1.6; margin-bottom: 1.5rem; }
+    .tip-msg { display: none; }
+    .sub-msg { display: none; }
+    .pay-msg { display: none; }
+    a.btn { display: inline-block; background: #2e7d32; color: #fff; padding: .85rem 2rem; border-radius: 8px; font-family: 'Montserrat', sans-serif; font-weight: 800; text-decoration: none; font-size: .95rem; transition: background .2s; }
+    a.btn:hover { background: #1b5e20; }
+    .logo { font-family: 'Montserrat', sans-serif; font-weight: 900; color: #555; font-size: .9rem; margin-top: 2rem; }
+  </style>
+</head>
+<body>
+<div class="card">
+  <div class="icon" id="icon">🎉</div>
+  <h1 id="title">Payment Successful!</h1>
+  <p id="msg">Thank you — your payment has been received. We'll see you on your next scheduled visit! 🐾</p>
+
+  <div class="tip-msg" id="tip-msg">
+    <p>Your technician will be so grateful. Tips like yours make a huge difference and inspire us to keep delivering the best service possible. 🙏</p>
+  </div>
+  <div class="sub-msg" id="sub-msg">
+    <p>Welcome to the Scoop N Go family! We'll be in touch shortly to confirm your start date and schedule. Get ready to enjoy a poop-free yard! 🏡</p>
+  </div>
+
+  <a href="/" class="btn">← Back to Home</a>
+  <div class="logo">🐾 Scoop N Go Arizona</div>
+</div>
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const type = params.get('type');
+  if (type === 'tip') {
+    document.getElementById('icon').textContent = '🙏';
+    document.getElementById('title').textContent = 'Thank You for the Tip!';
+    document.getElementById('msg').textContent = '';
+    document.getElementById('tip-msg').style.display = 'block';
+  } else if (type === 'subscription') {
+    document.getElementById('icon').textContent = '✅';
+    document.getElementById('title').textContent = 'You\'re Subscribed!';
+    document.getElementById('msg').textContent = '';
+    document.getElementById('sub-msg').style.display = 'block';
+  }
+</script>
+</body>
+</html>

@@ -277,7 +277,7 @@
         <div class="plan-price"><sup>$</sup>30</div><div class="plan-note">per visit · 1 dog</div>
         <hr class="plan-divider"/>
         <ul><li>Full yard scoop</li><li>Waste bagged &amp; removed</li><li>Gate closed &amp; secured</li><li>Service notification text</li></ul>
-        <a href="#contact" class="plan-btn">Get Started</a>
+        <button class="plan-btn" onclick="subscribe('biweekly')">Subscribe Online</button>
       </div>
       <div class="plan popular">
         <span class="popular-badge">⭐ Most Popular</span>
@@ -285,14 +285,14 @@
         <div class="plan-price"><sup>$</sup>20</div><div class="plan-note">per visit · 1 dog</div>
         <hr class="plan-divider"/>
         <ul><li>Full yard scoop</li><li>Waste bagged &amp; removed</li><li>Gate closed &amp; secured</li><li>Service notification text</li><li>Satisfaction guarantee</li></ul>
-        <a href="#contact" class="plan-btn">Get Started</a>
+        <button class="plan-btn" onclick="subscribe('weekly')">Subscribe Online</button>
       </div>
       <div class="plan">
         <div class="plan-name">One-Time</div><div class="plan-freq">Single visit</div>
         <div class="plan-price"><sup>$</sup>50</div><div class="plan-note">starting price · varies by yard</div>
         <hr class="plan-divider"/>
         <ul><li>Full yard deep clean</li><li>Waste bagged &amp; removed</li><li>Great for move-ins &amp; events</li><li>No commitment required</li></ul>
-        <a href="#contact" class="plan-btn">Get Started</a>
+        <a href="#contact" class="plan-btn">Get a Quote</a>
       </div>
     </div>
     <p style="text-align:center;margin-top:1.5rem;font-size:.85rem;color:var(--mid);">Additional dogs: +$5/dog per visit. Contact us for a custom quote.</p>
@@ -406,6 +406,38 @@
   </div>
 </section>
 
+<section id="tip" style="background:var(--green-dark);padding:70px 5%;color:#fff;">
+  <div class="section-inner">
+    <div class="section-header">
+      <span class="section-label" style="background:rgba(255,255,255,.15);color:#fff;">Leave a Tip</span>
+      <h2 style="color:#fff;">Show Your Technician Some Love 🐾</h2>
+      <p style="color:rgba(255,255,255,.8);max-width:520px;margin:.8rem auto 0;font-size:.95rem;">Our technicians work hard in the Arizona heat to keep your yard clean and safe. If they've gone above and beyond, a tip means the world!</p>
+    </div>
+    <div style="max-width:480px;margin:0 auto;text-align:center;">
+      <div style="display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap;margin-bottom:1.2rem;">
+        <button class="tip-btn" onclick="setTip(5)">$5</button>
+        <button class="tip-btn" onclick="setTip(10)">$10</button>
+        <button class="tip-btn" onclick="setTip(15)">$15</button>
+        <button class="tip-btn" onclick="setTip(20)">$20</button>
+      </div>
+      <div style="display:flex;gap:.75rem;align-items:center;margin-bottom:1.2rem;">
+        <span style="font-weight:700;font-size:1.2rem;">$</span>
+        <input type="number" id="tipAmount" placeholder="Custom amount" min="1" step="1"
+          style="flex:1;padding:.8rem 1rem;border:2px solid rgba(255,255,255,.3);border-radius:8px;background:rgba(255,255,255,.1);color:#fff;font-size:1rem;font-family:'Open Sans',sans-serif;"/>
+      </div>
+      <button id="tipBtn" onclick="sendTip()"
+        style="width:100%;padding:1rem;background:#fff;color:var(--green-dark);border:none;border-radius:8px;font-family:'Montserrat',sans-serif;font-size:1rem;font-weight:900;cursor:pointer;transition:background .2s;">
+        💳 Leave a Tip
+      </button>
+      <p style="font-size:.78rem;opacity:.5;margin-top:.8rem;">Processed securely via Stripe. Tips go directly to your technician.</p>
+    </div>
+  </div>
+</section>
+<style>
+  .tip-btn { background: rgba(255,255,255,.15); border: 2px solid rgba(255,255,255,.3); color: #fff; padding: .65rem 1.4rem; border-radius: 8px; font-family: 'Montserrat', sans-serif; font-size: 1rem; font-weight: 800; cursor: pointer; transition: background .2s, border-color .2s; }
+  .tip-btn:hover, .tip-btn.selected { background: #fff; color: var(--green-dark); border-color: #fff; }
+</style>
+
 <section class="areas">
   <div class="section-inner">
     <div class="section-header"><span class="section-label">Service Areas</span><h2>Proudly Serving the East Valley</h2></div>
@@ -438,6 +470,54 @@
 <script>
   const SUPABASE_URL = 'https://emvqtgsjdbyaionxguhq.supabase.co';
   const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVtdnF0Z3NqZGJ5YWlvbnhndWhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA4NDU3NjYsImV4cCI6MjA5NjQyMTc2Nn0.kBq_axQYLZOsbUl12vIJdnYLI5RCSRZh5bVz9mz-6jQ';
+
+  async function subscribe(plan) {
+    const btn = event.target;
+    btn.disabled = true;
+    btn.textContent = '⏳ Loading...';
+    try {
+      const r = await fetch('/api/stripe-subscription', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ plan })
+      });
+      const data = await r.json();
+      if (data.url) window.location.href = data.url;
+      else throw new Error(data.error);
+    } catch (err) {
+      btn.disabled = false;
+      btn.textContent = 'Subscribe Online';
+      alert('Something went wrong. Please try again or call us at 602-622-0238.');
+    }
+  }
+
+  function setTip(amount) {
+    document.getElementById('tipAmount').value = amount;
+    document.querySelectorAll('.tip-btn').forEach(b => b.classList.remove('selected'));
+    event.target.classList.add('selected');
+  }
+
+  async function sendTip() {
+    const amount = parseFloat(document.getElementById('tipAmount').value);
+    if (!amount || amount < 1) { alert('Please enter a tip amount of at least $1.'); return; }
+    const btn = document.getElementById('tipBtn');
+    btn.disabled = true;
+    btn.textContent = '⏳ Processing...';
+    try {
+      const r = await fetch('/api/stripe-tip', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ amount })
+      });
+      const data = await r.json();
+      if (data.url) window.location.href = data.url;
+      else throw new Error(data.error);
+    } catch (err) {
+      btn.disabled = false;
+      btn.textContent = '💳 Leave a Tip';
+      alert('Something went wrong. Please try again.');
+    }
+  }
 
   function toggleFaq(btn) {
     var answer = btn.nextElementSibling;
