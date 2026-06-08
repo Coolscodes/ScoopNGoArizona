@@ -16,7 +16,7 @@ export default async function handler(req, res) {
 
   const planLabel   = { weekly: 'Weekly', biweekly: 'Bi-Weekly', monthly: 'Monthly' }[plan];
   const intervalLabel = { weekly: 'every week', biweekly: 'every 2 weeks', monthly: 'every month' }[plan];
-  const productName = `Scoop N Go Arizona — ${planLabel} Dog Waste Removal`;
+  const productName = `Scoop N Go Arizona | ${planLabel} Dog Waste Removal`;
 
   const dogLine     = `${dogs} dog${dogs > 1 ? 's' : ''}`;
   const deodLine    = deodorizer ? ' + Deodorizer Treatment' : '';
@@ -27,7 +27,7 @@ export default async function handler(req, res) {
     '✓ Service notification text when complete',
     '✓ Gate photo sent after each visit',
     deodorizer ? '✓ Pet-safe deodorizer applied to yard' : '✓ 100% satisfaction guarantee',
-    '✓ No contracts — cancel anytime',
+    '✓ No contracts, cancel anytime',
   ].join('\n');
 
   const params = new URLSearchParams({

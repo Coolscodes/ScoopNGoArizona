@@ -115,7 +115,7 @@ export default async function handler(req, res) {
           from: 'Scoop N Go Arizona <onboarding@resend.dev>',
           to: 'scoopngoarizona@gmail.com',
           reply_to: email || 'noreply@stripe.com',
-          subject: `💳 New Online Subscriber — ${name || 'New Client'} (${planLabel})`,
+          subject: `💳 New Online Subscriber: ${name || 'New Client'} (${planLabel})`,
           text: `
 New subscription payment received!
 

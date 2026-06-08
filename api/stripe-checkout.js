@@ -10,7 +10,7 @@ export default async function handler(req, res) {
   const params = new URLSearchParams({
     'payment_method_types[0]': 'card',
     'line_items[0][price_data][currency]': 'usd',
-    'line_items[0][price_data][product_data][name]': `Scoop N Go Arizona — ${description || 'Invoice'}`,
+    'line_items[0][price_data][product_data][name]': `Scoop N Go Arizona | ${description || 'Invoice'}`,
     'line_items[0][price_data][product_data][description]': `Payment for ${customer_name}\n✓ Full yard scoop & waste removal\n✓ Gate closed & secured\n✓ Service notification text\n✓ 100% satisfaction guarantee`,
     'line_items[0][price_data][product_data][images][0]': 'https://scoopngoarizona.com/Scoopngologo.png',
     'line_items[0][price_data][unit_amount]': String(Math.round(parseFloat(amount) * 100)),
