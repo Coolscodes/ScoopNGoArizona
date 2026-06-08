@@ -531,22 +531,25 @@
   // ── PRICING CONFIGURATOR ──
   var _plan = 'biweekly', _dogs = 1, _deodorizer = false;
 
-  var BASE   = { weekly: 15, biweekly: 25, monthly: 40, onetime: 50 };
-  var VISITS = { weekly: 4,  biweekly: 2,  monthly: 1,  onetime: 1  };
-  var DEOD   = { weekly: 5,  biweekly: 10, monthly: 15, onetime: 10 };
+  var VISITS = { weekly: 4, biweekly: 2, monthly: 1, onetime: 1 };
+  var DEOD   = { weekly: 5, biweekly: 10, monthly: 15, onetime: 10 };
 
-  function dogAdder(dogs) {
-    // Dogs 1-4: +$5 each. Dogs 5+: +$3 each
-    if (dogs <= 1) return 0;
-    var base4 = Math.min(dogs - 1, 3) * 5;          // up to 3 extra dogs × $5
-    var over4 = Math.max(0, dogs - 4) * 3;           // beyond 4 dogs × $3
-    return base4 + over4;
+  // Price per visit by dog count (index 0 = 1 dog). Beyond table: +$3/dog.
+  var PRICE_TABLE = {
+    weekly:   [15, 20, 25, 30, 33, 36, 39, 42],
+    biweekly: [25, 30, 40, 50, 60, 63, 66, 69],
+    monthly:  [40, 55, 65, 75, 85, 88, 91, 94],
+    onetime:  [50, 55, 60, 65, 68, 71, 74, 77],
+  };
+
+  function getBasePrice(plan, dogs) {
+    var t = PRICE_TABLE[plan];
+    if (dogs <= t.length) return t[dogs - 1];
+    return t[t.length - 1] + (dogs - t.length) * 3;
   }
 
   function calcPrice() {
-    var base = BASE[_plan] + dogAdder(_dogs);
-    var deod = _deodorizer ? DEOD[_plan] : 0;
-    return base + deod;
+    return getBasePrice(_plan, _dogs) + (_deodorizer ? DEOD[_plan] : 0);
   }
 
   function updatePriceDisplay() {
@@ -557,7 +560,7 @@
 
     // Breakdown
     var parts = [];
-    parts.push(planName + ' base (' + _dogs + ' dog' + (_dogs>1?'s':'') + '): $' + (BASE[_plan] + (_dogs-1)*DOG_EXTRA));
+    parts.push(planName + ' base (' + _dogs + ' dog' + (_dogs>1?'s':'') + '): $' + getBasePrice(_plan, _dogs));
     if (_deodorizer) parts.push('Deodorizer: +$' + DEOD[_plan]);
     document.getElementById('priceBreakdown').textContent = parts.join('  ·  ');
 
