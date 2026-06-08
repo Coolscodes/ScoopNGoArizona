@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Leave a Tip | Scoop N Go Arizona</title>
+  <meta name="description" content="Leave a tip for your Scoop N Go Arizona technician. 100% goes directly to your tech."/>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800;900&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Open Sans', sans-serif; background: linear-gradient(135deg, #1b5e20 0%, #388e3c 100%); min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; }
+    .back-link { align-self: flex-start; color: rgba(255,255,255,.75); text-decoration: none; font-size: .85rem; font-weight: 600; margin-bottom: 1.5rem; display: flex; align-items: center; gap: .4rem; transition: color .2s; }
+    .back-link:hover { color: #fff; }
+    .card { background: #fff; border-radius: 24px; padding: 2.8rem 2.5rem; max-width: 460px; width: 100%; box-shadow: 0 24px 64px rgba(0,0,0,.22); }
+    .logo { font-family: 'Montserrat', sans-serif; font-weight: 900; color: #1b5e20; font-size: 1rem; margin-bottom: 1.8rem; display: flex; align-items: center; gap: .4rem; }
+    .icon { font-size: 3rem; margin-bottom: .6rem; }
+    h1 { font-family: 'Montserrat', sans-serif; font-size: 1.6rem; font-weight: 900; color: #1a1a1a; margin-bottom: .5rem; }
+    .subtitle { color: #666; font-size: .9rem; line-height: 1.6; margin-bottom: 2rem; }
+    label { display: block; font-size: .82rem; font-weight: 700; color: #333; margin-bottom: .4rem; }
+    input[type="text"], input[type="number"] {
+      width: 100%; padding: .8rem 1rem; border: 2px solid #e0e0e0; border-radius: 9px;
+      font-family: 'Open Sans', sans-serif; font-size: .95rem; color: #1a1a1a;
+      transition: border .2s; margin-bottom: 1.2rem;
+    }
+    input:focus { outline: none; border-color: #2e7d32; }
+    .tip-amounts { display: grid; grid-template-columns: repeat(4,1fr); gap: .5rem; margin-bottom: 1.2rem; }
+    .tip-btn { padding: .65rem .5rem; border: 2px solid #e0e0e0; border-radius: 9px; background: #fff; font-family: 'Montserrat', sans-serif; font-size: .95rem; font-weight: 800; color: #555; cursor: pointer; transition: all .2s; }
+    .tip-btn:hover { border-color: #2e7d32; color: #2e7d32; }
+    .tip-btn.selected { border-color: #1b5e20; background: #e8f5e9; color: #1b5e20; }
+    .custom-row { display: flex; align-items: center; gap: .5rem; margin-bottom: 1.8rem; }
+    .custom-row span { font-weight: 700; font-size: 1.1rem; color: #1b5e20; flex-shrink: 0; }
+    .custom-row input { margin-bottom: 0; }
+    .submit-btn { width: 100%; padding: 1rem; background: #1b5e20; color: #fff; border: none; border-radius: 10px; font-family: 'Montserrat', sans-serif; font-size: 1.05rem; font-weight: 900; cursor: pointer; transition: background .2s, transform .15s; }
+    .submit-btn:hover:not(:disabled) { background: #2e7d32; transform: translateY(-1px); }
+    .submit-btn:disabled { opacity: .65; cursor: not-allowed; }
+    .secure-note { text-align: center; font-size: .75rem; color: #aaa; margin-top: 1rem; }
+    .divider { border: none; border-top: 1px solid #eee; margin: 1.5rem 0; }
+    .error { background: #ffebee; border: 1px solid #ef9a9a; border-radius: 8px; padding: .8rem 1rem; font-size: .85rem; color: #c62828; margin-bottom: 1rem; display: none; }
+    .error.show { display: block; }
+  </style>
+</head>
+<body>
+
+<a href="/" class="back-link">← Back to Scoop N Go Arizona</a>
+
+<div class="card">
+  <div class="logo">🐾 Scoop N Go Arizona</div>
+  <div class="icon">🙏</div>
+  <h1>Leave Your Tech a Tip</h1>
+  <p class="subtitle">100% of your tip goes directly to your technician. They work hard in the Arizona heat to keep your yard clean and your pups happy!</p>
+
+  <hr class="divider"/>
+
+  <div class="error" id="errorMsg"></div>
+
+  <label for="techName">Who was your technician? *</label>
+  <input type="text" id="techName" placeholder="e.g. Jett, Mike, Sarah..." autocomplete="off"/>
+
+  <label>Select a tip amount</label>
+  <div class="tip-amounts">
+    <button class="tip-btn" onclick="setTip(5, this)">$5</button>
+    <button class="tip-btn" onclick="setTip(10, this)">$10</button>
+    <button class="tip-btn" onclick="setTip(15, this)">$15</button>
+    <button class="tip-btn" onclick="setTip(20, this)">$20</button>
+  </div>
+
+  <label for="customAmt">Or enter a custom amount</label>
+  <div class="custom-row">
+    <span>$</span>
+    <input type="number" id="customAmt" placeholder="Other amount" min="1" step="1" oninput="clearPreset()"/>
+  </div>
+
+  <button class="submit-btn" id="submitBtn" onclick="sendTip()">💳 Send Tip via Stripe</button>
+  <p class="secure-note">🔒 Processed securely via Stripe. No account needed.</p>
+</div>
+
+<script>
+  function setTip(amount, btn) {
+    document.getElementById('customAmt').value = amount;
+    document.querySelectorAll('.tip-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+  }
+
+  function clearPreset() {
+    document.querySelectorAll('.tip-btn').forEach(b => b.classList.remove('selected'));
+  }
+
+  async function sendTip() {
+    const techName = document.getElementById('techName').value.trim();
+    const amount = parseFloat(document.getElementById('customAmt').value);
+    const errorEl = document.getElementById('errorMsg');
+
+    errorEl.classList.remove('show');
+
+    if (!techName) {
+      errorEl.textContent = 'Please enter your technician\'s name so the tip goes to the right person!';
+      errorEl.classList.add('show');
+      return;
+    }
+    if (!amount || amount < 1) {
+      errorEl.textContent = 'Please enter a tip amount of at least $1.';
+      errorEl.classList.add('show');
+      return;
+    }
+
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.textContent = '⏳ Loading...';
+
+    try {
+      const r = await fetch('/api/stripe-tip', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ amount, tech_name: techName })
+      });
+      const data = await r.json();
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        throw new Error(data.error || 'Something went wrong');
+      }
+    } catch (err) {
+      btn.disabled = false;
+      btn.textContent = '💳 Send Tip via Stripe';
+      errorEl.textContent = 'Something went wrong. Please try again or call us at 602-622-0238.';
+      errorEl.classList.add('show');
+    }
+  }
+</script>
+</body>
+</html>

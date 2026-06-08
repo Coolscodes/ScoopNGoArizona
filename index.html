@@ -556,37 +556,6 @@
   </div>
 </section>
 
-<section id="tip" style="background:var(--green-dark);padding:70px 5%;color:#fff;">
-  <div class="section-inner">
-    <div class="section-header">
-      <span class="section-label" style="background:rgba(255,255,255,.15);color:#fff;">Leave a Tip</span>
-      <h2 style="color:#fff;">Show Your Technician Some Love 🐾</h2>
-      <p style="color:rgba(255,255,255,.8);max-width:520px;margin:.8rem auto 0;font-size:.95rem;">Our technicians work hard in the Arizona heat to keep your yard clean and safe. If they've gone above and beyond, a tip means the world!</p>
-    </div>
-    <div style="max-width:480px;margin:0 auto;text-align:center;">
-      <div style="display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap;margin-bottom:1.2rem;">
-        <button class="tip-btn" onclick="setTip(5)">$5</button>
-        <button class="tip-btn" onclick="setTip(10)">$10</button>
-        <button class="tip-btn" onclick="setTip(15)">$15</button>
-        <button class="tip-btn" onclick="setTip(20)">$20</button>
-      </div>
-      <div style="display:flex;gap:.75rem;align-items:center;margin-bottom:1.2rem;">
-        <span style="font-weight:700;font-size:1.2rem;">$</span>
-        <input type="number" id="tipAmount" placeholder="Custom amount" min="1" step="1"
-          style="flex:1;padding:.8rem 1rem;border:2px solid rgba(255,255,255,.3);border-radius:8px;background:rgba(255,255,255,.1);color:#fff;font-size:1rem;font-family:'Open Sans',sans-serif;"/>
-      </div>
-      <button id="tipBtn" onclick="sendTip()"
-        style="width:100%;padding:1rem;background:#fff;color:var(--green-dark);border:none;border-radius:8px;font-family:'Montserrat',sans-serif;font-size:1rem;font-weight:900;cursor:pointer;transition:background .2s;">
-        💳 Leave a Tip
-      </button>
-      <p style="font-size:.78rem;opacity:.5;margin-top:.8rem;">Processed securely via Stripe. Tips go directly to your technician.</p>
-    </div>
-  </div>
-</section>
-<style>
-  .tip-btn { background: rgba(255,255,255,.15); border: 2px solid rgba(255,255,255,.3); color: #fff; padding: .65rem 1.4rem; border-radius: 8px; font-family: 'Montserrat', sans-serif; font-size: 1rem; font-weight: 800; cursor: pointer; transition: background .2s, border-color .2s; }
-  .tip-btn:hover, .tip-btn.selected { background: #fff; color: var(--green-dark); border-color: #fff; }
-</style>
 
 <section class="areas">
   <div class="section-inner">
@@ -606,7 +575,7 @@
       <a href="#" class="nav-logo">🐾 Scoop N Go Arizona</a>
       <p>Professional dog waste removal serving the East Valley. We handle the dirty work so you don't have to.</p>
     </div>
-    <div><h4>Services</h4><ul><li><a href="#services">Residential Removal</a></li><li><a href="#services">One-Time Cleanup</a></li><li><a href="#services">Deodorizer Treatment</a></li></ul></div>
+    <div><h4>Services</h4><ul><li><a href="#services">Residential Removal</a></li><li><a href="#services">One-Time Cleanup</a></li><li><a href="#services">Deodorizer Treatment</a></li><li><a href="/tip">Leave a Tip</a></li></ul></div>
     <div><h4>Navigation</h4><ul><li><a href="#">Home</a></li><li><a href="#about">About Us</a></li><li><a href="#pricing">Pricing</a></li><li><a href="#testimonials">Reviews</a></li><li><a href="#contact">Contact Us</a></li></ul></div>
     <div><h4>Contact</h4><ul>
       <li><a href="tel:+16026220238">602-622-0238</a></li>
@@ -740,35 +709,7 @@
     updatePriceDisplay();
   });
 
-  function setTip(amount) {
-    document.getElementById('tipAmount').value = amount;
-    document.querySelectorAll('.tip-btn').forEach(b => b.classList.remove('selected'));
-    event.target.classList.add('selected');
-  }
-
-  async function sendTip() {
-    const amount = parseFloat(document.getElementById('tipAmount').value);
-    if (!amount || amount < 1) { alert('Please enter a tip amount of at least $1.'); return; }
-    const btn = document.getElementById('tipBtn');
-    btn.disabled = true;
-    btn.textContent = '⏳ Processing...';
-    try {
-      const r = await fetch('/api/stripe-tip', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ amount })
-      });
-      const data = await r.json();
-      if (data.url) window.location.href = data.url;
-      else throw new Error(data.error);
-    } catch (err) {
-      btn.disabled = false;
-      btn.textContent = '💳 Leave a Tip';
-      alert('Something went wrong. Please try again.');
-    }
-  }
-
-  function toggleFaq(btn) {
+function toggleFaq(btn) {
     var answer = btn.nextElementSibling;
     var isOpen = btn.classList.contains('open');
     document.querySelectorAll('.faq-q').forEach(function(b) { b.classList.remove('open'); });
