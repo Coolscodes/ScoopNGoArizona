@@ -270,34 +270,91 @@
 
 <section class="pricing" id="pricing">
   <div class="section-inner">
-    <div class="section-header"><span class="section-label">Transparent Pricing</span><h2>Simple, Affordable Plans</h2></div>
-    <div class="pricing-grid">
-      <div class="plan">
-        <div class="plan-name">Bi-Weekly</div><div class="plan-freq">Every 2 weeks</div>
-        <div class="plan-price"><sup>$</sup>30</div><div class="plan-note">per visit · 1 dog</div>
-        <hr class="plan-divider"/>
-        <ul><li>Full yard scoop</li><li>Waste bagged &amp; removed</li><li>Gate closed &amp; secured</li><li>Service notification text</li></ul>
-        <button class="plan-btn" onclick="subscribe('biweekly')">Subscribe Online</button>
+    <div class="section-header"><span class="section-label">Transparent Pricing</span><h2>Build Your Plan</h2>
+      <p style="color:var(--mid);margin-top:.5rem;font-size:.95rem;">Customize your service and see your exact price instantly.</p>
+    </div>
+
+    <div class="pricing-configurator">
+      <!-- Step 1: Frequency -->
+      <div class="config-step">
+        <div class="config-label">① How often?</div>
+        <div class="config-options" id="freqOptions">
+          <button class="config-btn" onclick="setPlan('weekly',this)">Weekly</button>
+          <button class="config-btn active" onclick="setPlan('biweekly',this)">Bi-Weekly</button>
+          <button class="config-btn" onclick="setPlan('monthly',this)">Monthly</button>
+          <button class="config-btn" onclick="setPlan('onetime',this)">One-Time</button>
+        </div>
       </div>
-      <div class="plan popular">
-        <span class="popular-badge">⭐ Most Popular</span>
-        <div class="plan-name">Weekly</div><div class="plan-freq">Every week</div>
-        <div class="plan-price"><sup>$</sup>20</div><div class="plan-note">per visit · 1 dog</div>
-        <hr class="plan-divider"/>
-        <ul><li>Full yard scoop</li><li>Waste bagged &amp; removed</li><li>Gate closed &amp; secured</li><li>Service notification text</li><li>Satisfaction guarantee</li></ul>
-        <button class="plan-btn" onclick="subscribe('weekly')">Subscribe Online</button>
+
+      <!-- Step 2: Dogs -->
+      <div class="config-step">
+        <div class="config-label">② How many dogs?</div>
+        <div class="dog-stepper">
+          <button class="stepper-btn" onclick="changeDogs(-1)">−</button>
+          <span id="dogCount">1</span>
+          <button class="stepper-btn" onclick="changeDogs(1)">+</button>
+          <span style="font-size:.85rem;color:var(--mid);margin-left:.5rem;">dog<span id="dogPlural"></span></span>
+        </div>
       </div>
-      <div class="plan">
-        <div class="plan-name">One-Time</div><div class="plan-freq">Single visit</div>
-        <div class="plan-price"><sup>$</sup>50</div><div class="plan-note">starting price · varies by yard</div>
-        <hr class="plan-divider"/>
-        <ul><li>Full yard deep clean</li><li>Waste bagged &amp; removed</li><li>Great for move-ins &amp; events</li><li>No commitment required</li></ul>
-        <a href="#contact" class="plan-btn">Get a Quote</a>
+
+      <!-- Step 3: Deodorizer -->
+      <div class="config-step">
+        <div class="config-label">③ Add deodorizer treatment? <span style="font-size:.78rem;color:var(--mid);font-weight:400;">(pet-safe, eliminates odors)</span></div>
+        <div class="config-options">
+          <button class="config-btn" id="deodNo"  onclick="setDeodorizer(false,this)">No thanks</button>
+          <button class="config-btn" id="deodYes" onclick="setDeodorizer(true,this)">Yes! +$10/visit</button>
+        </div>
+      </div>
+
+      <!-- Price display -->
+      <div class="price-result">
+        <div class="price-breakdown" id="priceBreakdown"></div>
+        <div class="price-total">
+          <div>
+            <span class="price-big" id="pricePerVisit">$30</span>
+            <span class="price-per" id="pricePer">/visit</span>
+          </div>
+          <div class="price-monthly" id="priceMonthly"></div>
+        </div>
+        <div class="price-includes">
+          <span>✓ Full yard scoop</span>
+          <span>✓ Waste removed</span>
+          <span>✓ Gate secured</span>
+          <span>✓ Service text</span>
+          <span id="deodInclude" style="display:none;">✓ Deodorizer</span>
+        </div>
+        <button class="price-cta" id="priceCta" onclick="doSubscribe()">Subscribe Online →</button>
+        <p style="font-size:.75rem;color:var(--mid);text-align:center;margin-top:.6rem;">Powered by Stripe · Cancel anytime · No contracts</p>
       </div>
     </div>
-    <p style="text-align:center;margin-top:1.5rem;font-size:.85rem;color:var(--mid);">Additional dogs: +$5/dog per visit. Contact us for a custom quote.</p>
   </div>
 </section>
+
+<style>
+  .pricing-configurator { max-width: 640px; margin: 0 auto; background: var(--white); border-radius: 16px; border: 2px solid var(--border); overflow: hidden; box-shadow: 0 8px 32px rgba(0,0,0,.07); }
+  .config-step { padding: 1.5rem 2rem; border-bottom: 1px solid var(--border); }
+  .config-label { font-family: 'Montserrat', sans-serif; font-size: .88rem; font-weight: 800; color: var(--dark); margin-bottom: .9rem; }
+  .config-options { display: flex; gap: .6rem; flex-wrap: wrap; }
+  .config-btn { padding: .55rem 1.2rem; border: 2px solid var(--border); border-radius: 8px; background: var(--white); font-family: 'Montserrat', sans-serif; font-size: .85rem; font-weight: 700; color: var(--mid); cursor: pointer; transition: all .2s; }
+  .config-btn:hover { border-color: var(--green); color: var(--green); }
+  .config-btn.active { border-color: var(--green-dark); background: var(--green-lt); color: var(--green-dark); }
+  .dog-stepper { display: flex; align-items: center; gap: .75rem; }
+  .stepper-btn { width: 36px; height: 36px; border-radius: 50%; border: 2px solid var(--border); background: var(--white); font-size: 1.2rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all .2s; color: var(--green-dark); line-height: 1; }
+  .stepper-btn:hover { border-color: var(--green); background: var(--green-lt); }
+  #dogCount { font-family: 'Montserrat', sans-serif; font-size: 1.6rem; font-weight: 900; color: var(--green-dark); min-width: 2rem; text-align: center; }
+  .price-result { background: var(--green-dark); padding: 2rem; color: #fff; }
+  .price-breakdown { font-size: .82rem; opacity: .75; margin-bottom: .8rem; min-height: 1.2rem; }
+  .price-total { display: flex; align-items: flex-end; justify-content: space-between; flex-wrap: wrap; gap: .5rem; margin-bottom: 1rem; }
+  .price-big { font-family: 'Montserrat', sans-serif; font-size: 3.2rem; font-weight: 900; line-height: 1; }
+  .price-per { font-size: 1rem; opacity: .75; margin-left: .3rem; }
+  .price-monthly { font-family: 'Montserrat', sans-serif; font-size: 1rem; font-weight: 700; opacity: .8; text-align: right; }
+  .price-includes { display: flex; flex-wrap: wrap; gap: .5rem 1.2rem; margin-bottom: 1.5rem; }
+  .price-includes span { font-size: .82rem; opacity: .85; }
+  .price-cta { width: 100%; padding: 1rem; background: #fff; color: var(--green-dark); border: none; border-radius: 9px; font-family: 'Montserrat', sans-serif; font-size: 1.05rem; font-weight: 900; cursor: pointer; transition: background .2s, transform .15s; }
+  .price-cta:hover:not(:disabled) { background: #e8f5e9; transform: translateY(-1px); }
+  .price-cta:disabled { opacity: .7; cursor: not-allowed; }
+  @media (max-width: 600px) { .config-step { padding: 1.2rem 1.2rem; } .price-result { padding: 1.5rem 1.2rem; } .price-big { font-size: 2.5rem; } }
+</style>
 
 <section class="about" id="about">
   <div class="section-inner">
@@ -471,25 +528,113 @@
   const SUPABASE_URL = 'https://emvqtgsjdbyaionxguhq.supabase.co';
   const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVtdnF0Z3NqZGJ5YWlvbnhndWhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA4NDU3NjYsImV4cCI6MjA5NjQyMTc2Nn0.kBq_axQYLZOsbUl12vIJdnYLI5RCSRZh5bVz9mz-6jQ';
 
-  async function subscribe(plan) {
-    const btn = event.target;
-    btn.disabled = true;
-    btn.textContent = '⏳ Loading...';
+  // ── PRICING CONFIGURATOR ──
+  var _plan = 'biweekly', _dogs = 1, _deodorizer = false;
+
+  var BASE = { weekly: 20, biweekly: 30, monthly: 50, onetime: 50 };
+  var VISITS = { weekly: 4, biweekly: 2, monthly: 1, onetime: 1 };
+  var DEOD = 10;
+  var DOG_EXTRA = 5;
+
+  function calcPrice() {
+    var base = BASE[_plan] + (_dogs - 1) * DOG_EXTRA;
+    var deod = _deodorizer ? DEOD : 0;
+    return base + deod;
+  }
+
+  function updatePriceDisplay() {
+    var price = calcPrice();
+    var visits = VISITS[_plan];
+    var monthly = price * visits;
+    var planName = { weekly:'Weekly', biweekly:'Bi-Weekly', monthly:'Monthly', onetime:'One-Time' }[_plan];
+
+    // Breakdown
+    var parts = [];
+    parts.push(planName + ' base (' + _dogs + ' dog' + (_dogs>1?'s':'') + '): $' + (BASE[_plan] + (_dogs-1)*DOG_EXTRA));
+    if (_deodorizer) parts.push('Deodorizer: +$' + DEOD);
+    document.getElementById('priceBreakdown').textContent = parts.join('  ·  ');
+
+    // Big price
+    document.getElementById('pricePerVisit').textContent = '$' + price;
+    document.getElementById('pricePer').textContent = '/visit';
+
+    // Monthly estimate
+    if (_plan === 'onetime') {
+      document.getElementById('priceMonthly').textContent = 'One-time visit';
+    } else {
+      document.getElementById('priceMonthly').textContent = '~$' + monthly + '/month (' + visits + ' visits)';
+    }
+
+    // Deodorizer include badge
+    document.getElementById('deodInclude').style.display = _deodorizer ? 'inline' : 'none';
+
+    // CTA button
+    var cta = document.getElementById('priceCta');
+    if (_plan === 'onetime') {
+      cta.textContent = 'Get a Quote →';
+      cta.onclick = function() { document.getElementById('contact').scrollIntoView({behavior:'smooth'}); };
+    } else {
+      cta.textContent = 'Subscribe Online →';
+      cta.onclick = doSubscribe;
+    }
+
+    // Dog plural
+    document.getElementById('dogPlural').textContent = _dogs > 1 ? 's' : '';
+  }
+
+  function setPlan(plan, btn) {
+    _plan = plan;
+    document.querySelectorAll('#freqOptions .config-btn').forEach(function(b){ b.classList.remove('active'); });
+    btn.classList.add('active');
+    updatePriceDisplay();
+  }
+
+  function changeDogs(delta) {
+    _dogs = Math.max(1, Math.min(8, _dogs + delta));
+    document.getElementById('dogCount').textContent = _dogs;
+    updatePriceDisplay();
+  }
+
+  function setDeodorizer(val, btn) {
+    _deodorizer = val;
+    document.getElementById('deodNo').classList.toggle('active', !val);
+    document.getElementById('deodYes').classList.toggle('active', val);
+    updatePriceDisplay();
+  }
+
+  async function doSubscribe() {
+    var price = calcPrice();
+    var cta = document.getElementById('priceCta');
+    cta.disabled = true;
+    cta.textContent = '⏳ Loading...';
     try {
-      const r = await fetch('/api/stripe-subscription', {
+      var label = (_dogs + ' dog' + (_dogs>1?'s':'')) + (_deodorizer ? ' + Deodorizer' : '');
+      var r = await fetch('/api/stripe-subscription', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ plan })
+        body: JSON.stringify({
+          plan: _plan,
+          dogs: _dogs,
+          deodorizer: _deodorizer,
+          amount_cents: price * 100,
+          label: label
+        })
       });
-      const data = await r.json();
-      if (data.url) window.location.href = data.url;
+      var data = await r.json();
+      if (data.url) { window.location.href = data.url; }
       else throw new Error(data.error);
-    } catch (err) {
-      btn.disabled = false;
-      btn.textContent = 'Subscribe Online';
-      alert('Something went wrong. Please try again or call us at 602-622-0238.');
+    } catch(err) {
+      cta.disabled = false;
+      cta.textContent = 'Subscribe Online →';
+      alert('Something went wrong. Please call us at 602-622-0238.');
     }
   }
+
+  // Init on load
+  document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('deodNo').classList.add('active');
+    updatePriceDisplay();
+  });
 
   function setTip(amount) {
     document.getElementById('tipAmount').value = amount;
