@@ -14,15 +14,28 @@ export default async function handler(req, res) {
   const selected = intervals[plan];
   if (!selected || !amount_cents) return res.status(400).json({ error: 'Invalid plan or amount' });
 
-  const planLabel = { weekly: 'Weekly', biweekly: 'Bi-Weekly', monthly: 'Monthly' }[plan];
-  const productName = `Scoop N Go Arizona — ${planLabel} Service`;
-  const description = label || `${dogs} dog${dogs > 1 ? 's' : ''}${deodorizer ? ' + Deodorizer' : ''}`;
+  const planLabel   = { weekly: 'Weekly', biweekly: 'Bi-Weekly', monthly: 'Monthly' }[plan];
+  const intervalLabel = { weekly: 'every week', biweekly: 'every 2 weeks', monthly: 'every month' }[plan];
+  const productName = `Scoop N Go Arizona — ${planLabel} Dog Waste Removal`;
+
+  const dogLine     = `${dogs} dog${dogs > 1 ? 's' : ''}`;
+  const deodLine    = deodorizer ? ' + Deodorizer Treatment' : '';
+  const description = [
+    `${dogLine}${deodLine} · Billed ${intervalLabel}`,
+    '✓ Full yard scoop & waste removal',
+    '✓ Gate closed & secured after every visit',
+    '✓ Service notification text when complete',
+    '✓ Gate photo sent after each visit',
+    deodorizer ? '✓ Pet-safe deodorizer applied to yard' : '✓ 100% satisfaction guarantee',
+    '✓ No contracts — cancel anytime',
+  ].join('\n');
 
   const params = new URLSearchParams({
     'payment_method_types[0]': 'card',
     'line_items[0][price_data][currency]': 'usd',
     'line_items[0][price_data][product_data][name]': productName,
     'line_items[0][price_data][product_data][description]': description,
+    'line_items[0][price_data][product_data][images][0]': 'https://scoopngoarizona.com/Scoopngologo.png',
     'line_items[0][price_data][recurring][interval]': selected.interval,
     'line_items[0][price_data][recurring][interval_count]': String(selected.interval_count),
     'line_items[0][price_data][unit_amount]': String(amount_cents),
@@ -33,6 +46,8 @@ export default async function handler(req, res) {
     'metadata[plan]': plan,
     'metadata[dogs]': String(dogs),
     'metadata[deodorizer]': String(deodorizer),
+    'custom_text[submit_button][message]': 'You\'ll receive a confirmation text within 24 hours to schedule your first visit. Cancel anytime — no questions asked.',
+    'phone_number_collection[enabled]': 'true',
   });
 
   try {
