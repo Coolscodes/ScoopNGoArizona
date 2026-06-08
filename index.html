@@ -4,6 +4,36 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Scoop N Go Arizona | Dog Waste Removal Service</title>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    "name": "Scoop N Go Arizona",
+    "description": "Professional dog waste removal service serving the East Valley of Arizona. Weekly, bi-weekly, and one-time cleanup services.",
+    "url": "https://scoopngoarizona.vercel.app",
+    "telephone": "+16026220238",
+    "email": "ScoopNgoarizona@gmail.com",
+    "priceRange": "$$",
+    "image": "https://scoopngoarizona.vercel.app/Scoopngologo.png",
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": "Chandler",
+      "addressRegion": "AZ",
+      "addressCountry": "US"
+    },
+    "geo": {
+      "@type": "GeoCoordinates",
+      "latitude": 33.3062,
+      "longitude": -111.8413
+    },
+    "areaServed": [
+      "Tempe, AZ", "Chandler, AZ", "Gilbert, AZ", "Mesa, AZ",
+      "Scottsdale, AZ", "Phoenix, AZ", "Ahwatukee, AZ", "Queen Creek, AZ"
+    ],
+    "openingHours": "Mo-Sa 06:00-18:00",
+    "sameAs": []
+  }
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Open+Sans:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
@@ -170,9 +200,19 @@
       .form-row { grid-template-columns: 1fr; }
     }
     @media (max-width: 600px) { .footer-grid { grid-template-columns: 1fr; } .hero { padding: 60px 5%; } }
+    /* Sticky mobile call bar */
+    .sticky-call { display: none; position: fixed; bottom: 0; left: 0; right: 0; z-index: 999; background: var(--green-dark); padding: .85rem 1.5rem; box-shadow: 0 -4px 20px rgba(0,0,0,.25); }
+    .sticky-call a { display: flex; align-items: center; justify-content: center; gap: .6rem; background: #fff; color: var(--green-dark); font-family: 'Montserrat', sans-serif; font-size: 1.05rem; font-weight: 900; text-decoration: none; border-radius: 8px; padding: .8rem; }
+    .sticky-call a:hover { background: var(--green-lt); }
+    @media (max-width: 768px) { .sticky-call { display: block; } body { padding-bottom: 80px; } }
   </style>
 </head>
 <body>
+
+<!-- Sticky mobile call bar -->
+<div class="sticky-call">
+  <a href="tel:+16026220238">📞 Tap to Call — 602-622-0238</a>
+</div>
 
 <div class="top-bar">
   📞 <a href="tel:+16026220238">602-622-0238</a> &nbsp;|&nbsp; Serving the East Valley &nbsp;|&nbsp; <a href="#contact">Get a Free Quote →</a>
@@ -193,6 +233,7 @@
   <div class="hero-inner">
     <div class="hero-badges">
       <span class="hero-badge">✅ 100% Satisfaction Guarantee</span>
+      <span class="hero-badge">🛡️ Fully Insured & Bonded</span>
       <span class="hero-badge">🐶 Dog Lovers</span>
       <span class="hero-badge">📍 Arizona Local</span>
     </div>
@@ -359,7 +400,7 @@
         </div>
         <button class="form-submit" id="submitBtn" onclick="handleSubmit()">🐾 Submit My Quote Request</button>
         <div class="form-error" id="formError"></div>
-        <p class="form-note">We'll reach out within 24 hours. No spam, ever.</p>
+        <p class="form-note">⚡ We typically respond within 2 hours. No spam, ever.</p>
       </div>
     </div>
   </div>
