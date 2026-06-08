@@ -49,6 +49,11 @@
     document.getElementById('title').textContent = 'You\'re Subscribed!';
     document.getElementById('msg').textContent = '';
     document.getElementById('sub-msg').style.display = 'block';
+  } else if (type === 'card_saved') {
+    const name = params.get('name') || 'your account';
+    document.getElementById('icon').textContent = '💳';
+    document.getElementById('title').textContent = 'Card Saved!';
+    document.getElementById('msg').textContent = `Your card has been securely saved to ${name}. Future invoices will be charged automatically. Thank you!`;
   }
 </script>
 </body>

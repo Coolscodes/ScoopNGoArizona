@@ -510,8 +510,9 @@
         <td>${c.service_type||'—'}</td>
         <td>${c.price_per_visit ? '$'+c.price_per_visit : '—'}</td>
         <td><span class="badge badge-${c.active?'active':'inactive'}">${c.active?'Active':'Inactive'}</span></td>
-        <td>
+        <td style="white-space:nowrap;display:flex;gap:.4rem;flex-wrap:wrap;">
           <button class="btn btn-outline btn-sm" onclick="editCustomer('${c.id}')">Edit</button>
+          <button class="btn btn-sm" style="background:#635bff;color:#fff;border:none;" onclick="sendCardSetupLink('${c.id}','${c.first_name} ${c.last_name}','${c.email||''}','${c.stripe_customer_id||''}')">💳 Card Link</button>
         </td>
       </tr>
     `).join('');
@@ -729,6 +730,34 @@
     const opts = allCustomers.map(c => `<option value="${c.id}">${c.first_name} ${c.last_name}</option>`).join('');
     document.getElementById('appt-customer').innerHTML = '<option value="">-- Select customer --</option>' + opts;
     document.getElementById('inv-customer').innerHTML  = '<option value="">-- Select customer --</option>' + opts;
+  }
+
+  async function sendCardSetupLink(customerId, customerName, customerEmail, stripeCustomerId) {
+    const btn = event.target;
+    btn.disabled = true;
+    btn.textContent = '⏳ Generating...';
+    try {
+      const r = await fetch('/api/stripe-setup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-admin-password': PW },
+        body: JSON.stringify({
+          customer_id: customerId,
+          customer_name: customerName.trim(),
+          customer_email: customerEmail || undefined,
+          stripe_customer_id: stripeCustomerId || undefined,
+        })
+      });
+      const data = await r.json();
+      if (data.url) {
+        await navigator.clipboard.writeText(data.url);
+        btn.textContent = '✅ Link Copied!';
+        setTimeout(() => { btn.disabled = false; btn.textContent = '💳 Card Link'; }, 3000);
+      } else throw new Error(data.error);
+    } catch (err) {
+      btn.disabled = false;
+      btn.textContent = '💳 Card Link';
+      alert('Error: ' + err.message);
+    }
   }
 
   async function sendPaymentLink(invoiceId, customerName, amount, customerEmail) {

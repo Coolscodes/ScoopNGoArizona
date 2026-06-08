@@ -3,5 +3,11 @@
     { "source": "/admin", "destination": "/admin.html" },
     { "source": "/payment-success", "destination": "/payment-success.html" },
     { "source": "/tip", "destination": "/tip.html" }
+  ],
+  "crons": [
+    {
+      "path": "/api/auto-invoice",
+      "schedule": "0 8 1 * *"
+    }
   ]
 }
