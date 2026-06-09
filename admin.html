@@ -708,7 +708,11 @@
     const tbody = document.getElementById('invoicesBody');
     if (!filtered.length) { tbody.innerHTML = '<tr class="empty-row"><td colspan="6">No invoices found.</td></tr>'; return; }
     tbody.innerHTML = filtered.map(i => {
-      const c = i.customers || {};
+      const c = allCustomers.find(x => x.id === i.customer_id) || i.customers || {};
+      const hasCard = !!c.stripe_customer_id;
+      const cardBtn = hasCard
+        ? `<span style="background:#e8f5e9;color:#2e7d32;border:1px solid #a5d6a7;border-radius:6px;padding:.28rem .7rem;font-size:.76rem;font-weight:700;font-family:'Montserrat',sans-serif;white-space:nowrap;">✅ Card on File</span>`
+        : `<button class="btn btn-sm" style="background:#1565c0;color:#fff;white-space:nowrap;" onclick="sendCardSetupLink('${c.id}','${((c.first_name||'')+' '+(c.last_name||'')).trim()}','${c.email||''}','${c.stripe_customer_id||''}')">💳 Add Card</button>`;
       return `<tr>
         <td><strong>${c.first_name||''} ${c.last_name||''}</strong></td>
         <td><a href="tel:${c.phone||''}" style="color:var(--green);font-weight:600;">${c.phone||'—'}</a></td>
@@ -722,8 +726,8 @@
             <option value="overdue" ${i.status==='overdue'?'selected':''}>🔴 Overdue</option>
           </select>
         </td>
-        <td style="display:flex;gap:.4rem;flex-wrap:wrap;">
-          <button class="btn btn-green btn-sm" onclick="sendPaymentLink('${i.id}','${(c.first_name||'') + ' ' + (c.last_name||'')}',${i.amount},'${c.email||''}')">💳 Payment Link</button>
+        <td style="display:flex;gap:.4rem;flex-wrap:wrap;align-items:center;">
+          ${cardBtn}
           <button class="btn btn-red btn-sm" onclick="deleteInvoice('${i.id}')">Delete</button>
         </td>
       </tr>`;
@@ -776,6 +780,7 @@
 
   async function sendCardSetupLink(customerId, customerName, customerEmail, stripeCustomerId) {
     const btn = event.target;
+    const originalText = btn.textContent;
     btn.disabled = true;
     btn.textContent = '⏳ Generating...';
     try {
@@ -793,11 +798,11 @@
       if (data.url) {
         await navigator.clipboard.writeText(data.url);
         btn.textContent = '✅ Link Copied!';
-        setTimeout(() => { btn.disabled = false; btn.textContent = '💳 Card Link'; }, 3000);
+        setTimeout(() => { btn.disabled = false; btn.textContent = originalText; }, 3000);
       } else throw new Error(data.error);
     } catch (err) {
       btn.disabled = false;
-      btn.textContent = '💳 Card Link';
+      btn.textContent = originalText;
       alert('Error: ' + err.message);
     }
   }
