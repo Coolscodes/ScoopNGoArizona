@@ -243,10 +243,31 @@
       <div class="section-hdr">
         <h2>Invoices</h2>
         <div style="display:flex;gap:.6rem;align-items:center;">
-          <button class="btn btn-green" id="runInvoiceBtn" onclick="runWeeklyCharges()" style="background:#1b5e20;">⚡ Charge & Invoice All</button>
+          <button class="btn btn-green" id="openChargeBtn" onclick="openChargePanel()" style="background:#1b5e20;">⚡ Charge Clients</button>
           <button class="btn btn-green" onclick="openModal('invoice')">+ New Invoice</button>
         </div>
       </div>
+
+      <!-- Charge panel -->
+      <div id="chargePanel" style="display:none;background:#fff;border:1px solid #c8e6c9;border-radius:10px;padding:1.25rem 1.5rem;margin-bottom:1.25rem;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:.5rem;">
+          <div>
+            <strong id="chargePanelTitle" style="font-family:'Montserrat',sans-serif;font-size:1rem;"></strong>
+            <span id="chargePanelSub" style="font-size:.82rem;color:#555;margin-left:.5rem;"></span>
+          </div>
+          <div style="display:flex;gap:.5rem;align-items:center;">
+            <button class="btn btn-outline btn-sm" onclick="toggleAllChargeClients(true)">Select All</button>
+            <button class="btn btn-outline btn-sm" onclick="toggleAllChargeClients(false)">Deselect All</button>
+            <button class="btn btn-outline btn-sm" onclick="closeChargePanel()">Cancel</button>
+          </div>
+        </div>
+        <div id="chargeClientList" style="display:flex;flex-direction:column;gap:.5rem;margin-bottom:1.1rem;"></div>
+        <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">
+          <button class="btn btn-green" id="chargeSubmitBtn" onclick="runWeeklyCharges()" style="background:#1b5e20;min-width:180px;">⚡ Charge Selected (<span id="chargeSelectedCount">0</span>)</button>
+          <span id="chargeSelectedTotal" style="font-family:'Montserrat',sans-serif;font-weight:700;color:#1b5e20;font-size:1rem;"></span>
+        </div>
+      </div>
+
       <div id="invoiceRunResult" style="display:none;background:#e8f5e9;border:1px solid #a5d6a7;border-radius:8px;padding:.85rem 1.1rem;margin-bottom:1rem;font-size:.88rem;color:#1b5e20;"></div>
       <div class="filter-row">
         <select id="invoiceFilter" onchange="renderInvoices()">
@@ -781,21 +802,94 @@
     }
   }
 
-  async function runWeeklyCharges() {
-    const btn = document.getElementById('runInvoiceBtn');
-    const resultEl = document.getElementById('invoiceRunResult');
+  // ── CHARGE PANEL ──
+  let chargePanelClients = []; // customers eligible today
 
+  function openChargePanel() {
     const todayName = new Date().toLocaleDateString('en-US', { weekday: 'long' });
-    if (!confirm(`Charge all ${todayName} clients with a card on file?`)) return;
+    // Filter active customers whose preferred_day matches today
+    chargePanelClients = allCustomers.filter(c => c.active && c.preferred_day === todayName);
 
+    document.getElementById('chargePanelTitle').textContent = `${todayName} Clients`;
+    document.getElementById('chargePanel').style.display = 'block';
+    document.getElementById('openChargeBtn').style.display = 'none';
+    renderChargeClientList();
+  }
+
+  function closeChargePanel() {
+    document.getElementById('chargePanel').style.display = 'none';
+    document.getElementById('openChargeBtn').style.display = '';
+    document.getElementById('invoiceRunResult').style.display = 'none';
+  }
+
+  function renderChargeClientList() {
+    const list = document.getElementById('chargeClientList');
+    if (!chargePanelClients.length) {
+      list.innerHTML = '<p style="color:#888;font-size:.88rem;">No active clients scheduled for today. Make sure clients have a Day of Week set.</p>';
+      document.getElementById('chargeSubmitBtn').disabled = true;
+      return;
+    }
+    list.innerHTML = chargePanelClients.map((c, i) => {
+      const hasCard = !!c.stripe_customer_id;
+      const noPrice = !c.price_per_visit;
+      const disabled = !hasCard || noPrice;
+      const warning = !hasCard ? ' <span style="color:#f57f17;font-size:.75rem;">No card on file</span>'
+                    : noPrice  ? ' <span style="color:#f57f17;font-size:.75rem;">No price set</span>' : '';
+      return `
+        <label style="display:flex;align-items:center;gap:.75rem;padding:.6rem .75rem;border-radius:7px;border:1px solid #e0e0e0;cursor:${disabled?'default':'pointer'};background:${disabled?'#fafafa':'#fff'};">
+          <input type="checkbox" data-idx="${i}" ${disabled ? 'disabled' : 'checked'}
+            onchange="updateChargeSelection()"
+            style="width:17px;height:17px;accent-color:#2e7d32;cursor:pointer;flex-shrink:0;"/>
+          <span style="flex:1;font-weight:600;">${c.first_name} ${c.last_name}</span>
+          <span style="color:#1b5e20;font-weight:700;font-family:'Montserrat',sans-serif;">${c.price_per_visit ? '$'+c.price_per_visit : '—'}</span>
+          ${warning}
+        </label>`;
+    }).join('');
+    updateChargeSelection();
+  }
+
+  function updateChargeSelection() {
+    const boxes = document.querySelectorAll('#chargeClientList input[type=checkbox]');
+    let count = 0, total = 0;
+    boxes.forEach(box => {
+      if (box.checked && !box.disabled) {
+        count++;
+        const c = chargePanelClients[parseInt(box.dataset.idx)];
+        total += c.price_per_visit || 0;
+      }
+    });
+    document.getElementById('chargeSelectedCount').textContent = count;
+    document.getElementById('chargeSelectedTotal').textContent = count ? `$${total.toFixed(2)} total` : '';
+    document.getElementById('chargeSubmitBtn').disabled = count === 0;
+  }
+
+  function toggleAllChargeClients(checked) {
+    document.querySelectorAll('#chargeClientList input[type=checkbox]:not(:disabled)')
+      .forEach(box => { box.checked = checked; });
+    updateChargeSelection();
+  }
+
+  async function runWeeklyCharges() {
+    const boxes = document.querySelectorAll('#chargeClientList input[type=checkbox]');
+    const selectedIds = [];
+    boxes.forEach(box => {
+      if (box.checked && !box.disabled) {
+        selectedIds.push(chargePanelClients[parseInt(box.dataset.idx)].id);
+      }
+    });
+    if (!selectedIds.length) return;
+
+    const btn = document.getElementById('chargeSubmitBtn');
+    const resultEl = document.getElementById('invoiceRunResult');
     btn.disabled = true;
-    btn.textContent = '⏳ Charging...';
+    btn.innerHTML = '⏳ Charging...';
     resultEl.style.display = 'none';
 
     try {
       const r = await fetch('/api/charge-customers', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'x-admin-password': PW },
+        body: JSON.stringify({ customer_ids: selectedIds }),
       });
       const data = await r.json();
       if (!r.ok) throw new Error(data.error || 'Server error');
@@ -805,19 +899,11 @@
       const skipped = (data.results || []).filter(x => x.status === 'skipped');
 
       let html = `<strong>Week of ${data.week}</strong><br>`;
-      html += `✅ <strong>${data.charged} charged</strong> ($${(data.total||0).toFixed(2)} total)`;
+      html += `✅ <strong>${data.charged} charged</strong> — $${(data.total||0).toFixed(2)} total`;
       if (failed.length)  html += ` &nbsp;|&nbsp; ❌ ${failed.length} failed`;
       if (skipped.length) html += ` &nbsp;|&nbsp; ⏭ ${skipped.length} skipped`;
-
-      if (charged.length) {
-        html += `<br><span style="opacity:.75;font-size:.83rem;">Charged: ${charged.map(x => x.name + ' ($' + x.amount + ')').join(', ')}</span>`;
-      }
-      if (failed.length) {
-        html += `<br><span style="color:#c62828;font-size:.83rem;">Failed: ${failed.map(x => x.name + ' — ' + x.reason).join('; ')}</span>`;
-      }
-      if (skipped.length) {
-        html += `<br><span style="opacity:.6;font-size:.83rem;">Skipped: ${skipped.map(x => x.name + ' (' + x.reason + ')').join(', ')}</span>`;
-      }
+      if (charged.length) html += `<br><span style="opacity:.75;font-size:.83rem;">Charged: ${charged.map(x => x.name + ' ($' + x.amount + ')').join(', ')}</span>`;
+      if (failed.length)  html += `<br><span style="color:#c62828;font-size:.83rem;">Failed: ${failed.map(x => x.name + ' — ' + x.reason).join('; ')}</span>`;
 
       resultEl.innerHTML = html;
       resultEl.style.background = failed.length ? '#fff8e1' : '#e8f5e9';
@@ -825,7 +911,8 @@
       resultEl.style.color = '#1a1a1a';
       resultEl.style.display = 'block';
 
-      // Refresh invoice list
+      closeChargePanel();
+
       const invoices = await api('invoices');
       allInvoices = Array.isArray(invoices) ? invoices : [];
       renderInvoices();
@@ -838,7 +925,7 @@
       resultEl.style.display = 'block';
     } finally {
       btn.disabled = false;
-      btn.textContent = '⚡ Charge & Invoice All';
+      btn.innerHTML = `⚡ Charge Selected (<span id="chargeSelectedCount">${document.getElementById('chargeSelectedCount')?.textContent||0}</span>)`;
     }
   }
 

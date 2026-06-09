@@ -52,13 +52,19 @@ export default async function handler(req, res) {
   const periodEnd   = fmt(sunday);
   const weekLabel   = `${fmtLabel(monday)} - ${fmtLabel(sunday)}, ${monday.getFullYear()}`;
 
-  // Only charge customers whose service day matches today
-  const todayName = now.toLocaleDateString('en-US', { weekday: 'long' }); // e.g. "Wednesday"
-  const custRes = await supa(`customers?active=eq.true&preferred_day=eq.${todayName}&order=first_name.asc`);
+  // Accept explicit list of customer IDs from the admin panel
+  const { customer_ids } = req.body || {};
+  if (!Array.isArray(customer_ids) || !customer_ids.length) {
+    return res.status(400).json({ error: 'No customers selected' });
+  }
+
+  // Fetch only the selected customers
+  const idFilter = customer_ids.map(id => `id.eq.${id}`).join(',');
+  const custRes = await supa(`customers?or=(${idFilter})&order=first_name.asc`);
   const customers = await custRes.json();
 
   if (!Array.isArray(customers) || !customers.length) {
-    return res.status(200).json({ message: 'No active customers found', week: weekLabel, results: [] });
+    return res.status(200).json({ message: 'No customers found', week: weekLabel, results: [] });
   }
 
   // Check for already-charged invoices this week
