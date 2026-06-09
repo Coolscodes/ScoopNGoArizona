@@ -338,6 +338,10 @@
         </div>
       </div>
       <div class="form-group"><label>Yard Notes</label><textarea id="cust-notes" placeholder="Gate on left side, dogs friendly, watch for sprinkler heads..."></textarea></div>
+      <div class="form-group" style="border-top:1px solid var(--border);padding-top:1rem;margin-top:.5rem;">
+        <label style="color:#635bff;">Stripe Customer ID <span style="font-weight:400;opacity:.7;">(optional — paste from Stripe dashboard)</span></label>
+        <input id="cust-stripe-id" placeholder="cus_xxxxxxxxxxxxxxxxxx" style="font-family:monospace;font-size:.85rem;"/>
+      </div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-outline" onclick="closeModal('customer')">Cancel</button>
@@ -557,7 +561,7 @@
   function openAddCustomer() {
     document.getElementById('customerModalTitle').textContent = 'Add Customer';
     document.getElementById('cust-id').value = '';
-    ['cust-first','cust-last','cust-phone','cust-email','cust-address','cust-gate','cust-zip','cust-notes','cust-start-date'].forEach(id => document.getElementById(id).value = '');
+    ['cust-first','cust-last','cust-phone','cust-email','cust-address','cust-gate','cust-zip','cust-notes','cust-start-date','cust-stripe-id'].forEach(id => document.getElementById(id).value = '');
     document.getElementById('cust-price').value = '';
     document.getElementById('cust-service').value = 'Weekly';
     document.getElementById('cust-day').value = '';
@@ -583,6 +587,7 @@
     document.getElementById('cust-price').value = c.price_per_visit||'';
     document.getElementById('cust-notes').value = c.yard_notes||'';
     document.getElementById('cust-active').value = c.active ? 'true' : 'false';
+    document.getElementById('cust-stripe-id').value = c.stripe_customer_id||'';
     openModal('customer');
   }
 
@@ -598,8 +603,9 @@
       zip:        document.getElementById('cust-zip').value.trim(),
       service_type:   document.getElementById('cust-service').value,
       preferred_day:  document.getElementById('cust-day').value,
-      start_date:     document.getElementById('cust-start-date').value || null,
-      price_per_visit: parseFloat(document.getElementById('cust-price').value)||null,
+      start_date:          document.getElementById('cust-start-date').value || null,
+      stripe_customer_id:  document.getElementById('cust-stripe-id').value.trim() || null,
+      price_per_visit:     parseFloat(document.getElementById('cust-price').value)||null,
       yard_notes: document.getElementById('cust-notes').value.trim(),
       active:     document.getElementById('cust-active').value === 'true',
     };
