@@ -609,7 +609,7 @@
       yard_notes: document.getElementById('cust-notes').value.trim(),
       active:     document.getElementById('cust-active').value === 'true',
     };
-    if (!data.first_name || !data.last_name || !data.phone) { alert('First name, last name, and phone are required.'); return; }
+    if (!data.first_name || !data.phone) { alert('First name and phone are required.'); return; }
     if (id) {
       await api('customers', 'PATCH', data, id);
     } else {
