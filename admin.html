@@ -242,8 +242,12 @@
       <div class="stats-row" id="invoiceStats"></div>
       <div class="section-hdr">
         <h2>Invoices</h2>
-        <button class="btn btn-green" onclick="openModal('invoice')">+ New Invoice</button>
+        <div style="display:flex;gap:.6rem;align-items:center;">
+          <button class="btn btn-outline" id="runInvoiceBtn" onclick="runWeeklyInvoices()">⚡ Run Weekly Invoices</button>
+          <button class="btn btn-green" onclick="openModal('invoice')">+ New Invoice</button>
+        </div>
       </div>
+      <div id="invoiceRunResult" style="display:none;background:#e8f5e9;border:1px solid #a5d6a7;border-radius:8px;padding:.85rem 1.1rem;margin-bottom:1rem;font-size:.88rem;color:#1b5e20;"></div>
       <div class="filter-row">
         <select id="invoiceFilter" onchange="renderInvoices()">
           <option value="unpaid">Unpaid</option>
@@ -774,6 +778,50 @@
       btn.disabled = false;
       btn.textContent = '💳 Card Link';
       alert('Error: ' + err.message);
+    }
+  }
+
+  async function runWeeklyInvoices() {
+    const btn = document.getElementById('runInvoiceBtn');
+    const resultEl = document.getElementById('invoiceRunResult');
+    btn.disabled = true;
+    btn.textContent = '⏳ Running...';
+    resultEl.style.display = 'none';
+    try {
+      const r = await fetch('/api/auto-invoice', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-admin-password': PW },
+      });
+      const data = await r.json();
+      if (!r.ok) throw new Error(data.error || 'Server error');
+
+      const created = data.results ? data.results.filter(x => x.status === 'created') : [];
+      const skipped = data.results ? data.results.filter(x => x.status.startsWith('skipped')) : [];
+      let html = `<strong>Week of ${data.week}</strong> &mdash; ${data.created} invoice${data.created !== 1 ? 's' : ''} created`;
+      if (skipped.length) html += `, ${skipped.length} skipped`;
+      if (created.length) {
+        html += `<br><span style="opacity:.8;">${created.map(x => x.name + ' ($' + x.amount + ')').join(', ')}</span>`;
+      }
+      resultEl.innerHTML = html;
+      resultEl.style.background = '#e8f5e9';
+      resultEl.style.borderColor = '#a5d6a7';
+      resultEl.style.color = '#1b5e20';
+      resultEl.style.display = 'block';
+
+      // Refresh invoice list
+      const invoices = await api('invoices');
+      allInvoices = Array.isArray(invoices) ? invoices : [];
+      renderInvoices();
+      renderInvoiceStats();
+    } catch (err) {
+      resultEl.innerHTML = '<strong>Error:</strong> ' + err.message;
+      resultEl.style.background = '#ffebee';
+      resultEl.style.borderColor = '#ffcdd2';
+      resultEl.style.color = '#c62828';
+      resultEl.style.display = 'block';
+    } finally {
+      btn.disabled = false;
+      btn.textContent = '⚡ Run Weekly Invoices';
     }
   }
 
