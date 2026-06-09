@@ -243,7 +243,7 @@
       <div class="section-hdr">
         <h2>Invoices</h2>
         <div style="display:flex;gap:.6rem;align-items:center;">
-          <button class="btn btn-outline" id="runInvoiceBtn" onclick="runWeeklyInvoices()">⚡ Run Weekly Invoices</button>
+          <button class="btn btn-green" id="runInvoiceBtn" onclick="runWeeklyCharges()" style="background:#1b5e20;">⚡ Charge & Invoice All</button>
           <button class="btn btn-green" onclick="openModal('invoice')">+ New Invoice</button>
         </div>
       </div>
@@ -781,31 +781,47 @@
     }
   }
 
-  async function runWeeklyInvoices() {
+  async function runWeeklyCharges() {
     const btn = document.getElementById('runInvoiceBtn');
     const resultEl = document.getElementById('invoiceRunResult');
+
+    if (!confirm('Charge all active customers with a card on file for this week?')) return;
+
     btn.disabled = true;
-    btn.textContent = '⏳ Running...';
+    btn.textContent = '⏳ Charging...';
     resultEl.style.display = 'none';
+
     try {
-      const r = await fetch('/api/auto-invoice', {
+      const r = await fetch('/api/charge-customers', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'x-admin-password': PW },
       });
       const data = await r.json();
       if (!r.ok) throw new Error(data.error || 'Server error');
 
-      const created = data.results ? data.results.filter(x => x.status === 'created') : [];
-      const skipped = data.results ? data.results.filter(x => x.status.startsWith('skipped')) : [];
-      let html = `<strong>Week of ${data.week}</strong> &mdash; ${data.created} invoice${data.created !== 1 ? 's' : ''} created`;
-      if (skipped.length) html += `, ${skipped.length} skipped`;
-      if (created.length) {
-        html += `<br><span style="opacity:.8;">${created.map(x => x.name + ' ($' + x.amount + ')').join(', ')}</span>`;
+      const charged = (data.results || []).filter(x => x.status === 'charged');
+      const failed  = (data.results || []).filter(x => x.status === 'failed');
+      const skipped = (data.results || []).filter(x => x.status === 'skipped');
+
+      let html = `<strong>Week of ${data.week}</strong><br>`;
+      html += `✅ <strong>${data.charged} charged</strong> ($${(data.total||0).toFixed(2)} total)`;
+      if (failed.length)  html += ` &nbsp;|&nbsp; ❌ ${failed.length} failed`;
+      if (skipped.length) html += ` &nbsp;|&nbsp; ⏭ ${skipped.length} skipped`;
+
+      if (charged.length) {
+        html += `<br><span style="opacity:.75;font-size:.83rem;">Charged: ${charged.map(x => x.name + ' ($' + x.amount + ')').join(', ')}</span>`;
       }
+      if (failed.length) {
+        html += `<br><span style="color:#c62828;font-size:.83rem;">Failed: ${failed.map(x => x.name + ' — ' + x.reason).join('; ')}</span>`;
+      }
+      if (skipped.length) {
+        html += `<br><span style="opacity:.6;font-size:.83rem;">Skipped: ${skipped.map(x => x.name + ' (' + x.reason + ')').join(', ')}</span>`;
+      }
+
       resultEl.innerHTML = html;
-      resultEl.style.background = '#e8f5e9';
-      resultEl.style.borderColor = '#a5d6a7';
-      resultEl.style.color = '#1b5e20';
+      resultEl.style.background = failed.length ? '#fff8e1' : '#e8f5e9';
+      resultEl.style.borderColor = failed.length ? '#ffe082' : '#a5d6a7';
+      resultEl.style.color = '#1a1a1a';
       resultEl.style.display = 'block';
 
       // Refresh invoice list
@@ -821,7 +837,7 @@
       resultEl.style.display = 'block';
     } finally {
       btn.disabled = false;
-      btn.textContent = '⚡ Run Weekly Invoices';
+      btn.textContent = '⚡ Charge & Invoice All';
     }
   }
 

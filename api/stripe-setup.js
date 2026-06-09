@@ -59,6 +59,7 @@ export default async function handler(req, res) {
       'cancel_url': `${origin}/admin`,
       'metadata[customer_id]': customer_id,
       'metadata[customer_name]': customer_name,
+      'metadata[setup_for]': 'card_on_file',
     });
 
     const r = await fetch('https://api.stripe.com/v1/checkout/sessions', {

@@ -54,7 +54,36 @@ export default async function handler(req, res) {
 
   if (event.type === 'checkout.session.completed') {
     const session = event.data.object;
-    const { invoice_id, plan, dogs, deodorizer, customer_name } = session.metadata || {};
+    const { invoice_id, plan, dogs, deodorizer, customer_name, customer_id } = session.metadata || {};
+
+    // Save payment method when a card setup session completes
+    if (session.mode === 'setup' && customer_id && session.setup_intent) {
+      try {
+        // Fetch the SetupIntent to get the payment method
+        const siRes = await fetch(`https://api.stripe.com/v1/setup_intents/${session.setup_intent}`, {
+          headers: { 'Authorization': `Bearer ${process.env.STRIPE_SECRET_KEY}` },
+        });
+        const si = await siRes.json();
+        if (si.payment_method) {
+          // Set as default on the Stripe customer
+          await fetch(`https://api.stripe.com/v1/customers/${session.customer}`, {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${process.env.STRIPE_SECRET_KEY}`,
+              'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: `invoice_settings[default_payment_method]=${si.payment_method}`,
+          });
+          // Save payment method ID to Supabase customer record
+          await supabase(`customers?id=eq.${customer_id}`, 'PATCH', {
+            stripe_payment_method_id: si.payment_method,
+            stripe_customer_id: session.customer,
+          });
+        }
+      } catch (e) {
+        // Non-fatal — card is still saved in Stripe
+      }
+    }
 
     // 1. Mark invoice paid (admin-generated payment links)
     if (invoice_id) {
