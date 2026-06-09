@@ -39,8 +39,14 @@ export default async function handler(req, res) {
   const fmtLabel = d => d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
   const weekLabel = `${fmtLabel(monday)} - ${fmtLabel(sunday)}, ${monday.getFullYear()}`;
 
-  // Get all active customers
-  const custRes = await fetch(`${BASE}/customers?active=eq.true&order=first_name.asc`, { headers: hdrs });
+  // When triggered by cron, only invoice customers whose service day matches today
+  // When triggered manually by admin, invoice all active customers
+  const todayName = now.toLocaleDateString('en-US', { weekday: 'long' }); // e.g. "Wednesday"
+  const custUrl = validCron
+    ? `${BASE}/customers?active=eq.true&preferred_day=eq.${todayName}&order=first_name.asc`
+    : `${BASE}/customers?active=eq.true&order=first_name.asc`;
+
+  const custRes = await fetch(custUrl, { headers: hdrs });
   const customers = await custRes.json();
 
   if (!Array.isArray(customers) || !customers.length) {
