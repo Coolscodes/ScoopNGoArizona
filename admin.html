@@ -785,7 +785,8 @@
     const btn = document.getElementById('runInvoiceBtn');
     const resultEl = document.getElementById('invoiceRunResult');
 
-    if (!confirm('Charge all active customers with a card on file for this week?')) return;
+    const todayName = new Date().toLocaleDateString('en-US', { weekday: 'long' });
+    if (!confirm(`Charge all ${todayName} clients with a card on file?`)) return;
 
     btn.disabled = true;
     btn.textContent = '⏳ Charging...';

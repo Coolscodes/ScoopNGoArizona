@@ -52,8 +52,9 @@ export default async function handler(req, res) {
   const periodEnd   = fmt(sunday);
   const weekLabel   = `${fmtLabel(monday)} - ${fmtLabel(sunday)}, ${monday.getFullYear()}`;
 
-  // Get all active customers with a stripe_customer_id
-  const custRes = await supa('customers?active=eq.true&order=first_name.asc');
+  // Only charge customers whose service day matches today
+  const todayName = now.toLocaleDateString('en-US', { weekday: 'long' }); // e.g. "Wednesday"
+  const custRes = await supa(`customers?active=eq.true&preferred_day=eq.${todayName}&order=first_name.asc`);
   const customers = await custRes.json();
 
   if (!Array.isArray(customers) || !customers.length) {
