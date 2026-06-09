@@ -200,13 +200,13 @@
     <div class="panel" id="panel-customers">
       <div class="section-hdr">
         <h2>Active Customers</h2>
-        <button class="btn btn-green" onclick="openModal('customer')">+ Add Customer</button>
+        <button class="btn btn-green" onclick="openAddCustomer()">+ Add Customer</button>
       </div>
       <div class="table-wrap">
         <table>
           <thead><tr>
             <th>Name</th><th>Phone</th><th>Address</th>
-            <th>Gate Code</th><th>Notes</th><th>Service</th><th>Price/Visit</th><th>Status</th><th style="min-width:140px;"></th>
+            <th>Gate Code</th><th>Notes</th><th>Service</th><th>Day</th><th>Start Date</th><th>Price/Visit</th><th>Status</th><th style="min-width:140px;"></th>
           </tr></thead>
           <tbody id="customersBody"><tr class="empty-row"><td colspan="9"><div class="loading">Loading customers...</div></td></tr></tbody>
         </table>
@@ -292,19 +292,22 @@
       <div class="form-row-2">
         <div class="form-group"><label>Service Type</label>
           <select id="cust-service">
-            <option>Weekly</option><option>Bi-Weekly</option><option>One-Time</option>
+            <option>Weekly</option><option>Bi-Weekly</option><option>Monthly</option><option>One-Time</option>
           </select>
         </div>
-        <div class="form-group"><label>Preferred Day</label>
+        <div class="form-group"><label>Day of Week</label>
           <select id="cust-day">
-            <option value="">-- Any --</option>
+            <option value="">-- Select --</option>
             <option>Monday</option><option>Tuesday</option><option>Wednesday</option>
-            <option>Thursday</option><option>Friday</option><option>Saturday</option>
+            <option>Thursday</option><option>Friday</option><option>Saturday</option><option>Sunday</option>
           </select>
         </div>
       </div>
       <div class="form-row-2">
+        <div class="form-group"><label>Start Date</label><input id="cust-start-date" type="date"/></div>
         <div class="form-group"><label>Price Per Visit ($)</label><input id="cust-price" type="number" placeholder="20"/></div>
+      </div>
+      <div class="form-row-2">
         <div class="form-group"><label>Status</label>
           <select id="cust-active"><option value="true">Active</option><option value="false">Inactive</option></select>
         </div>
@@ -507,6 +510,8 @@
         <td>${c.gate_code||'—'}</td>
         <td style="font-size:.8rem;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${c.yard_notes||''}">${c.yard_notes||'—'}</td>
         <td>${c.service_type||'—'}</td>
+        <td>${c.preferred_day||'—'}</td>
+        <td style="white-space:nowrap;">${c.start_date ? new Date(c.start_date+'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '—'}</td>
         <td>${c.price_per_visit ? '$'+c.price_per_visit : '—'}</td>
         <td><span class="badge badge-${c.active?'active':'inactive'}">${c.active?'Active':'Inactive'}</span></td>
         <td style="white-space:nowrap;">
@@ -524,6 +529,17 @@
     document.getElementById('modal-'+type).classList.remove('open');
   }
 
+  function openAddCustomer() {
+    document.getElementById('customerModalTitle').textContent = 'Add Customer';
+    document.getElementById('cust-id').value = '';
+    ['cust-first','cust-last','cust-phone','cust-email','cust-address','cust-gate','cust-zip','cust-notes','cust-start-date'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('cust-price').value = '';
+    document.getElementById('cust-service').value = 'Weekly';
+    document.getElementById('cust-day').value = '';
+    document.getElementById('cust-active').value = 'true';
+    openModal('customer');
+  }
+
   function editCustomer(id) {
     const c = allCustomers.find(x => x.id === id);
     if (!c) return;
@@ -538,6 +554,7 @@
     document.getElementById('cust-zip').value = c.zip||'';
     document.getElementById('cust-service').value = c.service_type||'Weekly';
     document.getElementById('cust-day').value = c.preferred_day||'';
+    document.getElementById('cust-start-date').value = c.start_date||'';
     document.getElementById('cust-price').value = c.price_per_visit||'';
     document.getElementById('cust-notes').value = c.yard_notes||'';
     document.getElementById('cust-active').value = c.active ? 'true' : 'false';
@@ -556,6 +573,7 @@
       zip:        document.getElementById('cust-zip').value.trim(),
       service_type:   document.getElementById('cust-service').value,
       preferred_day:  document.getElementById('cust-day').value,
+      start_date:     document.getElementById('cust-start-date').value || null,
       price_per_visit: parseFloat(document.getElementById('cust-price').value)||null,
       yard_notes: document.getElementById('cust-notes').value.trim(),
       active:     document.getElementById('cust-active').value === 'true',
