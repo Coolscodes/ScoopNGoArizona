@@ -1,3 +1,37 @@
+async function sendFailureEmail(customerName, phone, amount, reason, weekLabel, resendKey) {
+  try {
+    await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${resendKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        from: 'Scoop N Go Arizona <onboarding@resend.dev>',
+        to: 'scoopngoarizona@gmail.com',
+        subject: `⚠️ Payment Failed: ${customerName}`,
+        html: `
+          <div style="font-family:Arial,sans-serif;max-width:500px;margin:0 auto;padding:20px;">
+            <h2 style="color:#c62828;">⚠️ Payment Failed</h2>
+            <p>A charge did not go through for the following client:</p>
+            <table style="width:100%;border-collapse:collapse;margin:16px 0;">
+              <tr><td style="padding:8px 0;color:#555;">Client</td><td style="padding:8px 0;font-weight:bold;">${customerName}</td></tr>
+              <tr><td style="padding:8px 0;color:#555;">Phone</td><td style="padding:8px 0;">${phone || 'N/A'}</td></tr>
+              <tr><td style="padding:8px 0;color:#555;">Amount</td><td style="padding:8px 0;font-weight:bold;">$${(amount||0).toFixed(2)}</td></tr>
+              <tr><td style="padding:8px 0;color:#555;">Week</td><td style="padding:8px 0;">${weekLabel}</td></tr>
+              <tr><td style="padding:8px 0;color:#555;">Reason</td><td style="padding:8px 0;color:#c62828;">${reason}</td></tr>
+            </table>
+            <p>You may need to send them a new card setup link or follow up directly.</p>
+            <a href="https://www.scoopngoarizona.com/admin" style="display:inline-block;background:#1b5e20;color:#fff;padding:10px 20px;border-radius:8px;text-decoration:none;font-weight:bold;">Open Admin</a>
+          </div>
+        `,
+      }),
+    });
+  } catch (e) {
+    // Non-fatal — don't let email failure block the rest
+  }
+}
+
 // Charge all active customers with a card on file, create paid invoices, email receipts
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -195,12 +229,17 @@ export default async function handler(req, res) {
         results.push({ name, status: 'charged', amount: c.price_per_visit });
 
       } else if (pi.status === 'requires_action' || pi.status === 'requires_payment_method') {
-        results.push({ name, status: 'failed', reason: `Card declined or requires action (${pi.status})` });
+        const reason = `Card declined or requires action (${pi.status})`;
+        await sendFailureEmail(name, c.phone, c.price_per_visit, reason, weekLabel, RESEND_KEY);
+        results.push({ name, status: 'failed', reason });
       } else {
-        results.push({ name, status: 'failed', reason: `Unexpected status: ${pi.status}` });
+        const reason = `Unexpected status: ${pi.status}`;
+        await sendFailureEmail(name, c.phone, c.price_per_visit, reason, weekLabel, RESEND_KEY);
+        results.push({ name, status: 'failed', reason });
       }
 
     } catch (err) {
+      await sendFailureEmail(name, c.phone, c.price_per_visit, err.message, weekLabel, RESEND_KEY);
       results.push({ name, status: 'failed', reason: err.message });
     }
   }
