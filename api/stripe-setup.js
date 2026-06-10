@@ -60,6 +60,8 @@ export default async function handler(req, res) {
       'metadata[customer_id]': customer_id,
       'metadata[customer_name]': customer_name,
       'metadata[setup_for]': 'card_on_file',
+      'setup_intent_data[metadata][customer_id]': customer_id,
+      'setup_intent_data[metadata][customer_name]': customer_name,
     });
 
     const r = await fetch('https://api.stripe.com/v1/checkout/sessions', {

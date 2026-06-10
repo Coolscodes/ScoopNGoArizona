@@ -52,36 +52,54 @@ export default async function handler(req, res) {
   let event;
   try { event = JSON.parse(rawBody); } catch { return res.status(400).json({ error: 'Invalid JSON' }); }
 
+  // Most reliable: setup_intent.succeeded fires with payment_method directly on the object
+  if (event.type === 'setup_intent.succeeded') {
+    const si = event.data.object;
+    const customerId = si.metadata?.customer_id;
+    const pmId = si.payment_method;
+    const stripeCustomerId = si.customer;
+
+    if (customerId && pmId && stripeCustomerId) {
+      // Set as default payment method on the Stripe customer
+      await fetch(`https://api.stripe.com/v1/customers/${stripeCustomerId}`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${process.env.STRIPE_SECRET_KEY}`,
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `invoice_settings[default_payment_method]=${pmId}`,
+      });
+      // Save to Supabase
+      await supabase(`customers?id=eq.${customerId}`, 'PATCH', {
+        stripe_payment_method_id: pmId,
+        stripe_customer_id: stripeCustomerId,
+      });
+    }
+  }
+
   if (event.type === 'checkout.session.completed') {
     const session = event.data.object;
     const { invoice_id, plan, dogs, deodorizer, customer_name, customer_id } = session.metadata || {};
 
-    // Save payment method when a card setup session completes
+    // Fallback: also handle setup via checkout session in case setup_intent.succeeded isn't subscribed
     if (session.mode === 'setup' && customer_id && session.setup_intent) {
-      try {
-        // Fetch the SetupIntent to get the payment method
-        const siRes = await fetch(`https://api.stripe.com/v1/setup_intents/${session.setup_intent}`, {
-          headers: { 'Authorization': `Bearer ${process.env.STRIPE_SECRET_KEY}` },
+      const siRes = await fetch(`https://api.stripe.com/v1/setup_intents/${session.setup_intent}`, {
+        headers: { 'Authorization': `Bearer ${process.env.STRIPE_SECRET_KEY}` },
+      });
+      const si = await siRes.json();
+      if (si.payment_method) {
+        await fetch(`https://api.stripe.com/v1/customers/${session.customer}`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${process.env.STRIPE_SECRET_KEY}`,
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: `invoice_settings[default_payment_method]=${si.payment_method}`,
         });
-        const si = await siRes.json();
-        if (si.payment_method) {
-          // Set as default on the Stripe customer
-          await fetch(`https://api.stripe.com/v1/customers/${session.customer}`, {
-            method: 'POST',
-            headers: {
-              'Authorization': `Bearer ${process.env.STRIPE_SECRET_KEY}`,
-              'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: `invoice_settings[default_payment_method]=${si.payment_method}`,
-          });
-          // Save payment method ID to Supabase customer record
-          await supabase(`customers?id=eq.${customer_id}`, 'PATCH', {
-            stripe_payment_method_id: si.payment_method,
-            stripe_customer_id: session.customer,
-          });
-        }
-      } catch (e) {
-        // Non-fatal — card is still saved in Stripe
+        await supabase(`customers?id=eq.${customer_id}`, 'PATCH', {
+          stripe_payment_method_id: si.payment_method,
+          stripe_customer_id: session.customer,
+        });
       }
     }
 
