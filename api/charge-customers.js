@@ -67,8 +67,8 @@ export default async function handler(req, res) {
     return res.status(200).json({ message: 'No customers found', week: weekLabel, results: [] });
   }
 
-  // Check for already-charged invoices this week
-  const invRes = await supa(`invoices?period_start=eq.${periodStart}`);
+  // Only skip if already PAID this week — don't skip "sent" invoices
+  const invRes = await supa(`invoices?period_start=eq.${periodStart}&status=eq.paid`);
   const existing = await invRes.json();
   const existingIds = new Set((Array.isArray(existing) ? existing : []).map(i => i.customer_id));
 
