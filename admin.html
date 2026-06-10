@@ -157,6 +157,7 @@
     <div class="topbar-logo">🐾 Scoop N Go Admin</div>
     <div class="topbar-right">
       <a href="/" target="_blank">← View Site</a>
+      <button class="logout-btn" id="refreshBtn" onclick="refreshAll()">↻ Refresh</button>
       <button class="logout-btn" onclick="logout()">Sign Out</button>
     </div>
   </div>
@@ -461,6 +462,15 @@
     allAppts = Array.isArray(appts) ? appts : [];
     allInvoices = Array.isArray(invoices) ? invoices : [];
     renderAll();
+  }
+
+  async function refreshAll() {
+    const btn = document.getElementById('refreshBtn');
+    btn.textContent = '↻ Refreshing...';
+    btn.disabled = true;
+    await loadAll();
+    btn.textContent = '✓ Done';
+    setTimeout(() => { btn.textContent = '↻ Refresh'; btn.disabled = false; }, 1500);
   }
 
   function renderAll() {
