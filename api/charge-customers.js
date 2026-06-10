@@ -128,23 +128,36 @@ export default async function handler(req, res) {
       });
 
       if (pi.status === 'succeeded') {
-        // Create paid invoice in Supabase
+        // Create or update invoice to paid
         const dayMap = { Sunday:0, Monday:1, Tuesday:2, Wednesday:3, Thursday:4, Friday:5, Saturday:6 };
         const serviceDayNum = dayMap[c.preferred_day] ?? 5;
         const dueDate = new Date(monday);
         dueDate.setDate(monday.getDate() + ((serviceDayNum - 1 + 7) % 7));
         const dueDateStr = fmt(dueDate <= sunday ? dueDate : sunday);
 
-        await supa('invoices', 'POST', {
-          customer_id:  c.id,
-          amount:       c.price_per_visit,
-          status:       'paid',
-          due_date:     dueDateStr,
-          period_start: periodStart,
-          period_end:   periodEnd,
-          notes:        `Week of ${weekLabel} - charged to card on file`,
-          stripe_payment_intent_id: pi.id,
-        });
+        // Check if a sent invoice already exists for this week — update it instead of creating a new one
+        const existingInvRes = await supa(`invoices?customer_id=eq.${c.id}&period_start=eq.${periodStart}&status=eq.sent`);
+        const existingInvData = await existingInvRes.json();
+        const existingInv = Array.isArray(existingInvData) && existingInvData[0];
+
+        if (existingInv) {
+          await supa(`invoices?id=eq.${existingInv.id}`, 'PATCH', {
+            status: 'paid',
+            notes: `Week of ${weekLabel} - charged to card on file`,
+            stripe_payment_intent_id: pi.id,
+          });
+        } else {
+          await supa('invoices', 'POST', {
+            customer_id:  c.id,
+            amount:       c.price_per_visit,
+            status:       'paid',
+            due_date:     dueDateStr,
+            period_start: periodStart,
+            period_end:   periodEnd,
+            notes:        `Week of ${weekLabel} - charged to card on file`,
+            stripe_payment_intent_id: pi.id,
+          });
+        }
 
         // Send receipt email to customer (if they have an email)
         if (c.email) {
