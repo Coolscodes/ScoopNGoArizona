@@ -256,7 +256,11 @@
             <strong id="chargePanelTitle" style="font-family:'Montserrat',sans-serif;font-size:1rem;"></strong>
             <span id="chargePanelSub" style="font-size:.82rem;color:#555;margin-left:.5rem;"></span>
           </div>
-          <div style="display:flex;gap:.5rem;align-items:center;">
+          <div style="display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;">
+            <label style="display:flex;align-items:center;gap:.4rem;font-size:.82rem;font-weight:600;color:#555;cursor:pointer;margin-right:.5rem;">
+              <input type="checkbox" id="chargeShowAll" onchange="rebuildChargePanel()" style="width:15px;height:15px;accent-color:#2e7d32;cursor:pointer;"/>
+              Show all clients
+            </label>
             <button class="btn btn-outline btn-sm" onclick="toggleAllChargeClients(true)">Select All</button>
             <button class="btn btn-outline btn-sm" onclick="toggleAllChargeClients(false)">Deselect All</button>
             <button class="btn btn-outline btn-sm" onclick="closeChargePanel()">Cancel</button>
@@ -827,14 +831,21 @@
   let chargePanelClients = []; // customers eligible today
 
   function openChargePanel() {
-    const todayName = new Date().toLocaleDateString('en-US', { weekday: 'long' });
-    // Filter active customers whose preferred_day matches today
-    chargePanelClients = allCustomers.filter(c => c.active && c.preferred_day === todayName);
-
-    document.getElementById('chargePanelTitle').textContent = `${todayName} Clients`;
+    document.getElementById('chargeShowAll').checked = false;
     document.getElementById('chargePanel').style.display = 'block';
     document.getElementById('openChargeBtn').style.display = 'none';
-    renderChargeClientList();
+    rebuildChargePanel();
+  }
+
+  function rebuildChargePanel() {
+    const showAll = document.getElementById('chargeShowAll').checked;
+    const todayName = new Date().toLocaleDateString('en-US', { weekday: 'long' });
+    chargePanelClients = showAll
+      ? allCustomers.filter(c => c.active)
+      : allCustomers.filter(c => c.active && c.preferred_day === todayName);
+    document.getElementById('chargePanelTitle').textContent = showAll ? 'All Clients' : `${todayName} Clients`;
+    document.getElementById('chargePanelSub').textContent = showAll ? 'Off-day clients start unchecked. Check who you want to charge.' : '';
+    renderChargeClientList(showAll);
   }
 
   function closeChargePanel() {
@@ -843,25 +854,32 @@
     document.getElementById('invoiceRunResult').style.display = 'none';
   }
 
-  function renderChargeClientList() {
+  function renderChargeClientList(showAll) {
     const list = document.getElementById('chargeClientList');
+    const todayName = new Date().toLocaleDateString('en-US', { weekday: 'long' });
     if (!chargePanelClients.length) {
-      list.innerHTML = '<p style="color:#888;font-size:.88rem;">No active clients scheduled for today. Make sure clients have a Day of Week set.</p>';
+      list.innerHTML = '<p style="color:#888;font-size:.88rem;">No active clients scheduled for today. Use "Show all clients" to charge someone off-schedule.</p>';
       document.getElementById('chargeSubmitBtn').disabled = true;
+      updateChargeSelection();
       return;
     }
     list.innerHTML = chargePanelClients.map((c, i) => {
       const hasCard = !!c.stripe_customer_id;
       const noPrice = !c.price_per_visit;
       const disabled = !hasCard || noPrice;
+      const isToday = c.preferred_day === todayName;
+      // In show-all mode only today's clients start checked; off-day clients must be checked manually
+      const checked = !disabled && (!showAll || isToday);
       const warning = !hasCard ? ' <span style="color:#f57f17;font-size:.75rem;">No card on file</span>'
                     : noPrice  ? ' <span style="color:#f57f17;font-size:.75rem;">No price set</span>' : '';
+      const dayTag = showAll ? `<span style="color:${isToday?'#2e7d32':'#888'};font-size:.76rem;font-weight:600;min-width:80px;">${c.preferred_day||'No day'}</span>` : '';
       return `
         <label style="display:flex;align-items:center;gap:.75rem;padding:.6rem .75rem;border-radius:7px;border:1px solid #e0e0e0;cursor:${disabled?'default':'pointer'};background:${disabled?'#fafafa':'#fff'};">
-          <input type="checkbox" data-idx="${i}" ${disabled ? 'disabled' : 'checked'}
+          <input type="checkbox" data-idx="${i}" ${disabled ? 'disabled' : (checked ? 'checked' : '')}
             onchange="updateChargeSelection()"
             style="width:17px;height:17px;accent-color:#2e7d32;cursor:pointer;flex-shrink:0;"/>
           <span style="flex:1;font-weight:600;">${c.first_name} ${c.last_name}</span>
+          ${dayTag}
           <span style="color:#1b5e20;font-weight:700;font-family:'Montserrat',sans-serif;">${c.price_per_visit ? '$'+c.price_per_visit : '—'}</span>
           ${warning}
         </label>`;
