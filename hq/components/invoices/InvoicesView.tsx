@@ -14,6 +14,7 @@ import {
   useToast,
 } from '@/components/ui';
 import { money, shortDate } from '@/lib/format';
+import { InvoiceActions } from './InvoiceActions';
 import type { InvoiceStatus } from '@/lib/types';
 import type { ArSummary, ClientBalance, InvoiceRow } from './data';
 
@@ -167,6 +168,7 @@ export function InvoicesView({
                 <Th>Due</Th>
                 <Th className="text-right">Amount</Th>
                 <Th>Status</Th>
+                <Th></Th>
               </tr>
             </thead>
             <tbody>
@@ -194,6 +196,15 @@ export function InvoicesView({
                   </Td>
                   <Td>
                     <StatusPill status={r.pastDue ? 'overdue' : r.invoice.status} />
+                  </Td>
+                  <Td>
+                    {r.invoice.status !== 'paid' && (
+                      <InvoiceActions
+                        invoiceId={r.invoice.id}
+                        amount={r.invoice.amount}
+                        customerName={r.customerName}
+                      />
+                    )}
                   </Td>
                 </tr>
               ))}

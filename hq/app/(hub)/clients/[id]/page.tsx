@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { PageHeader, Card, Avatar, StatusPill, Badge } from '@/components/ui';
 import { ClientForm } from '@/components/clients/ClientForm';
+import { ClientQuickActions } from '@/components/clients/ClientQuickActions';
 import { DogsEditor } from '@/components/clients/DogsEditor';
 import { supabaseServer } from '@/lib/supabase';
 import { money, phone as fmtPhone, fullName, initials, shortDate } from '@/lib/format';
@@ -56,7 +57,18 @@ export default async function ClientDetailPage({ params }: { params: { id: strin
           subtitle={[client.service_type, client.preferred_day, client.price_per_visit != null ? money(client.price_per_visit) + '/visit' : null]
             .filter(Boolean)
             .join(' · ')}
-          actions={<ClientForm client={client} />}
+          actions={
+            <div className="flex items-center gap-2 flex-wrap">
+              <ClientQuickActions
+                customerId={client.id}
+                customerName={fullName(client)}
+                email={client.email}
+                stripeCustomerId={client.stripe_customer_id}
+                hasCard={Boolean(client.stripe_customer_id)}
+              />
+              <ClientForm client={client} />
+            </div>
+          }
         />
       </div>
 

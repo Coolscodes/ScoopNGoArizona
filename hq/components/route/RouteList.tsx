@@ -85,25 +85,27 @@ export function RouteList({
     void persistOrder(renumbered);
   }
 
-  async function markDone(stop: RouteStop) {
-    const nextStatus = stop.status === 'completed' ? 'scheduled' : 'completed';
+  async function setStatus(stop: RouteStop, next: RouteStop['status']) {
+    const prevStatus = stop.status;
     setSavingId(stop.id);
     // Optimistic update.
     setStops((prev) =>
-      prev.map((s) => (s.id === stop.id ? { ...s, status: nextStatus } : s))
+      prev.map((s) => (s.id === stop.id ? { ...s, status: next } : s))
     );
     try {
       const res = await fetch('/api/route', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'status', id: stop.id, status: nextStatus }),
+        body: JSON.stringify({ action: 'status', id: stop.id, status: next }),
       });
       if (!res.ok) throw new Error('status failed');
-      toast(nextStatus === 'completed' ? 'Stop marked done' : 'Stop reopened');
+      toast(
+        next === 'completed' ? 'Stop marked done' : next === 'skipped' ? 'Stop skipped' : 'Stop reopened'
+      );
     } catch {
       // Roll back.
       setStops((prev) =>
-        prev.map((s) => (s.id === stop.id ? { ...s, status: stop.status } : s))
+        prev.map((s) => (s.id === stop.id ? { ...s, status: prevStatus } : s))
       );
       toast('Could not update the stop', 'error');
     } finally {
@@ -140,7 +142,7 @@ export function RouteList({
               className="flex flex-col gap-2"
             >
               {stops.map((stop, index) => {
-                const done = stop.status === 'completed';
+                const dimmed = stop.status === 'completed' || stop.status === 'skipped';
                 const cust = stop.customer;
                 return (
                   <Draggable key={stop.id} draggableId={stop.id} index={index}>
@@ -151,7 +153,7 @@ export function RouteList({
                         className={cn(
                           'bg-white rounded-card border border-line flex items-center gap-3 p-3 transition-shadow',
                           snapshot.isDragging && 'shadow-lg border-brand',
-                          done && 'opacity-70'
+                          dimmed && 'opacity-70'
                         )}
                       >
                         {/* Drag handle */}
@@ -207,15 +209,37 @@ export function RouteList({
                           </div>
                         </div>
 
-                        <Button
-                          variant={done ? 'ghost' : 'primary'}
-                          size="sm"
-                          className="shrink-0"
-                          disabled={savingId === stop.id}
-                          onClick={() => markDone(stop)}
-                        >
-                          {done ? 'Undo' : 'Mark done'}
-                        </Button>
+                        <div className="flex items-center gap-1.5 shrink-0">
+                          {stop.status === 'scheduled' ? (
+                            <>
+                              <Button
+                                variant="primary"
+                                size="sm"
+                                disabled={savingId === stop.id}
+                                onClick={() => setStatus(stop, 'completed')}
+                              >
+                                Mark done
+                              </Button>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                disabled={savingId === stop.id}
+                                onClick={() => setStatus(stop, 'skipped')}
+                              >
+                                Skip
+                              </Button>
+                            </>
+                          ) : (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              disabled={savingId === stop.id}
+                              onClick={() => setStatus(stop, 'scheduled')}
+                            >
+                              Undo
+                            </Button>
+                          )}
+                        </div>
                       </li>
                     )}
                   </Draggable>
