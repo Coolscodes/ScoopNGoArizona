@@ -268,3 +268,9 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }
+
+// Vercel Cron invokes via GET (with Authorization: Bearer <CRON_SECRET>);
+// delegate to the same authorized logic.
+export function GET(request: Request) {
+  return POST(request);
+}
