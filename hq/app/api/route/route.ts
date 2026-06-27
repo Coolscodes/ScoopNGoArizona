@@ -154,10 +154,10 @@ export async function PATCH(request: Request) {
     if (action === 'status') {
       const id = payload.id;
       const status = payload.status;
-      const allowed: ApptStatus[] = ['completed', 'scheduled'];
+      const allowed: ApptStatus[] = ['completed', 'scheduled', 'skipped'];
       if (typeof id !== 'string' || !allowed.includes(status as ApptStatus)) {
         return NextResponse.json(
-          { error: "status requires id and status in ['completed','scheduled']" },
+          { error: "status requires id and status in ['completed','scheduled','skipped']" },
           { status: 400 }
         );
       }
