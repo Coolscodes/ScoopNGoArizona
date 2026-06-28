@@ -148,6 +148,27 @@ export async function PATCH(request: Request) {
         updated++;
       }
 
+      // Also persist a STANDING order per client (customers.route_order) so every
+      // future route for this day-of-week inherits it. Best-effort: if the column
+      // doesn't exist yet (migration 002 not run), this no-ops without failing.
+      try {
+        const ids = order as string[];
+        const { data: rows } = await sb
+          .from('appointments')
+          .select('id, customer_id')
+          .in('id', ids);
+        const custByAppt = new Map(
+          ((rows ?? []) as { id: string; customer_id: string }[]).map((r) => [r.id, r.customer_id])
+        );
+        for (let i = 0; i < ids.length; i++) {
+          const cid = custByAppt.get(ids[i]);
+          if (cid) await sb.from('customers').update({ route_order: i + 1 }).eq('id', cid);
+        }
+      } catch {
+        // route_order column not present yet — standing order will start working
+        // after migration 002 is run. Per-day reorder above still saved.
+      }
+
       return NextResponse.json({ ok: true, updated });
     }
 
@@ -177,6 +198,61 @@ export async function PATCH(request: Request) {
     );
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Failed to update route';
+    return NextResponse.json({ error: message }, { status: 500 });
+  }
+}
+
+// POST /api/route  { date: YYYY-MM-DD, customer_id }
+//   Add a client to a specific day's route. Skips if they already have a stop
+//   that day. New stop inherits the client's standing route_order if set.
+export async function POST(request: Request) {
+  let body: { date?: string; customer_id?: string };
+  try {
+    body = (await request.json()) as { date?: string; customer_id?: string };
+  } catch {
+    return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
+  }
+
+  const date = body.date;
+  const customerId = body.customer_id;
+  if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date) || !customerId) {
+    return NextResponse.json({ error: 'date (YYYY-MM-DD) and customer_id are required' }, { status: 400 });
+  }
+
+  try {
+    const sb = supabaseServer();
+
+    // Don't double-book the same client on the same day.
+    const { data: existing } = await sb
+      .from('appointments')
+      .select('id')
+      .eq('customer_id', customerId)
+      .eq('scheduled_at', date)
+      .neq('status', 'cancelled')
+      .limit(1);
+    if (existing && existing.length > 0) {
+      return NextResponse.json({ ok: true, duplicate: true });
+    }
+
+    const { data: custData } = await sb.from('customers').select('*').eq('id', customerId).single();
+    const c = custData as Customer | null;
+
+    const { data: ins, error } = await sb
+      .from('appointments')
+      .insert({
+        customer_id: customerId,
+        scheduled_at: date,
+        status: 'scheduled',
+        service_type: c?.service_type ?? null,
+        route_position: c?.route_order ?? null,
+      })
+      .select('id')
+      .single();
+    if (error) throw error;
+
+    return NextResponse.json({ ok: true, id: (ins as { id: string } | null)?.id });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Failed to add stop';
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }
