@@ -101,6 +101,9 @@ export async function POST(request: Request) {
           service_type: c.service_type ?? null,
           status: 'scheduled',
           assigned_to: null,
+          // Inherit the client's standing route order so the new route comes up
+          // pre-sorted (undefined before migration 002 — falls back to null).
+          route_position: c.route_order ?? null,
         });
         if (insErr) throw insErr;
         created.push({ customer_id: c.id, scheduled_at: scheduledAt });

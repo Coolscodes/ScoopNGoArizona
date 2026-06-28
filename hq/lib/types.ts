@@ -45,6 +45,8 @@ export interface Customer {
   start_date?: string; // new
   next_visit_date?: string; // new (generator)
   portal_token?: string; // new (customer portal)
+  route_order?: number; // new: standing position within their day's route
+  flags?: string[]; // new: admin flags (e.g. "dog aggressive", "cash only")
 }
 
 export interface Dog {

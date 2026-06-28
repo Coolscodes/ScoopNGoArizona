@@ -4,6 +4,7 @@ import { PageHeader, Card, Avatar, StatusPill, Badge } from '@/components/ui';
 import { ClientForm } from '@/components/clients/ClientForm';
 import { ClientQuickActions } from '@/components/clients/ClientQuickActions';
 import { DogsEditor } from '@/components/clients/DogsEditor';
+import { FlagsEditor } from '@/components/clients/FlagsEditor';
 import { supabaseServer } from '@/lib/supabase';
 import { money, phone as fmtPhone, fullName, initials, shortDate } from '@/lib/format';
 import type { Customer, Dog, Appointment, Invoice, ServiceLog } from '@/lib/types';
@@ -96,6 +97,10 @@ export default async function ClientDetailPage({ params }: { params: { id: strin
               <p className="text-sm text-ink">{client.yard_notes}</p>
             </div>
           )}
+          <div className="border-t border-line pt-4 mt-4">
+            <div className="text-[0.72rem] uppercase tracking-wide text-muted mb-2">Flags</div>
+            <FlagsEditor clientId={client.id} flags={client.flags ?? []} />
+          </div>
         </Card>
 
         <Card className="p-5">
