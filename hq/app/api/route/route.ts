@@ -189,6 +189,45 @@ export async function PATCH(request: Request) {
         .eq('id', id);
       if (error) throw error;
 
+      // Keep service_logs in sync so analytics / client history / the AI see
+      // visits marked done from the route (not just field-tool completions).
+      const ROUTE_DONE_NOTE = 'Marked done from route';
+      try {
+        if (status === 'completed') {
+          const { data: existing } = await sb
+            .from('service_logs')
+            .select('id')
+            .eq('appointment_id', id)
+            .limit(1);
+          if (!existing || existing.length === 0) {
+            const { data: appt } = await sb
+              .from('appointments')
+              .select('customer_id')
+              .eq('id', id)
+              .single();
+            if (appt) {
+              await sb.from('service_logs').insert({
+                customer_id: appt.customer_id,
+                appointment_id: id,
+                completed_at: new Date().toISOString(),
+                issue_flagged: false,
+                technician_notes: ROUTE_DONE_NOTE,
+              });
+            }
+          }
+        } else {
+          // Undo / skip: remove only the auto-created route log — never a
+          // field-tool log (which has photos/notes worth keeping).
+          await sb
+            .from('service_logs')
+            .delete()
+            .eq('appointment_id', id)
+            .eq('technician_notes', ROUTE_DONE_NOTE);
+        }
+      } catch {
+        // Log sync is best-effort; the status change itself already succeeded.
+      }
+
       return NextResponse.json({ ok: true, id, status });
     }
 
