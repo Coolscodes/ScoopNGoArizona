@@ -87,7 +87,7 @@ export default async function handler(req, res) {
   const weekLabel   = `${fmtLabel(monday)} - ${fmtLabel(sunday)}, ${monday.getFullYear()}`;
 
   // Accept explicit list of customer IDs from the admin panel
-  const { customer_ids } = req.body || {};
+  const { customer_ids, amounts } = req.body || {};
   if (!Array.isArray(customer_ids) || !customer_ids.length) {
     return res.status(400).json({ error: 'No customers selected' });
   }
@@ -117,8 +117,12 @@ export default async function handler(req, res) {
       continue;
     }
 
-    // Skip if no price set
-    if (!c.price_per_visit) {
+    // Per-client amount override from the admin panel; falls back to their standard price
+    const override = amounts && typeof amounts === 'object' ? parseFloat(amounts[c.id]) : NaN;
+    const chargeAmount = (!isNaN(override) && override >= 1) ? Math.round(override * 100) / 100 : c.price_per_visit;
+
+    // Skip if no amount to charge
+    if (!chargeAmount) {
       results.push({ name, status: 'skipped', reason: 'No price set' });
       continue;
     }
@@ -129,7 +133,7 @@ export default async function handler(req, res) {
       continue;
     }
 
-    const amountCents = Math.round(c.price_per_visit * 100);
+    const amountCents = Math.round(chargeAmount * 100);
 
     try {
       // Get customer's saved payment method from Stripe
@@ -177,13 +181,14 @@ export default async function handler(req, res) {
         if (existingInv) {
           await supa(`invoices?id=eq.${existingInv.id}`, 'PATCH', {
             status: 'paid',
+            amount: chargeAmount,
             notes: `Week of ${weekLabel} - charged to card on file`,
             stripe_payment_intent_id: pi.id,
           });
         } else {
           await supa('invoices', 'POST', {
             customer_id:  c.id,
-            amount:       c.price_per_visit,
+            amount:       chargeAmount,
             status:       'paid',
             due_date:     dueDateStr,
             period_start: periodStart,
@@ -214,7 +219,7 @@ export default async function handler(req, res) {
                   <table style="width:100%;border-collapse:collapse;margin:20px 0;">
                     <tr><td style="padding:8px 0;color:#555;">Service Week</td><td style="padding:8px 0;font-weight:bold;">${weekLabel}</td></tr>
                     <tr><td style="padding:8px 0;color:#555;">Service Type</td><td style="padding:8px 0;">${c.service_type || 'Weekly'}</td></tr>
-                    <tr><td style="padding:8px 0;color:#555;">Amount Charged</td><td style="padding:8px 0;font-weight:bold;color:#1b5e20;">$${c.price_per_visit.toFixed(2)}</td></tr>
+                    <tr><td style="padding:8px 0;color:#555;">Amount Charged</td><td style="padding:8px 0;font-weight:bold;color:#1b5e20;">$${chargeAmount.toFixed(2)}</td></tr>
                   </table>
                   <p style="color:#555;font-size:14px;">Thank you for choosing Scoop N Go Arizona! 🐾</p>
                   <p style="color:#555;font-size:14px;">Questions? Reply to this email or text us anytime.</p>
@@ -226,20 +231,20 @@ export default async function handler(req, res) {
           });
         }
 
-        results.push({ name, status: 'charged', amount: c.price_per_visit });
+        results.push({ name, status: 'charged', amount: chargeAmount });
 
       } else if (pi.status === 'requires_action' || pi.status === 'requires_payment_method') {
         const reason = `Card declined or requires action (${pi.status})`;
-        await sendFailureEmail(name, c.phone, c.price_per_visit, reason, weekLabel, RESEND_KEY);
+        await sendFailureEmail(name, c.phone, chargeAmount, reason, weekLabel, RESEND_KEY);
         results.push({ name, status: 'failed', reason });
       } else {
         const reason = `Unexpected status: ${pi.status}`;
-        await sendFailureEmail(name, c.phone, c.price_per_visit, reason, weekLabel, RESEND_KEY);
+        await sendFailureEmail(name, c.phone, chargeAmount, reason, weekLabel, RESEND_KEY);
         results.push({ name, status: 'failed', reason });
       }
 
     } catch (err) {
-      await sendFailureEmail(name, c.phone, c.price_per_visit, err.message, weekLabel, RESEND_KEY);
+      await sendFailureEmail(name, c.phone, chargeAmount, err.message, weekLabel, RESEND_KEY);
       results.push({ name, status: 'failed', reason: err.message });
     }
   }

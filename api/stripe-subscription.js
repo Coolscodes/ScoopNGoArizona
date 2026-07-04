@@ -2,7 +2,7 @@
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end();
 
-  const { plan, dogs, deodorizer, amount_cents, label } = req.body;
+  const { plan, dogs, deodorizer, haul_away, amount_cents, label } = req.body;
   const origin = 'https://scoopngoarizona.com';
 
   const intervals = {
@@ -20,9 +20,11 @@ export default async function handler(req, res) {
 
   const dogLine     = `${dogs} dog${dogs > 1 ? 's' : ''}`;
   const deodLine    = deodorizer ? ' + Deodorizer Treatment' : '';
+  const haulLine    = haul_away ? ' + Haul-Away' : '';
   const description = [
-    `${dogLine}${deodLine} · Billed ${intervalLabel}`,
-    '✓ Full yard scoop & waste removal',
+    `${dogLine}${deodLine}${haulLine} · Billed ${intervalLabel}`,
+    '✓ Full yard scoop',
+    haul_away ? '✓ Waste hauled off your property' : '✓ Waste double-bagged in your trash bin',
     '✓ Gate closed & secured after every visit',
     '✓ Service notification text when complete',
     '✓ Gate photo sent after each visit',
@@ -46,6 +48,7 @@ export default async function handler(req, res) {
     'metadata[plan]': plan,
     'metadata[dogs]': String(dogs),
     'metadata[deodorizer]': String(deodorizer),
+    'metadata[haul_away]': String(haul_away || false),
     'phone_number_collection[enabled]': 'true',
   });
 

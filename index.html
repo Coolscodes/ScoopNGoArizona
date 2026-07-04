@@ -61,7 +61,7 @@
       {
         "@type": "Question",
         "name": "What do you do with the waste?",
-        "acceptedAnswer": { "@type": "Answer", "text": "We bag all waste and remove it from your property entirely. You never have to touch it or deal with it. That's the whole point!" }
+        "acceptedAnswer": { "@type": "Answer", "text": "We scoop everything and double-bag it, then place it neatly in your outdoor trash can at no extra charge. Prefer it gone completely? Add our haul-away option — $5/visit on weekly plans, $10 bi-weekly, $15 monthly — and we'll take it off your property. Either way, you never have to touch it." }
       },
       {
         "@type": "Question",
@@ -82,252 +82,431 @@
   }
   </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Open+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700;12..96,800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --green:      #2e7d32;
-      --green-dark: #1b5e20;
-      --green-lt:   #e8f5e9;
-      --green-mid:  #388e3c;
-      --tan:        #f9f6f1;
-      --dark:       #1a1a1a;
-      --mid:        #555;
-      --white:      #ffffff;
-      --border:     #e0e0e0;
-      --yellow:     #f9a825;
-      --radius:     10px;
+      --pine:        #1c4a26;
+      --pine-deep:   #123419;
+      --pine-mid:    #2c6a38;
+      --grass:       #4c8f4a;
+      --orange:      #e8842c;
+      --orange-deep: #c96a15;
+      --orange-soft: #fdeedd;
+      --cream:       #faf6ee;
+      --sand:        #f2ead9;
+      --white:       #ffffff;
+      --ink:         #1d2b1a;
+      --mid:         #5b6656;
+      --line:        #e6dfd0;
+      --green-lt:    #e9f2e5;
+      --radius:      16px;
+      --shadow-sm:   0 2px 10px rgba(29,43,26,.07);
+      --shadow-md:   0 10px 30px rgba(29,43,26,.10);
+      --shadow-lg:   0 24px 60px rgba(18,52,25,.18);
+      --font-display:'Bricolage Grotesque', sans-serif;
+      --font-body:   'Inter', sans-serif;
     }
     html { scroll-behavior: smooth; }
-    body { font-family: 'Open Sans', sans-serif; color: var(--dark); line-height: 1.6; }
-    .top-bar { background: var(--green-dark); color: #fff; text-align: center; padding: .5rem 5%; font-size: .85rem; font-weight: 600; }
+    body { font-family: var(--font-body); color: var(--ink); line-height: 1.65; background: var(--cream); }
+    section { scroll-margin-top: 90px; }
+    img { max-width: 100%; height: auto; display: block; }
+
+    /* ---------- Reveal animations ---------- */
+    .reveal { opacity: 0; transform: translateY(26px); transition: opacity .7s ease, transform .7s ease; }
+    .reveal.in { opacity: 1; transform: none; }
+    .reveal-d1 { transition-delay: .1s; }
+    .reveal-d2 { transition-delay: .2s; }
+    .reveal-d3 { transition-delay: .3s; }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      .reveal { opacity: 1; transform: none; transition: none; }
+      * { animation: none !important; }
+    }
+
+    /* ---------- Top bar ---------- */
+    .top-bar { background: var(--pine-deep); color: #e9f2e5; text-align: center; padding: .55rem 5%; font-size: .83rem; font-weight: 600; letter-spacing: .01em; }
     .top-bar a { color: #fff; text-decoration: none; }
     .top-bar a:hover { text-decoration: underline; }
-    nav { background: var(--white); border-bottom: 3px solid var(--green); padding: 0 5%; display: flex; align-items: center; justify-content: space-between; height: 70px; position: sticky; top: 0; z-index: 200; box-shadow: 0 2px 12px rgba(0,0,0,.08); }
-    .nav-logo { font-family: 'Montserrat', sans-serif; font-size: 1.25rem; font-weight: 900; color: var(--green-dark); text-decoration: none; }
-    .nav-links { display: flex; gap: 1.8rem; list-style: none; }
-    .nav-links a { text-decoration: none; color: var(--dark); font-size: .9rem; font-weight: 600; transition: color .2s; }
-    .nav-links a:hover { color: var(--green); }
-    .nav-cta { background: var(--green); color: #fff !important; padding: .5rem 1.3rem; border-radius: 6px; }
-    .nav-cta:hover { background: var(--green-dark) !important; }
-    .hero { background: linear-gradient(135deg, var(--green-dark) 0%, var(--green-mid) 100%); color: #fff; padding: 90px 5% 80px; text-align: center; position: relative; overflow: hidden; }
-    .hero::before { content: ''; position: absolute; inset: 0; background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/svg%3E") repeat; }
-    .hero-inner { position: relative; max-width: 760px; margin: 0 auto; }
-    .hero-badges { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
-    .hero-badge { background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.3); color: #fff; font-size: .78rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; padding: .3rem .9rem; border-radius: 20px; }
-    .hero h1 { font-family: 'Montserrat', sans-serif; font-size: clamp(2.2rem,5vw,3.6rem); font-weight: 900; line-height: 1.1; margin-bottom: 1.2rem; text-shadow: 0 2px 12px rgba(0,0,0,.2); }
-    .hero p { font-size: 1.1rem; opacity: .92; max-width: 560px; margin: 0 auto 2.2rem; }
-    .hero-btns { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; }
-    .btn-white { background: #fff; color: var(--green-dark); padding: .85rem 2rem; border-radius: 8px; font-size: 1rem; font-weight: 800; text-decoration: none; font-family: 'Montserrat', sans-serif; transition: transform .2s, box-shadow .2s; box-shadow: 0 4px 16px rgba(0,0,0,.2); }
-    .btn-white:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,.25); }
-    .btn-outline-white { background: transparent; color: #fff; padding: .85rem 2rem; border-radius: 8px; font-size: 1rem; font-weight: 700; text-decoration: none; border: 2px solid rgba(255,255,255,.7); font-family: 'Montserrat', sans-serif; transition: background .2s; }
-    .btn-outline-white:hover { background: rgba(255,255,255,.12); }
-    .guarantees { background: var(--tan); border-bottom: 1px solid var(--border); padding: 55px 5%; }
-    .guarantees-inner { max-width: 1100px; margin: 0 auto; }
-    .guarantees h2 { font-family: 'Montserrat', sans-serif; font-size: 1.6rem; font-weight: 800; text-align: center; margin-bottom: 2rem; color: var(--green-dark); }
-    .guarantee-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1.5rem; }
-    .guarantee-card { background: var(--white); border-radius: var(--radius); padding: 1.8rem; text-align: center; border: 1px solid var(--border); box-shadow: 0 2px 8px rgba(0,0,0,.05); transition: transform .2s; }
-    .guarantee-card:hover { transform: translateY(-3px); }
-    .guarantee-icon { font-size: 2.5rem; margin-bottom: .8rem; }
-    .guarantee-card h3 { font-family: 'Montserrat', sans-serif; font-size: 1rem; font-weight: 800; margin-bottom: .6rem; color: var(--green-dark); }
-    .guarantee-card p { font-size: .9rem; color: var(--mid); }
-    .section-inner { max-width: 1100px; margin: 0 auto; }
-    .section-header { text-align: center; margin-bottom: 3rem; }
-    .section-label { display: inline-block; background: var(--green-lt); color: var(--green-dark); font-size: .75rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; padding: .3rem .9rem; border-radius: 20px; margin-bottom: .7rem; }
-    .section-header h2 { font-family: 'Montserrat', sans-serif; font-size: clamp(1.7rem,3vw,2.3rem); font-weight: 900; color: var(--dark); }
-    .services { background: var(--white); padding: 70px 5%; }
-    .service-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1.5rem; }
-    .service-card { border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border); transition: box-shadow .2s, transform .2s; }
-    .service-card:hover { box-shadow: 0 8px 28px rgba(0,0,0,.1); transform: translateY(-3px); }
-    .service-img { height: 180px; display: flex; align-items: center; justify-content: center; font-size: 4rem; }
-    .service-img.green { background: linear-gradient(135deg, var(--green-lt), #c8e6c9); }
-    .service-img.tan   { background: linear-gradient(135deg, #fff8e1, #ffe082); }
-    .service-img.blue  { background: linear-gradient(135deg, #e3f2fd, #bbdefb); }
-    .service-body { padding: 1.5rem; }
-    .service-body h3 { font-family: 'Montserrat', sans-serif; font-size: 1.05rem; font-weight: 800; margin-bottom: .6rem; color: var(--dark); }
-    .service-body p { font-size: .9rem; color: var(--mid); }
-    .pricing { background: var(--tan); padding: 70px 5%; }
-    .pricing-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1.5rem; margin-top: 3rem; }
-    .plan { background: var(--white); border: 2px solid var(--border); border-radius: var(--radius); padding: 2rem; display: flex; flex-direction: column; transition: transform .2s, box-shadow .2s; }
-    .plan:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(0,0,0,.1); }
-    .plan.popular { background: var(--green-dark); border-color: var(--green-dark); color: #fff; }
-    .popular-badge { background: var(--yellow); color: var(--dark); font-size: .72rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; border-radius: 20px; padding: .2rem .8rem; display: inline-block; margin-bottom: .8rem; align-self: flex-start; }
-    .plan-name { font-family: 'Montserrat', sans-serif; font-size: 1.1rem; font-weight: 800; margin-bottom: .2rem; }
-    .plan-freq { font-size: .85rem; opacity: .6; margin-bottom: 1.2rem; }
-    .plan-price { font-family: 'Montserrat', sans-serif; font-size: 2.6rem; font-weight: 900; line-height: 1; margin-bottom: .3rem; }
-    .plan-price sup { font-size: 1.3rem; vertical-align: top; margin-top: .4rem; }
-    .plan-note { font-size: .8rem; opacity: .55; margin-bottom: 1.5rem; }
-    .plan-divider { border: none; border-top: 1px solid rgba(0,0,0,.1); margin-bottom: 1.2rem; }
-    .plan.popular .plan-divider { border-color: rgba(255,255,255,.2); }
-    .plan ul { list-style: none; flex: 1; margin-bottom: 1.8rem; }
-    .plan ul li { font-size: .9rem; padding: .35rem 0; display: flex; align-items: flex-start; gap: .5rem; }
-    .plan ul li::before { content: '✓'; font-weight: 800; color: var(--green); flex-shrink: 0; }
-    .plan.popular ul li::before { color: #81c784; }
-    .plan-btn { display: block; text-align: center; background: var(--green); color: #fff; padding: .8rem; border-radius: 7px; font-weight: 700; text-decoration: none; font-family: 'Montserrat', sans-serif; font-size: .95rem; transition: background .2s; }
-    .plan-btn:hover { background: var(--green-mid); }
-    .plan.popular .plan-btn { background: #fff; color: var(--green-dark); }
-    .plan.popular .plan-btn:hover { background: #e8f5e9; }
-    .about { background: var(--white); padding: 70px 5%; }
-    .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; }
-    .about-visual { background: var(--green-lt); border-radius: 16px; padding: 3rem; text-align: center; font-size: 7rem; line-height: 1; }
-    .about-text h2 { font-family: 'Montserrat', sans-serif; font-size: clamp(1.7rem,3vw,2.2rem); font-weight: 900; margin-bottom: 1rem; color: var(--dark); }
-    .about-text p { color: var(--mid); margin-bottom: 1rem; font-size: .95rem; }
-    .stats-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 1rem; margin-top: 2rem; }
-    .stat { text-align: center; background: var(--tan); border-radius: 10px; padding: 1.2rem .8rem; }
-    .stat-num { font-family: 'Montserrat', sans-serif; font-size: 1.8rem; font-weight: 900; color: var(--green-dark); }
-    .stat-lbl { font-size: .75rem; color: var(--mid); font-weight: 600; margin-top: .2rem; }
-    .why { background: var(--green-dark); color: #fff; padding: 70px 5%; }
+    .top-bar .dot { opacity: .4; margin: 0 .7rem; }
+    .top-bar .quote-link { color: #f5b56e; font-weight: 700; }
+
+    /* ---------- Nav ---------- */
+    nav { background: rgba(250,246,238,.88); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid var(--line); padding: 0 5%; display: flex; align-items: center; justify-content: space-between; height: 74px; position: sticky; top: 0; z-index: 200; }
+    .nav-logo { display: flex; align-items: center; gap: .65rem; text-decoration: none; }
+    .nav-logo img { width: 46px; height: 46px; border-radius: 50%; box-shadow: var(--shadow-sm); }
+    .nav-logo span { font-family: var(--font-display); font-size: 1.15rem; font-weight: 800; color: var(--pine); line-height: 1.1; }
+    .nav-logo small { display: block; font-family: var(--font-body); font-size: .62rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--orange-deep); }
+    .nav-links { display: flex; align-items: center; gap: 1.9rem; list-style: none; }
+    .nav-links a { text-decoration: none; color: var(--ink); font-size: .92rem; font-weight: 600; transition: color .2s; }
+    .nav-links a:hover { color: var(--orange-deep); }
+    .nav-cta { background: var(--orange); color: #fff !important; padding: .6rem 1.4rem; border-radius: 999px; box-shadow: 0 4px 14px rgba(232,132,44,.35); transition: background .2s, transform .2s; }
+    .nav-cta:hover { background: var(--orange-deep); transform: translateY(-1px); }
+    .nav-burger { display: none; background: none; border: none; cursor: pointer; padding: .5rem; }
+    .nav-burger span { display: block; width: 24px; height: 3px; border-radius: 2px; background: var(--pine); margin: 5px 0; transition: transform .3s, opacity .3s; }
+    .nav-burger.open span:nth-child(1) { transform: translateY(8px) rotate(45deg); }
+    .nav-burger.open span:nth-child(2) { opacity: 0; }
+    .nav-burger.open span:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
+    .mobile-menu { display: none; position: fixed; top: 74px; left: 0; right: 0; z-index: 199; background: var(--cream); border-bottom: 1px solid var(--line); box-shadow: var(--shadow-md); padding: .8rem 5% 1.4rem; }
+    .mobile-menu.open { display: block; }
+    .mobile-menu a { display: block; padding: .85rem .2rem; text-decoration: none; color: var(--ink); font-weight: 600; font-size: 1.02rem; border-bottom: 1px solid var(--line); }
+    .mobile-menu a:last-child { border-bottom: none; margin-top: .8rem; background: var(--orange); color: #fff; text-align: center; border-radius: 999px; padding: .8rem; font-family: var(--font-display); font-weight: 700; }
+
+    /* ---------- Hero ---------- */
+    .hero { position: relative; background: var(--cream); padding: 72px 5% 0; overflow: hidden; }
+    .hero::before { content: ''; position: absolute; inset: 0; background:
+      radial-gradient(600px 380px at 88% 8%, rgba(232,132,44,.12), transparent 65%),
+      radial-gradient(700px 460px at 4% 90%, rgba(76,143,74,.12), transparent 65%);
+      pointer-events: none; }
+    .hero-inner { position: relative; max-width: 1120px; margin: 0 auto; display: grid; grid-template-columns: 1.15fr .85fr; gap: 3rem; align-items: center; padding-bottom: 84px; }
+    .hero-rating { display: inline-flex; align-items: center; gap: .55rem; background: var(--white); border: 1px solid var(--line); border-radius: 999px; padding: .4rem 1rem .4rem .6rem; font-size: .82rem; font-weight: 600; color: var(--mid); box-shadow: var(--shadow-sm); margin-bottom: 1.4rem; }
+    .hero-rating .stars { color: var(--orange); letter-spacing: .1em; font-size: .9rem; }
+    .hero h1 { font-family: var(--font-display); font-size: clamp(2.6rem, 5.4vw, 4.2rem); font-weight: 800; line-height: 1.04; letter-spacing: -.02em; color: var(--pine-deep); margin-bottom: 1.3rem; }
+    .hero h1 em { font-style: normal; color: var(--orange); position: relative; white-space: nowrap; }
+    .hero h1 em svg { position: absolute; left: 0; right: 0; bottom: -.18em; width: 100%; height: .3em; }
+    .hero p.lede { font-size: 1.12rem; color: var(--mid); max-width: 520px; margin-bottom: 2.1rem; }
+    .hero-btns { display: flex; gap: .9rem; flex-wrap: wrap; margin-bottom: 2.2rem; }
+    .btn-primary { display: inline-flex; align-items: center; gap: .5rem; background: var(--orange); color: #fff; padding: .95rem 2.1rem; border-radius: 999px; font-family: var(--font-display); font-size: 1.02rem; font-weight: 700; text-decoration: none; border: none; cursor: pointer; box-shadow: 0 8px 24px rgba(232,132,44,.4); transition: transform .2s, box-shadow .2s, background .2s; }
+    .btn-primary:hover { background: var(--orange-deep); transform: translateY(-2px); box-shadow: 0 12px 30px rgba(201,106,21,.45); }
+    .btn-ghost { display: inline-flex; align-items: center; gap: .5rem; background: transparent; color: var(--pine); padding: .95rem 1.9rem; border-radius: 999px; font-family: var(--font-display); font-size: 1.02rem; font-weight: 700; text-decoration: none; border: 2px solid var(--pine); transition: background .2s, color .2s; }
+    .btn-ghost:hover { background: var(--pine); color: #fff; }
+    .hero-checks { display: flex; flex-wrap: wrap; gap: .5rem 1.5rem; }
+    .hero-checks span { display: inline-flex; align-items: center; gap: .45rem; font-size: .88rem; font-weight: 600; color: var(--pine); }
+    .hero-checks svg { flex-shrink: 0; }
+    .hero-visual { position: relative; display: flex; justify-content: center; }
+    .hero-visual .blob { position: absolute; inset: -8% -6%; background: radial-gradient(circle at 50% 45%, var(--sand) 0%, var(--sand) 58%, transparent 60%); z-index: 0; }
+    .hero-visual img { position: relative; z-index: 1; width: min(400px, 88%); border-radius: 50%; box-shadow: var(--shadow-lg); animation: float 7s ease-in-out infinite; }
+    @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+    .hero-chip { position: absolute; z-index: 2; background: var(--white); border: 1px solid var(--line); border-radius: 14px; box-shadow: var(--shadow-md); padding: .6rem .95rem; font-size: .8rem; font-weight: 700; color: var(--pine-deep); display: flex; align-items: center; gap: .5rem; }
+    .hero-chip .big { font-family: var(--font-display); font-size: 1.05rem; color: var(--orange-deep); }
+    .chip-1 { top: 6%; left: 0; animation: float 6s ease-in-out infinite .5s; }
+    .chip-2 { bottom: 10%; right: 0; animation: float 6.5s ease-in-out infinite 1s; }
+    .hero-wave { display: block; width: 100%; margin-bottom: -1px; }
+
+    /* ---------- Section scaffolding ---------- */
+    .section-inner { max-width: 1120px; margin: 0 auto; }
+    .section-header { text-align: center; margin-bottom: 3.2rem; }
+    .section-label { display: inline-flex; align-items: center; gap: .45rem; background: var(--orange-soft); color: var(--orange-deep); font-size: .74rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; padding: .38rem 1rem; border-radius: 999px; margin-bottom: .9rem; }
+    .section-header h2 { font-family: var(--font-display); font-size: clamp(1.9rem, 3.4vw, 2.7rem); font-weight: 800; letter-spacing: -.015em; color: var(--pine-deep); line-height: 1.15; }
+    .section-sub { color: var(--mid); font-size: 1rem; margin-top: .7rem; max-width: 560px; margin-left: auto; margin-right: auto; }
+
+    /* ---------- How it works ---------- */
+    .how { background: var(--white); padding: 84px 5%; }
+    .how-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.6rem; counter-reset: step; }
+    .how-card { position: relative; background: var(--cream); border: 1px solid var(--line); border-radius: 20px; padding: 2.2rem 1.8rem 1.9rem; transition: transform .25s, box-shadow .25s; }
+    .how-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-md); }
+    .how-num { position: absolute; top: -18px; left: 1.6rem; width: 40px; height: 40px; border-radius: 12px; background: var(--orange); color: #fff; font-family: var(--font-display); font-weight: 800; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 6px 16px rgba(232,132,44,.4); }
+    .how-icon { font-size: 2.1rem; margin-bottom: .9rem; }
+    .how-card h3 { font-family: var(--font-display); font-size: 1.12rem; font-weight: 700; color: var(--pine-deep); margin-bottom: .5rem; }
+    .how-card p { font-size: .92rem; color: var(--mid); }
+
+    /* ---------- Services ---------- */
+    .services { background: var(--cream); padding: 84px 5%; }
+    .service-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.6rem; }
+    .service-card { background: var(--white); border-radius: 20px; overflow: hidden; border: 1px solid var(--line); box-shadow: var(--shadow-sm); transition: box-shadow .25s, transform .25s; display: flex; flex-direction: column; }
+    .service-card:hover { box-shadow: var(--shadow-md); transform: translateY(-5px); }
+    .service-img { height: 150px; display: flex; align-items: center; justify-content: center; font-size: 3.6rem; position: relative; }
+    .service-img.green  { background: linear-gradient(135deg, #dcebd4, #b9d8ab); }
+    .service-img.orange { background: linear-gradient(135deg, #fbe6cd, #f5c791); }
+    .service-img.blue   { background: linear-gradient(135deg, #ddeef4, #b5d8e6); }
+    .service-body { padding: 1.7rem; flex: 1; }
+    .service-body h3 { font-family: var(--font-display); font-size: 1.12rem; font-weight: 700; margin-bottom: .55rem; color: var(--pine-deep); }
+    .service-body p { font-size: .92rem; color: var(--mid); }
+
+    /* ---------- Pricing configurator ---------- */
+    .pricing { background: var(--white); padding: 84px 5%; position: relative; overflow: hidden; }
+    .pricing::before { content: '🐾'; position: absolute; font-size: 14rem; opacity: .04; top: 40px; left: -40px; transform: rotate(-20deg); }
+    .pricing-configurator { max-width: 660px; margin: 0 auto; background: var(--cream); border-radius: 24px; border: 1px solid var(--line); overflow: hidden; box-shadow: var(--shadow-lg); position: relative; }
+    .config-step { padding: 1.7rem 2.2rem; border-bottom: 1px solid var(--line); }
+    .config-label { font-family: var(--font-display); font-size: .95rem; font-weight: 700; color: var(--pine-deep); margin-bottom: 1rem; display: flex; align-items: baseline; gap: .5rem; flex-wrap: wrap; }
+    .config-label .step-tag { background: var(--pine); color: #fff; font-size: .68rem; font-weight: 700; border-radius: 6px; padding: .12rem .5rem; letter-spacing: .06em; }
+    .config-label .hint { font-family: var(--font-body); font-size: .78rem; color: var(--mid); font-weight: 500; }
+    .config-options { display: flex; gap: .6rem; flex-wrap: wrap; }
+    .config-btn { padding: .6rem 1.3rem; border: 2px solid var(--line); border-radius: 999px; background: var(--white); font-family: var(--font-display); font-size: .88rem; font-weight: 700; color: var(--mid); cursor: pointer; transition: all .2s; }
+    .config-btn:hover { border-color: var(--orange); color: var(--orange-deep); }
+    .config-btn.active { border-color: var(--orange); background: var(--orange); color: #fff; box-shadow: 0 4px 14px rgba(232,132,44,.35); }
+    .dog-stepper { display: flex; align-items: center; gap: .8rem; }
+    .stepper-btn { width: 42px; height: 42px; border-radius: 50%; border: 2px solid var(--line); background: var(--white); font-size: 1.3rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all .2s; color: var(--pine); line-height: 1; }
+    .stepper-btn:hover { border-color: var(--orange); background: var(--orange-soft); color: var(--orange-deep); }
+    #dogCount { font-family: var(--font-display); font-size: 1.8rem; font-weight: 800; color: var(--pine-deep); min-width: 2.2rem; text-align: center; }
+    .price-result { background: linear-gradient(150deg, var(--pine) 0%, var(--pine-deep) 100%); padding: 2.2rem; color: #fff; }
+    .price-breakdown { font-size: .84rem; opacity: .75; margin-bottom: .9rem; min-height: 1.2rem; }
+    .price-total { display: flex; align-items: flex-end; justify-content: space-between; flex-wrap: wrap; gap: .5rem; margin-bottom: 1.1rem; }
+    .price-big { font-family: var(--font-display); font-size: 3.6rem; font-weight: 800; line-height: 1; letter-spacing: -.02em; }
+    .price-per { font-size: 1rem; opacity: .75; margin-left: .3rem; }
+    .price-monthly { font-family: var(--font-display); font-size: 1rem; font-weight: 700; color: #f5b56e; text-align: right; }
+    .price-includes { display: flex; flex-wrap: wrap; gap: .5rem .6rem; margin-bottom: 1.6rem; }
+    .price-includes span { font-size: .78rem; font-weight: 600; background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.16); border-radius: 999px; padding: .3rem .8rem; }
+    .price-cta { width: 100%; padding: 1.05rem; background: var(--orange); color: #fff; border: none; border-radius: 999px; font-family: var(--font-display); font-size: 1.1rem; font-weight: 800; cursor: pointer; transition: background .2s, transform .15s; box-shadow: 0 8px 24px rgba(0,0,0,.25); }
+    .price-cta:hover:not(:disabled) { background: var(--orange-deep); transform: translateY(-2px); }
+    .price-cta:disabled { opacity: .7; cursor: not-allowed; }
+    .price-fineprint { font-size: .75rem; opacity: .55; text-align: center; margin-top: .8rem; }
+
+    /* ---------- About ---------- */
+    .about { background: var(--cream); padding: 84px 5%; }
+    .about-grid { display: grid; grid-template-columns: 1fr 1.1fr; gap: 4rem; align-items: center; }
+    .about-visual { position: relative; }
+    .about-visual img { border-radius: 28px; box-shadow: var(--shadow-lg); }
+    .about-badge { position: absolute; bottom: -20px; right: -14px; background: var(--orange); color: #fff; border-radius: 18px; padding: 1rem 1.4rem; box-shadow: var(--shadow-md); text-align: center; }
+    .about-badge .n { font-family: var(--font-display); font-size: 1.5rem; font-weight: 800; line-height: 1.1; }
+    .about-badge .l { font-size: .7rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; opacity: .9; }
+    .about-text h2 { font-family: var(--font-display); font-size: clamp(1.8rem, 3vw, 2.4rem); font-weight: 800; letter-spacing: -.015em; margin-bottom: 1.1rem; color: var(--pine-deep); line-height: 1.15; }
+    .about-text p { color: var(--mid); margin-bottom: 1rem; font-size: .97rem; }
+    .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 2.1rem; }
+    .stat { text-align: center; background: var(--white); border: 1px solid var(--line); border-radius: 16px; padding: 1.25rem .8rem; box-shadow: var(--shadow-sm); }
+    .stat-num { font-family: var(--font-display); font-size: 1.9rem; font-weight: 800; color: var(--orange-deep); line-height: 1.1; }
+    .stat-lbl { font-size: .74rem; color: var(--mid); font-weight: 600; margin-top: .25rem; letter-spacing: .02em; }
+
+    /* ---------- Why ---------- */
+    .why { background: linear-gradient(160deg, var(--pine) 0%, var(--pine-deep) 100%); color: #fff; padding: 84px 5%; position: relative; overflow: hidden; }
+    .why::before { content: ''; position: absolute; inset: 0; background: url("data:image/svg+xml,%3Csvg width='72' height='72' viewBox='0 0 72 72' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.035'%3E%3Ccircle cx='18' cy='18' r='5'/%3E%3Ccircle cx='10' cy='30' r='3'/%3E%3Ccircle cx='26' cy='30' r='3'/%3E%3Cellipse cx='18' cy='40' rx='7' ry='5'/%3E%3C/g%3E%3C/svg%3E") repeat; }
+    .why .section-inner { position: relative; }
     .why .section-header h2 { color: #fff; }
-    .why-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1.5rem; margin-top: 3rem; }
-    .why-card { background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.12); border-radius: var(--radius); padding: 1.8rem; transition: background .2s; }
-    .why-card:hover { background: rgba(255,255,255,.13); }
-    .why-icon { font-size: 2rem; margin-bottom: .8rem; }
-    .why-card h3 { font-family: 'Montserrat', sans-serif; font-size: .95rem; font-weight: 800; margin-bottom: .5rem; }
-    .why-card p { font-size: .88rem; opacity: .8; }
-    .testimonials { background: var(--tan); padding: 70px 5%; }
-    .reviews-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1.5rem; margin-top: 3rem; }
-    .review-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.8rem; transition: box-shadow .2s; }
-    .review-card:hover { box-shadow: 0 6px 20px rgba(0,0,0,.08); }
-    .stars { color: var(--yellow); font-size: 1.1rem; margin-bottom: .8rem; }
-    .review-text { font-size: .9rem; color: var(--mid); font-style: italic; margin-bottom: 1rem; line-height: 1.6; }
-    .review-author { font-weight: 700; font-size: .9rem; color: var(--dark); }
-    .faq { background: var(--white); padding: 70px 5%; }
-    .faq-list { max-width: 780px; margin: 3rem auto 0; }
-    .faq-item { border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: .8rem; overflow: hidden; }
-    .faq-q { width: 100%; background: none; border: none; padding: 1.2rem 1.5rem; display: flex; align-items: center; justify-content: space-between; font-family: 'Montserrat', sans-serif; font-size: .95rem; font-weight: 700; color: var(--dark); cursor: pointer; text-align: left; transition: background .2s; }
-    .faq-q:hover { background: var(--tan); }
-    .faq-q.open { background: var(--green-lt); color: var(--green-dark); }
-    .faq-arrow { font-size: .8rem; transition: transform .3s; }
+    .why .section-label { background: rgba(255,255,255,.12); color: #f5b56e; }
+    .why-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.4rem; }
+    .why-card { background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.12); border-radius: 18px; padding: 1.8rem; transition: background .25s, transform .25s; }
+    .why-card:hover { background: rgba(255,255,255,.11); transform: translateY(-4px); }
+    .why-icon { width: 48px; height: 48px; border-radius: 13px; background: rgba(232,132,44,.2); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 1rem; }
+    .why-card h3 { font-family: var(--font-display); font-size: 1.02rem; font-weight: 700; margin-bottom: .45rem; }
+    .why-card p { font-size: .89rem; opacity: .78; }
+
+    /* ---------- Before / After slider ---------- */
+    .before-after { background: var(--white); padding: 84px 5%; }
+    .ba-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; max-width: 1000px; margin: 0 auto; }
+    .ba-figure { margin: 0; }
+    .ba-caption { text-align: center; margin-top: 1rem; font-size: .9rem; font-weight: 700; color: var(--pine-deep); }
+    .ba-caption small { display: block; font-weight: 500; color: var(--mid); font-size: .8rem; margin-top: .15rem; }
+    .ba-slider { position: relative; border-radius: 24px; overflow: hidden; box-shadow: var(--shadow-lg); aspect-ratio: 3/3.4; cursor: ew-resize; touch-action: pan-y; user-select: none; -webkit-user-select: none; }
+    .ba-slider img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 30%; pointer-events: none; }
+    .ba-after-img { z-index: 1; }
+    .ba-before-img { z-index: 2; clip-path: inset(0 calc(100% - var(--ba-pos, 50%)) 0 0); }
+    .ba-handle { position: absolute; top: 0; bottom: 0; left: var(--ba-pos, 50%); z-index: 4; width: 4px; background: #fff; transform: translateX(-50%); box-shadow: 0 0 12px rgba(0,0,0,.4); }
+    .ba-handle::after { content: '◂ ▸'; position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 52px; height: 52px; border-radius: 50%; background: var(--orange); color: #fff; font-size: .85rem; font-weight: 700; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 16px rgba(0,0,0,.35); letter-spacing: -1px; }
+    .ba-tag { position: absolute; top: 16px; z-index: 3; padding: .4rem .95rem; border-radius: 999px; font-family: var(--font-display); font-size: .78rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: #fff; box-shadow: 0 2px 10px rgba(0,0,0,.3); }
+    .ba-tag-before { left: 16px; background: #cf4532; }
+    .ba-tag-after  { right: 16px; background: var(--grass); }
+    .ba-hint { text-align: center; margin-top: 1.3rem; font-size: .88rem; color: var(--mid); font-weight: 600; }
+    .ba-cta-row { text-align: center; margin-top: 2.4rem; }
+
+    /* ---------- Testimonials ---------- */
+    .testimonials { background: var(--cream); padding: 84px 5%; }
+    .reviews-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.6rem; }
+    .review-card { background: var(--white); border: 1px solid var(--line); border-radius: 20px; padding: 1.9rem; box-shadow: var(--shadow-sm); transition: box-shadow .25s, transform .25s; display: flex; flex-direction: column; }
+    .review-card:hover { box-shadow: var(--shadow-md); transform: translateY(-4px); }
+    .review-card .stars { color: var(--orange); font-size: 1.05rem; letter-spacing: .12em; margin-bottom: .9rem; }
+    .review-text { font-size: .93rem; color: var(--mid); margin-bottom: 1.3rem; line-height: 1.7; flex: 1; }
+    .review-author { display: flex; align-items: center; gap: .75rem; }
+    .review-avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--pine); color: #fff; font-family: var(--font-display); font-weight: 700; font-size: .9rem; display: flex; align-items: center; justify-content: center; }
+    .review-name { font-weight: 700; font-size: .9rem; color: var(--ink); line-height: 1.3; }
+    .review-loc { font-size: .78rem; color: var(--mid); }
+
+    /* ---------- FAQ ---------- */
+    .faq { background: var(--white); padding: 84px 5%; }
+    .faq-list { max-width: 780px; margin: 0 auto; }
+    .faq-item { border: 1px solid var(--line); border-radius: 16px; margin-bottom: .8rem; overflow: hidden; background: var(--cream); transition: box-shadow .2s; }
+    .faq-item:has(.faq-q.open) { box-shadow: var(--shadow-sm); }
+    .faq-q { width: 100%; background: none; border: none; padding: 1.25rem 1.5rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; font-family: var(--font-display); font-size: 1rem; font-weight: 700; color: var(--pine-deep); cursor: pointer; text-align: left; transition: color .2s; }
+    .faq-q:hover { color: var(--orange-deep); }
+    .faq-arrow { flex-shrink: 0; width: 28px; height: 28px; border-radius: 50%; background: var(--orange-soft); color: var(--orange-deep); display: flex; align-items: center; justify-content: center; font-size: .75rem; transition: transform .3s ease; }
     .faq-q.open .faq-arrow { transform: rotate(180deg); }
-    .faq-a { display: none; padding: 0 1.5rem 1.2rem; font-size: .9rem; color: var(--mid); background: var(--green-lt); }
-    .faq-a.open { display: block; }
-    .contact { background: var(--green-dark); color: #fff; padding: 70px 5%; }
+    .faq-a { max-height: 0; overflow: hidden; transition: max-height .35s ease; }
+    .faq-a > div { padding: 0 1.5rem 1.3rem; font-size: .92rem; color: var(--mid); }
+
+    /* ---------- Contact ---------- */
+    .contact { background: linear-gradient(160deg, var(--pine) 0%, var(--pine-deep) 100%); color: #fff; padding: 84px 5%; position: relative; overflow: hidden; }
+    .contact::before { content: ''; position: absolute; inset: 0; background: radial-gradient(700px 420px at 90% 10%, rgba(232,132,44,.15), transparent 65%); pointer-events: none; }
+    .contact .section-inner { position: relative; }
     .contact .section-header h2 { color: #fff; }
-    .contact-inner { max-width: 680px; margin: 3rem auto 0; }
-    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
+    .contact .section-label { background: rgba(255,255,255,.12); color: #f5b56e; }
+    .contact .section-sub { color: rgba(255,255,255,.75); }
+    .contact-inner { max-width: 720px; margin: 0 auto; background: var(--white); border-radius: 24px; padding: 2.6rem; box-shadow: var(--shadow-lg); color: var(--ink); }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1.1rem; margin-bottom: 1.1rem; }
     .form-group { display: flex; flex-direction: column; gap: .4rem; }
     .form-group.full { grid-column: 1/-1; }
-    .form-group label { font-size: .83rem; font-weight: 700; opacity: .85; }
-    .form-group input, .form-group select, .form-group textarea { padding: .75rem 1rem; border: 2px solid rgba(255,255,255,.2); border-radius: 7px; background: rgba(255,255,255,.1); color: #fff; font-size: .9rem; font-family: 'Open Sans', sans-serif; transition: border .2s, background .2s; }
-    .form-group input::placeholder, .form-group textarea::placeholder { opacity: .5; }
-    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: rgba(255,255,255,.6); background: rgba(255,255,255,.15); }
-    .form-group select option { color: var(--dark); background: #fff; }
+    .form-group label { font-size: .82rem; font-weight: 700; color: var(--pine-deep); }
+    .form-group input, .form-group select, .form-group textarea { padding: .8rem 1rem; border: 2px solid var(--line); border-radius: 12px; background: var(--cream); color: var(--ink); font-size: .93rem; font-family: var(--font-body); transition: border .2s, background .2s, box-shadow .2s; width: 100%; }
+    .form-group input::placeholder, .form-group textarea::placeholder { color: #a8a294; }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: var(--orange); background: #fff; box-shadow: 0 0 0 4px rgba(232,132,44,.12); }
     .form-group textarea { resize: vertical; min-height: 100px; }
-    .form-submit { width: 100%; padding: 1rem; background: #fff; color: var(--green-dark); border: none; border-radius: 8px; font-family: 'Montserrat', sans-serif; font-size: 1rem; font-weight: 900; cursor: pointer; margin-top: .5rem; transition: background .2s, transform .15s; }
-    .form-submit:hover:not(:disabled) { background: #e8f5e9; transform: translateY(-1px); }
+    .form-submit { width: 100%; padding: 1.05rem; background: var(--orange); color: #fff; border: none; border-radius: 999px; font-family: var(--font-display); font-size: 1.05rem; font-weight: 800; cursor: pointer; margin-top: .6rem; transition: background .2s, transform .15s; box-shadow: 0 8px 24px rgba(232,132,44,.35); }
+    .form-submit:hover:not(:disabled) { background: var(--orange-deep); transform: translateY(-2px); }
     .form-submit:disabled { opacity: .7; cursor: not-allowed; }
-    .form-note { font-size: .78rem; opacity: .5; text-align: center; margin-top: .8rem; }
-    .form-success { display: none; background: rgba(255,255,255,.1); border: 2px solid rgba(255,255,255,.25); border-radius: var(--radius); padding: 2.5rem; text-align: center; }
+    .form-note { font-size: .78rem; color: var(--mid); text-align: center; margin-top: .9rem; }
+    .form-success { display: none; text-align: center; padding: 1.5rem 0; }
     .form-success.show { display: block; }
     .form-success-icon { font-size: 3.5rem; margin-bottom: .8rem; }
-    .form-success h3 { font-family: 'Montserrat', sans-serif; font-size: 1.3rem; font-weight: 800; margin-bottom: .6rem; }
-    .form-success p { font-size: .95rem; opacity: .85; }
-    .form-error { display: none; background: rgba(220,53,69,.25); border: 1px solid rgba(220,53,69,.5); border-radius: 8px; padding: 1rem; margin-top: .8rem; font-size: .88rem; text-align: center; }
+    .form-success h3 { font-family: var(--font-display); font-size: 1.4rem; font-weight: 800; margin-bottom: .6rem; color: var(--pine-deep); }
+    .form-success p { font-size: .95rem; color: var(--mid); }
+    .form-error { display: none; background: #fdecea; border: 1px solid #f3b6ae; border-radius: 12px; padding: 1rem; margin-top: .9rem; font-size: .88rem; color: #b3362a; text-align: center; }
     .form-error.show { display: block; }
-    .areas { background: var(--tan); padding: 60px 5%; text-align: center; }
-    .areas-list { display: flex; flex-wrap: wrap; justify-content: center; gap: .6rem; max-width: 900px; margin: 2rem auto 0; }
-    .area-chip { background: var(--white); border: 1px solid var(--border); border-radius: 20px; padding: .4rem 1.1rem; font-size: .88rem; font-weight: 600; color: var(--dark); transition: background .2s, border-color .2s; }
-    .area-chip:hover { background: var(--green-lt); border-color: var(--green); }
-    footer { background: #111; color: #ccc; padding: 50px 5% 30px; }
-    .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 3rem; max-width: 1100px; margin: 0 auto 3rem; }
-    .footer-brand .nav-logo { color: #fff; display: block; margin-bottom: .8rem; }
+
+    /* ---------- Areas ---------- */
+    .areas { background: var(--cream); padding: 70px 5%; text-align: center; }
+    .areas .section-header { margin-bottom: 2rem; }
+    .areas-list { display: flex; flex-wrap: wrap; justify-content: center; gap: .6rem; max-width: 900px; margin: 0 auto; }
+    .area-chip { background: var(--white); border: 1px solid var(--line); border-radius: 999px; padding: .5rem 1.2rem; font-size: .88rem; font-weight: 600; color: var(--pine-deep); transition: all .2s; display: inline-flex; align-items: center; gap: .4rem; }
+    .area-chip:hover { background: var(--orange-soft); border-color: var(--orange); color: var(--orange-deep); transform: translateY(-2px); }
+    .areas-note { margin-top: 1.6rem; font-size: .9rem; color: var(--mid); }
+    .areas-note a { color: var(--orange-deep); font-weight: 700; text-decoration: none; }
+    .areas-note a:hover { text-decoration: underline; }
+
+    /* ---------- Footer ---------- */
+    footer { background: var(--pine-deep); color: #b9c9b3; padding: 60px 5% 30px; }
+    .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1.2fr; gap: 3rem; max-width: 1120px; margin: 0 auto 3rem; }
+    .footer-brand-logo { display: flex; align-items: center; gap: .7rem; margin-bottom: 1rem; text-decoration: none; }
+    .footer-brand-logo img { width: 48px; height: 48px; border-radius: 50%; }
+    .footer-brand-logo span { font-family: var(--font-display); font-weight: 800; font-size: 1.1rem; color: #fff; }
     .footer-brand p { font-size: .88rem; line-height: 1.7; }
-    footer h4 { font-family: 'Montserrat', sans-serif; font-size: .85rem; font-weight: 800; color: #fff; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 1rem; }
+    footer h4 { font-family: var(--font-display); font-size: .82rem; font-weight: 700; color: #f5b56e; text-transform: uppercase; letter-spacing: .1em; margin-bottom: 1rem; }
     footer ul { list-style: none; }
-    footer ul li { margin-bottom: .5rem; }
-    footer ul a { color: #ccc; text-decoration: none; font-size: .88rem; transition: color .2s; }
-    footer ul a:hover { color: #81c784; }
-    .footer-bottom { border-top: 1px solid #333; padding-top: 1.5rem; text-align: center; font-size: .82rem; color: #888; max-width: 1100px; margin: 0 auto; }
-    @media (max-width: 900px) {
-      .guarantee-grid, .service-grid, .why-grid, .reviews-grid, .pricing-grid { grid-template-columns: 1fr; }
-      .about-grid { grid-template-columns: 1fr; }
-      .about-visual { display: none; }
-      .footer-grid { grid-template-columns: 1fr 1fr; }
+    footer ul li { margin-bottom: .55rem; }
+    footer ul a { color: #b9c9b3; text-decoration: none; font-size: .88rem; transition: color .2s; }
+    footer ul a:hover { color: #fff; }
+    .footer-bottom { border-top: 1px solid rgba(255,255,255,.1); padding-top: 1.6rem; text-align: center; font-size: .82rem; color: #7e9077; max-width: 1120px; margin: 0 auto; }
+
+    /* ---------- Sticky mobile call bar ---------- */
+    .sticky-call { display: none; position: fixed; bottom: 0; left: 0; right: 0; z-index: 999; background: rgba(18,52,25,.92); backdrop-filter: blur(8px); padding: .8rem 1rem calc(.8rem + env(safe-area-inset-bottom)); box-shadow: 0 -4px 20px rgba(0,0,0,.25); gap: .7rem; }
+    .sticky-call a { flex: 1; display: flex; align-items: center; justify-content: center; gap: .5rem; font-family: var(--font-display); font-size: .95rem; font-weight: 800; text-decoration: none; border-radius: 999px; padding: .85rem .5rem; }
+    .sticky-call .call { background: #fff; color: var(--pine-deep); }
+    .sticky-call .quote { background: var(--orange); color: #fff; }
+
+    /* ---------- Responsive ---------- */
+    @media (max-width: 960px) {
+      .hero-inner { grid-template-columns: 1fr; text-align: center; gap: 2.5rem; padding-bottom: 60px; }
+      .hero p.lede { margin-left: auto; margin-right: auto; }
+      .hero-btns, .hero-checks { justify-content: center; }
+      .hero-visual { order: -1; }
+      .hero-visual img { width: min(300px, 72%); }
+      .chip-1 { left: 4%; } .chip-2 { right: 4%; }
+      .how-grid, .service-grid, .why-grid, .reviews-grid { grid-template-columns: 1fr; }
+      .ba-grid { grid-template-columns: 1fr; max-width: 560px; gap: 2.5rem; }
+      .how-card { margin-top: 14px; }
+      .about-grid { grid-template-columns: 1fr; gap: 3rem; }
+      .footer-grid { grid-template-columns: 1fr 1fr; gap: 2rem; }
       .nav-links { display: none; }
+      .nav-burger { display: block; }
       .form-row { grid-template-columns: 1fr; }
     }
-    @media (max-width: 600px) { .footer-grid { grid-template-columns: 1fr; } .hero { padding: 60px 5%; } }
-    /* Sticky mobile call bar */
-    .sticky-call { display: none; position: fixed; bottom: 0; left: 0; right: 0; z-index: 999; background: var(--green-dark); padding: .85rem 1.5rem; box-shadow: 0 -4px 20px rgba(0,0,0,.25); }
-    .sticky-call a { display: flex; align-items: center; justify-content: center; gap: .6rem; background: #fff; color: var(--green-dark); font-family: 'Montserrat', sans-serif; font-size: 1.05rem; font-weight: 900; text-decoration: none; border-radius: 8px; padding: .8rem; }
-    .sticky-call a:hover { background: var(--green-lt); }
-    @media (max-width: 768px) { .sticky-call { display: block; } body { padding-bottom: 80px; } }
+    @media (max-width: 600px) {
+      .footer-grid { grid-template-columns: 1fr; }
+      .hero { padding-top: 48px; }
+      .hero h1 { font-size: clamp(2.2rem, 9vw, 2.8rem); }
+      .sticky-call { display: flex; }
+      body { padding-bottom: 84px; }
+      .contact-inner { padding: 1.8rem 1.3rem; }
+      .config-step { padding: 1.4rem 1.3rem; }
+      .price-result { padding: 1.7rem 1.3rem; }
+      .price-big { font-size: 2.8rem; }
+      .top-bar .hide-sm { display: none; }
+    }
   </style>
 </head>
 <body>
 
-<!-- Sticky mobile call bar -->
+<!-- Sticky mobile action bar -->
 <div class="sticky-call">
-  <a href="tel:+16026220238">📞 Tap to Call: 602-622-0238</a>
+  <a class="call" href="tel:+16026220238">📞 Call Now</a>
+  <a class="quote" href="#pricing">Get My Price</a>
 </div>
 
 <div class="top-bar">
-  📞 <a href="tel:+16026220238">602-622-0238</a> &nbsp;|&nbsp; Serving the East Valley &nbsp;|&nbsp; <a href="#contact">Get a Free Quote →</a>
+  📞 <a href="tel:+16026220238">602-622-0238</a><span class="dot">•</span><span class="hide-sm">Serving the East Valley<span class="dot">•</span></span><a class="quote-link" href="#contact">Get a Free Quote →</a>
 </div>
 
 <nav>
-  <a href="#" class="nav-logo">🐾 Scoop N Go Arizona</a>
+  <a href="#" class="nav-logo">
+    <img src="Scoopngologo.png" alt="Scoop N Go Arizona logo" width="46" height="46"/>
+    <span>Scoop N Go<small>Arizona · Est. Local</small></span>
+  </a>
   <ul class="nav-links">
+    <li><a href="#how">How It Works</a></li>
     <li><a href="#services">Services</a></li>
     <li><a href="#pricing">Pricing</a></li>
-    <li><a href="#about">About Us</a></li>
     <li><a href="#testimonials">Reviews</a></li>
+    <li><a href="#faq">FAQ</a></li>
     <li><a href="#contact" class="nav-cta">Get a Free Quote</a></li>
   </ul>
+  <button class="nav-burger" id="navBurger" aria-label="Open menu" aria-expanded="false" onclick="toggleMenu()">
+    <span></span><span></span><span></span>
+  </button>
 </nav>
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#how" onclick="closeMenu()">How It Works</a>
+  <a href="#services" onclick="closeMenu()">Services</a>
+  <a href="#pricing" onclick="closeMenu()">Pricing</a>
+  <a href="#testimonials" onclick="closeMenu()">Reviews</a>
+  <a href="#faq" onclick="closeMenu()">FAQ</a>
+  <a href="#contact" onclick="closeMenu()">Get a Free Quote</a>
+</div>
 
 <section class="hero">
   <div class="hero-inner">
-    <div class="hero-badges">
-      <span class="hero-badge">✅ 100% Satisfaction Guarantee</span>
-      <span class="hero-badge">🛡️ Fully Insured & Bonded</span>
-      <span class="hero-badge">🐶 Dog Lovers</span>
-      <span class="hero-badge">📍 Arizona Local</span>
+    <div>
+      <div class="hero-rating reveal in"><span class="stars">★★★★★</span> Loved by East Valley dog owners</div>
+      <h1 class="reveal in">Never pick up<br/>dog poop <em>again.<svg viewBox="0 0 200 14" preserveAspectRatio="none"><path d="M3 11 C 60 2, 140 2, 197 8" stroke="#e8842c" stroke-width="5" fill="none" stroke-linecap="round"/></svg></em></h1>
+      <p class="lede reveal in reveal-d1">Professional, reliable dog waste removal across the East Valley. We scoop it, double-bag it, and leave your yard spotless — you just enjoy it.</p>
+      <div class="hero-btns reveal in reveal-d2">
+        <a href="#pricing" class="btn-primary">Get My Price →</a>
+        <a href="tel:+16026220238" class="btn-ghost">📞 602-622-0238</a>
+      </div>
+      <div class="hero-checks reveal in reveal-d3">
+        <span><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="8" fill="#4c8f4a"/><path d="M4.5 8.2 7 10.5l4.5-5" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Fully Insured</span>
+        <span><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="8" fill="#4c8f4a"/><path d="M4.5 8.2 7 10.5l4.5-5" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> No Contracts</span>
+        <span><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="8" fill="#4c8f4a"/><path d="M4.5 8.2 7 10.5l4.5-5" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Gate Photo Every Visit</span>
+        <span><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="8" fill="#4c8f4a"/><path d="M4.5 8.2 7 10.5l4.5-5" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> AZ Local & Family Run</span>
+      </div>
     </div>
-    <h1>Never Pick Up Dog Poop Again!</h1>
-    <p>Scoop N Go Arizona delivers reliable, professional dog waste removal so you can enjoy your yard without the mess. Serving the East Valley with pride.</p>
-    <div class="hero-btns">
-      <a href="#contact" class="btn-white">Get a Free Quote</a>
-      <a href="tel:+16026220238" class="btn-outline-white">📞 Call Us Now</a>
+    <div class="hero-visual reveal in reveal-d1">
+      <img src="Scoopngologo.png" alt="Scoop N Go Arizona — weekly dog poop cleanup mascot" width="400" height="400"/>
+      <div class="hero-chip chip-1">Starting at <span class="big">$15</span>/visit</div>
+      <div class="hero-chip chip-2">📸 Gate photo, every visit</div>
     </div>
   </div>
+  <svg class="hero-wave" viewBox="0 0 1440 70" preserveAspectRatio="none" aria-hidden="true"><path d="M0,40 C240,75 480,5 720,25 C960,45 1200,70 1440,30 L1440,70 L0,70 Z" fill="#ffffff"/></svg>
 </section>
 
-<section class="guarantees">
-  <div class="guarantees-inner">
-    <h2>We Stand Behind Every Scoop!</h2>
-    <div class="guarantee-grid">
-      <div class="guarantee-card"><div class="guarantee-icon">🏆</div><h3>100% Satisfaction Guarantee</h3><p>Not happy with your service? Contact us within 24 hours and we'll come back out, no questions asked.</p></div>
-      <div class="guarantee-card"><div class="guarantee-icon">❤️</div><h3>Customer Focused</h3><p>We treat every yard like our own. Flexible scheduling, personal attention, and service that fits your life.</p></div>
-      <div class="guarantee-card"><div class="guarantee-icon">⭐</div><h3>Professional Service</h3><p>Reliable, on-time, and thorough. We bring the right tools and the right attitude to every single visit.</p></div>
+<section class="how" id="how">
+  <div class="section-inner">
+    <div class="section-header reveal">
+      <span class="section-label">Dead Simple</span>
+      <h2>How It Works</h2>
+      <p class="section-sub">From messy yard to spotless in three easy steps. No contracts, no hassle, no gross Saturday chores.</p>
+    </div>
+    <div class="how-grid">
+      <div class="how-card reveal"><div class="how-num">1</div><div class="how-icon">📱</div><h3>Pick Your Plan</h3><p>Use the price builder below to choose weekly, bi-weekly, monthly, or one-time service. See your exact price instantly and subscribe online in under a minute.</p></div>
+      <div class="how-card reveal reveal-d1"><div class="how-num">2</div><div class="how-icon">🧹</div><h3>We Scoop &amp; Sanitize</h3><p>Your tech texts you on the way, does a full-yard sweep, and double-bags everything into your outdoor trash bin — or adds haul-away and we take it with us. Equipment is sanitized between every yard.</p></div>
+      <div class="how-card reveal reveal-d2"><div class="how-num">3</div><div class="how-icon">📸</div><h3>Gate Photo &amp; Done</h3><p>You get a "job complete" text with a photo of your securely closed gate. Let the dogs out — the yard is clean and your weekend is yours.</p></div>
     </div>
   </div>
 </section>
 
 <section class="services" id="services">
   <div class="section-inner">
-    <div class="section-header"><span class="section-label">Our Most Popular Services</span><h2>What We Offer</h2></div>
+    <div class="section-header reveal"><span class="section-label">What We Offer</span><h2>Services Built for AZ Dog Owners</h2></div>
     <div class="service-grid">
-      <div class="service-card"><div class="service-img green">🏡</div><div class="service-body"><h3>Residential Dog Waste Removal</h3><p>We keep your backyard clean and safe on a regular schedule. Weekly, bi-weekly, or monthly, so you and your dogs can enjoy the space worry-free.</p></div></div>
-      <div class="service-card"><div class="service-img tan">🧹</div><div class="service-body"><h3>One-Time Cleanups</h3><p>Moving in, hosting a party, or just overdue for a cleanout? We'll do a full yard cleanup and leave it spotless with no recurring commitment needed.</p></div></div>
-      <div class="service-card"><div class="service-img blue">✨</div><div class="service-body"><h3>Deodorizer Treatment</h3><p>After we scoop, we can apply a pet-safe deodorizer to treated areas so your yard smells as fresh as it looks.</p></div></div>
+      <div class="service-card reveal"><div class="service-img green">🏡</div><div class="service-body"><h3>Recurring Waste Removal</h3><p>We keep your backyard clean and safe on a regular schedule — weekly, bi-weekly, or monthly — so you and your dogs can enjoy the space worry-free.</p></div></div>
+      <div class="service-card reveal reveal-d1"><div class="service-img orange">🧹</div><div class="service-body"><h3>One-Time Cleanups</h3><p>Moving in, hosting a party, or just overdue for a cleanout? We'll do a full yard cleanup and leave it spotless — no recurring commitment needed.</p></div></div>
+      <div class="service-card reveal reveal-d2"><div class="service-img blue">✨</div><div class="service-body"><h3>Deodorizer Treatment</h3><p>After we scoop, we can apply a pet-safe deodorizer to treated areas so your yard smells as fresh as it looks. Big help in the summer heat.</p></div></div>
     </div>
   </div>
 </section>
 
 <section class="pricing" id="pricing">
   <div class="section-inner">
-    <div class="section-header"><span class="section-label">Transparent Pricing</span><h2>Build Your Plan</h2>
-      <p style="color:var(--mid);margin-top:.5rem;font-size:.95rem;">Customize your service and see your exact price instantly.</p>
+    <div class="section-header reveal">
+      <span class="section-label">Transparent Pricing</span>
+      <h2>Build Your Plan</h2>
+      <p class="section-sub">Customize your service and see your exact price instantly. No quotes to wait on, no surprises.</p>
     </div>
 
-    <div class="pricing-configurator">
+    <div class="pricing-configurator reveal">
       <!-- Step 1: Frequency -->
       <div class="config-step">
-        <div class="config-label">① How often?</div>
+        <div class="config-label"><span class="step-tag">STEP 1</span> How often should we come?</div>
         <div class="config-options" id="freqOptions">
-          <button class="config-btn" onclick="setPlan('weekly',this)">Weekly</button>
-          <button class="config-btn active" onclick="setPlan('biweekly',this)">Bi-Weekly</button>
+          <button class="config-btn active" onclick="setPlan('weekly',this)">Weekly</button>
+          <button class="config-btn" onclick="setPlan('biweekly',this)">Bi-Weekly</button>
           <button class="config-btn" onclick="setPlan('monthly',this)">Monthly</button>
           <button class="config-btn" onclick="setPlan('onetime',this)">One-Time</button>
         </div>
@@ -335,21 +514,30 @@
 
       <!-- Step 2: Dogs -->
       <div class="config-step">
-        <div class="config-label">② How many dogs?</div>
+        <div class="config-label"><span class="step-tag">STEP 2</span> How many dogs?</div>
         <div class="dog-stepper">
-          <button class="stepper-btn" onclick="changeDogs(-1)">−</button>
+          <button class="stepper-btn" aria-label="Fewer dogs" onclick="changeDogs(-1)">−</button>
           <span id="dogCount">1</span>
-          <button class="stepper-btn" onclick="changeDogs(1)">+</button>
-          <span style="font-size:.85rem;color:var(--mid);margin-left:.5rem;">dog<span id="dogPlural"></span></span>
+          <button class="stepper-btn" aria-label="More dogs" onclick="changeDogs(1)">+</button>
+          <span style="font-size:.88rem;color:var(--mid);margin-left:.4rem;font-weight:600;">happy dog<span id="dogPlural"></span> 🐕</span>
         </div>
       </div>
 
       <!-- Step 3: Deodorizer -->
       <div class="config-step">
-        <div class="config-label">③ Add deodorizer treatment? <span style="font-size:.78rem;color:var(--mid);font-weight:400;">(pet-safe, eliminates odors)</span></div>
+        <div class="config-label"><span class="step-tag">STEP 3</span> Add deodorizer? <span class="hint">pet-safe, eliminates odors</span></div>
         <div class="config-options">
           <button class="config-btn" id="deodNo"  onclick="setDeodorizer(false,this)">No thanks</button>
           <button class="config-btn" id="deodYes" onclick="setDeodorizer(true,this)">Yes! +$<span id="deodPrice">10</span>/visit</button>
+        </div>
+      </div>
+
+      <!-- Step 4: Haul-away -->
+      <div class="config-step">
+        <div class="config-label"><span class="step-tag">STEP 4</span> Waste haul-away? <span class="hint">double-bagged in your bin is always free</span></div>
+        <div class="config-options">
+          <button class="config-btn" id="haulNo"  onclick="setHaulAway(false,this)">Leave in my bin</button>
+          <button class="config-btn" id="haulYes" onclick="setHaulAway(true,this)">Haul it away! +$<span id="haulPrice">10</span>/visit</button>
         </div>
       </div>
 
@@ -358,61 +546,38 @@
         <div class="price-breakdown" id="priceBreakdown"></div>
         <div class="price-total">
           <div>
-            <span class="price-big" id="pricePerVisit">$30</span>
+            <span class="price-big" id="pricePerVisit">$15</span>
             <span class="price-per" id="pricePer">/visit</span>
           </div>
           <div class="price-monthly" id="priceMonthly"></div>
         </div>
         <div class="price-includes">
           <span>✓ Full yard scoop</span>
-          <span>✓ Waste removed</span>
+          <span id="wasteInclude">✓ Double-bagged in your bin</span>
           <span>✓ Gate secured</span>
           <span>✓ Service text</span>
           <span id="deodInclude" style="display:none;">✓ Deodorizer</span>
         </div>
         <button class="price-cta" id="priceCta" onclick="doSubscribe()">Subscribe Online →</button>
-        <p style="font-size:.75rem;color:var(--mid);text-align:center;margin-top:.6rem;">Powered by Stripe · Cancel anytime · No contracts</p>
+        <p class="price-fineprint">🔒 Powered by Stripe · Cancel anytime · No contracts</p>
       </div>
     </div>
   </div>
 </section>
 
-<style>
-  .pricing-configurator { max-width: 640px; margin: 0 auto; background: var(--white); border-radius: 16px; border: 2px solid var(--border); overflow: hidden; box-shadow: 0 8px 32px rgba(0,0,0,.07); }
-  .config-step { padding: 1.5rem 2rem; border-bottom: 1px solid var(--border); }
-  .config-label { font-family: 'Montserrat', sans-serif; font-size: .88rem; font-weight: 800; color: var(--dark); margin-bottom: .9rem; }
-  .config-options { display: flex; gap: .6rem; flex-wrap: wrap; }
-  .config-btn { padding: .55rem 1.2rem; border: 2px solid var(--border); border-radius: 8px; background: var(--white); font-family: 'Montserrat', sans-serif; font-size: .85rem; font-weight: 700; color: var(--mid); cursor: pointer; transition: all .2s; }
-  .config-btn:hover { border-color: var(--green); color: var(--green); }
-  .config-btn.active { border-color: var(--green-dark); background: var(--green-lt); color: var(--green-dark); }
-  .dog-stepper { display: flex; align-items: center; gap: .75rem; }
-  .stepper-btn { width: 36px; height: 36px; border-radius: 50%; border: 2px solid var(--border); background: var(--white); font-size: 1.2rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all .2s; color: var(--green-dark); line-height: 1; }
-  .stepper-btn:hover { border-color: var(--green); background: var(--green-lt); }
-  #dogCount { font-family: 'Montserrat', sans-serif; font-size: 1.6rem; font-weight: 900; color: var(--green-dark); min-width: 2rem; text-align: center; }
-  .price-result { background: var(--green-dark); padding: 2rem; color: #fff; }
-  .price-breakdown { font-size: .82rem; opacity: .75; margin-bottom: .8rem; min-height: 1.2rem; }
-  .price-total { display: flex; align-items: flex-end; justify-content: space-between; flex-wrap: wrap; gap: .5rem; margin-bottom: 1rem; }
-  .price-big { font-family: 'Montserrat', sans-serif; font-size: 3.2rem; font-weight: 900; line-height: 1; }
-  .price-per { font-size: 1rem; opacity: .75; margin-left: .3rem; }
-  .price-monthly { font-family: 'Montserrat', sans-serif; font-size: 1rem; font-weight: 700; opacity: .8; text-align: right; }
-  .price-includes { display: flex; flex-wrap: wrap; gap: .5rem 1.2rem; margin-bottom: 1.5rem; }
-  .price-includes span { font-size: .82rem; opacity: .85; }
-  .price-cta { width: 100%; padding: 1rem; background: #fff; color: var(--green-dark); border: none; border-radius: 9px; font-family: 'Montserrat', sans-serif; font-size: 1.05rem; font-weight: 900; cursor: pointer; transition: background .2s, transform .15s; }
-  .price-cta:hover:not(:disabled) { background: #e8f5e9; transform: translateY(-1px); }
-  .price-cta:disabled { opacity: .7; cursor: not-allowed; }
-  @media (max-width: 600px) { .config-step { padding: 1.2rem 1.2rem; } .price-result { padding: 1.5rem 1.2rem; } .price-big { font-size: 2.5rem; } }
-</style>
-
 <section class="about" id="about">
   <div class="section-inner">
     <div class="about-grid">
-      <div class="about-visual">🐾</div>
-      <div class="about-text">
+      <div class="about-visual reveal">
+        <img src="Scoopngologo.png" alt="Scoop N Go Arizona logo — locally owned dog waste removal" width="480" height="480"/>
+        <div class="about-badge"><div class="n">100%</div><div class="l">Local &amp; Family Run</div></div>
+      </div>
+      <div class="about-text reveal reveal-d1">
         <span class="section-label">About Us</span>
-        <h2>Your Local Dog Waste Removal Pros</h2>
-        <p>Scoop N Go Arizona was founded right here in the Valley by a dog lover who got tired of, well, you know. We started small, and we're proud to keep it personal, professional, and local.</p>
-        <p>We understand picking up after your pets isn't the highlight of your day. That's where we come in. We show up, we scoop, and we leave your yard looking great, every single time.</p>
-        <p>We're not a big corporate company. We're your neighbors, and we treat every yard with the care and respect it deserves.</p>
+        <h2>Your Neighbors, Not a Corporate Chain</h2>
+        <p>Scoop N Go Arizona was founded right here in the Valley by a dog lover who got tired of, well… you know. We started small, and we're proud to keep it personal, professional, and local.</p>
+        <p>We understand picking up after your pets isn't the highlight of your day. That's where we come in. We show up, we scoop, and we leave your yard looking great — every single time.</p>
+        <p>Every yard gets treated with the care and respect it deserves, because chances are we're cleaning up just down the street from our own.</p>
         <div class="stats-row">
           <div class="stat"><div class="stat-num">11+</div><div class="stat-lbl">Happy Clients</div></div>
           <div class="stat"><div class="stat-num">100%</div><div class="stat-lbl">Satisfaction Rate</div></div>
@@ -425,99 +590,88 @@
 
 <section class="why">
   <div class="section-inner">
-    <div class="section-header">
-      <span class="section-label" style="background:rgba(255,255,255,.15);color:#fff;">Why Choose Us</span>
+    <div class="section-header reveal">
+      <span class="section-label">Why Choose Us</span>
       <h2>Why Scoop N Go Arizona?</h2>
     </div>
     <div class="why-grid">
-      <div class="why-card"><div class="why-icon">📸</div><h3>Gate Photos</h3><p>We send a photo after every visit confirming your gate is securely closed. Peace of mind, every time.</p></div>
-      <div class="why-card"><div class="why-icon">📱</div><h3>Service Notifications</h3><p>You'll get a text when we're on our way and again when we're done. No guessing, no surprises.</p></div>
-      <div class="why-card"><div class="why-icon">🐕</div><h3>Pet Safety First</h3><p>We sanitize our equipment after every yard to minimize the spread of germs and keep your pets healthy.</p></div>
-      <div class="why-card"><div class="why-icon">💯</div><h3>Satisfaction Guaranteed</h3><p>If you're not 100% satisfied, contact us within 24 hours and we'll make it right. No fuss, no hassle.</p></div>
-      <div class="why-card"><div class="why-icon">📅</div><h3>Flexible Scheduling</h3><p>Weekly, bi-weekly, or one-time. We work around your schedule so you never have to worry about it.</p></div>
-      <div class="why-card"><div class="why-icon">🤝</div><h3>No Contract Required</h3><p>No long-term commitments. Start or stop service whenever you need. We earn your business every visit.</p></div>
+      <div class="why-card reveal"><div class="why-icon">📸</div><h3>Gate Photos</h3><p>We send a photo after every visit confirming your gate is securely closed. Peace of mind, every time.</p></div>
+      <div class="why-card reveal reveal-d1"><div class="why-icon">📱</div><h3>Service Notifications</h3><p>You'll get a text when we're on our way and again when we're done. No guessing, no surprises.</p></div>
+      <div class="why-card reveal reveal-d2"><div class="why-icon">🐕</div><h3>Pet Safety First</h3><p>We sanitize our equipment after every yard to minimize the spread of germs and keep your pets healthy.</p></div>
+      <div class="why-card reveal"><div class="why-icon">💯</div><h3>Satisfaction Guaranteed</h3><p>If you're not 100% satisfied, contact us within 24 hours and we'll make it right. No fuss, no hassle.</p></div>
+      <div class="why-card reveal reveal-d1"><div class="why-icon">📅</div><h3>Flexible Scheduling</h3><p>Weekly, bi-weekly, or one-time. We work around your schedule so you never have to worry about it.</p></div>
+      <div class="why-card reveal reveal-d2"><div class="why-icon">🤝</div><h3>No Contract Required</h3><p>No long-term commitments. Start or stop service whenever you need. We earn your business every visit.</p></div>
     </div>
   </div>
 </section>
 
 <section class="before-after">
   <div class="section-inner">
-    <div class="section-header">
+    <div class="section-header reveal">
       <span class="section-label">Real Results</span>
       <h2>See the Difference We Make</h2>
-      <p class="section-sub">One visit. Same yard. Zero waste left behind.</p>
+      <p class="section-sub">One visit. Same yard. Zero waste left behind. Drag the slider to compare.</p>
     </div>
-    <div class="ba-container">
-      <div class="ba-card">
-        <div class="ba-img-wrap">
-          <div class="ba-label ba-label-before">Before</div>
-          <img src="before.jpg" alt="Yard before dog waste removal service" loading="lazy" width="4284" height="5712"/>
+    <div class="ba-grid">
+      <figure class="ba-figure reveal">
+        <div class="ba-slider">
+          <img class="ba-after-img" src="after2.jpg" alt="Backyard completely clean after Scoop N Go Arizona full cleanup" loading="lazy" width="1200" height="1600"/>
+          <img class="ba-before-img" src="before2.jpg" alt="Backyard covered in dog waste before cleanup service" loading="lazy" width="1200" height="1600"/>
+          <div class="ba-tag ba-tag-before">Before</div>
+          <div class="ba-tag ba-tag-after">After</div>
+          <div class="ba-handle"></div>
         </div>
-        <div class="ba-caption">❌ Waste scattered throughout the yard</div>
-      </div>
-      <div class="ba-card">
-        <div class="ba-img-wrap">
-          <div class="ba-label ba-label-after">After</div>
-          <img src="after.jpg" alt="Clean yard after Scoop N Go Arizona service" loading="lazy" width="4284" height="5712"/>
+        <figcaption class="ba-caption">Full backyard cleanout<small>Every last pile scooped &amp; double-bagged</small></figcaption>
+      </figure>
+      <figure class="ba-figure reveal reveal-d1">
+        <div class="ba-slider">
+          <img class="ba-after-img" src="after.jpg" alt="Clean side yard after Scoop N Go Arizona service" loading="lazy" width="4284" height="5712"/>
+          <img class="ba-before-img" src="before.jpg" alt="Side yard before dog waste removal service" loading="lazy" width="4284" height="5712"/>
+          <div class="ba-tag ba-tag-before">Before</div>
+          <div class="ba-tag ba-tag-after">After</div>
+          <div class="ba-handle"></div>
         </div>
-        <div class="ba-caption">✅ Completely clean, gate secured and photo sent</div>
-      </div>
+        <figcaption class="ba-caption">Side yard refresh<small>Gate secured &amp; photo sent after service</small></figcaption>
+      </figure>
     </div>
-    <p style="text-align:center;margin-top:2.5rem;"><a href="#contact" class="btn-white" style="display:inline-block;">Get Your Free Quote</a></p>
+    <p class="ba-hint">↔ Drag the sliders to compare before &amp; after</p>
+    <div class="ba-cta-row reveal"><a href="#contact" class="btn-primary">Get Your Free Quote →</a></div>
   </div>
 </section>
-<style>
-  .before-after { background: var(--tan); padding: 70px 5%; }
-  .section-sub { color: var(--mid); font-size: .95rem; margin-top: .5rem; }
-  .ba-container { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; max-width: 780px; margin: 3rem auto 0; }
-  .ba-card { border-radius: 16px; overflow: hidden; box-shadow: 0 8px 32px rgba(0,0,0,.13); position: relative; background: #000; }
-  .ba-img-wrap { width: 100%; height: 320px; overflow: hidden; position: relative; }
-  .ba-img-wrap img { width: 100%; height: 100%; object-fit: cover; object-position: center 30%; display: block; opacity: .97; }
-  .ba-label { position: absolute; top: 12px; left: 12px; padding: .35rem .85rem; border-radius: 20px; font-family: 'Montserrat', sans-serif; font-size: .78rem; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; box-shadow: 0 2px 8px rgba(0,0,0,.2); z-index: 1; }
-  .ba-label-before { background: #e53935; color: #fff; }
-  .ba-label-after  { background: var(--green); color: #fff; }
-  .ba-caption { padding: .85rem 1rem; font-size: .83rem; color: var(--mid); background: var(--white); text-align: center; font-weight: 600; line-height: 1.4; }
-  @media (max-width: 700px) {
-    .before-after { padding: 50px 4%; }
-    .ba-container { gap: .75rem; }
-    .ba-img-wrap { height: 180px; }
-    .ba-label { font-size: .65rem; padding: .2rem .55rem; top: 8px; left: 8px; }
-    .ba-caption { font-size: .72rem; padding: .6rem .5rem; }
-  }
-</style>
 
 <section class="testimonials" id="testimonials">
   <div class="section-inner">
-    <div class="section-header"><span class="section-label">Testimonials</span><h2>What Our Customers Are Saying</h2></div>
+    <div class="section-header reveal"><span class="section-label">Testimonials</span><h2>What Our Customers Are Saying</h2></div>
     <div class="reviews-grid">
-      <div class="review-card"><div class="stars">★★★★★</div><p class="review-text">"Absolutely love this service! My backyard has never looked better. They're always on time and super professional. Highly recommend to any dog owner in the Valley."</p><div class="review-author">Sarah M., Tempe</div></div>
-      <div class="review-card"><div class="stars">★★★★★</div><p class="review-text">"I was nervous to hire someone for this but I'm so glad I did. They sent a photo of the gate after every visit and texted when they were done. Exactly what you want."</p><div class="review-author">Jason R., Chandler</div></div>
-      <div class="review-card"><div class="stars">★★★★★</div><p class="review-text">"Great price, great service. I have two big dogs so the yard gets messy fast. They take care of everything every week without me having to think about it."</p><div class="review-author">Melissa T., Gilbert</div></div>
+      <div class="review-card reveal"><div class="stars">★★★★★</div><p class="review-text">"Absolutely love this service! My backyard has never looked better. They're always on time and super professional. Highly recommend to any dog owner in the Valley."</p><div class="review-author"><div class="review-avatar">SM</div><div><div class="review-name">Sarah M.</div><div class="review-loc">Tempe, AZ</div></div></div></div>
+      <div class="review-card reveal reveal-d1"><div class="stars">★★★★★</div><p class="review-text">"I was nervous to hire someone for this but I'm so glad I did. They sent a photo of the gate after every visit and texted when they were done. Exactly what you want."</p><div class="review-author"><div class="review-avatar">JR</div><div><div class="review-name">Jason R.</div><div class="review-loc">Chandler, AZ</div></div></div></div>
+      <div class="review-card reveal reveal-d2"><div class="stars">★★★★★</div><p class="review-text">"Great price, great service. I have two big dogs so the yard gets messy fast. They take care of everything every week without me having to think about it."</p><div class="review-author"><div class="review-avatar">MT</div><div><div class="review-name">Melissa T.</div><div class="review-loc">Gilbert, AZ</div></div></div></div>
     </div>
   </div>
 </section>
 
-<section class="faq">
+<section class="faq" id="faq">
   <div class="section-inner">
-    <div class="section-header"><span class="section-label">FAQ</span><h2>Frequently Asked Questions</h2></div>
-    <div class="faq-list">
-      <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">How often do you visit? <span class="faq-arrow">▼</span></button><div class="faq-a">We offer weekly, bi-weekly, and one-time cleanups. Most customers love weekly service to keep the yard consistently clean and odor-free.</div></div>
-      <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">Do I need to be home when you come? <span class="faq-arrow">▼</span></button><div class="faq-a">Not at all! As long as we can access your yard, we'll handle everything. You'll get a text when we're done, plus a photo of your closed and secured gate, so you always know the job is complete.</div></div>
-      <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">What do you do with the waste? <span class="faq-arrow">▼</span></button><div class="faq-a">We bag all waste and remove it from your property entirely. You don't have to deal with it. That's the whole point!</div></div>
-      <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">How much does it cost? <span class="faq-arrow">▼</span></button><div class="faq-a">Weekly service starts at $15/visit for 1 dog. Bi-weekly starts at $25 and monthly starts at $45. Additional dogs are just a few dollars more. Use the pricing configurator above to get your exact price instantly!</div></div>
-      <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">What areas do you serve? <span class="faq-arrow">▼</span></button><div class="faq-a">We serve the entire East Valley: Gilbert, Chandler, Mesa, Tempe, Scottsdale, Queen Creek, San Tan Valley, Ahwatukee, and surrounding communities. Not sure if we cover your zip? Just ask!</div></div>
-      <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">Is there a contract or long-term commitment? <span class="faq-arrow">▼</span></button><div class="faq-a">No contracts required! You can start or stop service at any time. We believe in earning your business with great service, not locking you in.</div></div>
+    <div class="section-header reveal"><span class="section-label">FAQ</span><h2>Frequently Asked Questions</h2></div>
+    <div class="faq-list reveal">
+      <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">How often do you visit? <span class="faq-arrow">▼</span></button><div class="faq-a"><div>We offer weekly, bi-weekly, and one-time cleanups. Most customers love weekly service to keep the yard consistently clean and odor-free.</div></div></div>
+      <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">Do I need to be home when you come? <span class="faq-arrow">▼</span></button><div class="faq-a"><div>Not at all! As long as we can access your yard, we'll handle everything. You'll get a text when we're done, plus a photo of your closed and secured gate, so you always know the job is complete.</div></div></div>
+      <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">What do you do with the waste? <span class="faq-arrow">▼</span></button><div class="faq-a"><div>We scoop everything and double-bag it, then place it neatly in your outdoor trash can — no extra charge. Want it gone completely? Add haul-away ($5/visit weekly, $10 bi-weekly, $15 monthly) and we'll take it off your property. Either way, you never touch it.</div></div></div>
+      <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">How much does it cost? <span class="faq-arrow">▼</span></button><div class="faq-a"><div>Weekly service starts at $15/visit for 1 dog. Bi-weekly starts at $25 and monthly starts at $45. Additional dogs are just a few dollars more. Use the pricing configurator above to get your exact price instantly!</div></div></div>
+      <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">What areas do you serve? <span class="faq-arrow">▼</span></button><div class="faq-a"><div>We serve the entire East Valley: Gilbert, Chandler, Mesa, Tempe, Scottsdale, Queen Creek, San Tan Valley, Ahwatukee, and surrounding communities. Not sure if we cover your zip? Just ask!</div></div></div>
+      <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">Is there a contract or long-term commitment? <span class="faq-arrow">▼</span></button><div class="faq-a"><div>No contracts required! You can start or stop service at any time. We believe in earning your business with great service, not locking you in.</div></div></div>
     </div>
   </div>
 </section>
 
 <section class="contact" id="contact">
   <div class="section-inner">
-    <div class="section-header">
-      <span class="section-label" style="background:rgba(255,255,255,.15);color:#fff;">Get in Touch</span>
+    <div class="section-header reveal">
+      <span class="section-label">Get in Touch</span>
       <h2>Get Your Free Quote!</h2>
+      <p class="section-sub">Tell us about your yard and your pups — we typically respond within 2 hours.</p>
     </div>
-    <div class="contact-inner">
+    <div class="contact-inner reveal">
       <!-- Success State -->
       <div class="form-success" id="formSuccess">
         <div class="form-success-icon">🎉</div>
@@ -527,26 +681,26 @@
       <!-- Form -->
       <div id="quoteForm">
         <div class="form-row">
-          <div class="form-group"><label>First Name *</label><input type="text" id="firstName" placeholder="Jane"/></div>
-          <div class="form-group"><label>Last Name *</label><input type="text" id="lastName" placeholder="Smith"/></div>
+          <div class="form-group"><label for="firstName">First Name *</label><input type="text" id="firstName" placeholder="Jane" autocomplete="given-name"/></div>
+          <div class="form-group"><label for="lastName">Last Name *</label><input type="text" id="lastName" placeholder="Smith" autocomplete="family-name"/></div>
         </div>
         <div class="form-row">
-          <div class="form-group"><label>Phone Number *</label><input type="tel" id="phone" placeholder="(602) 555-0000"/></div>
-          <div class="form-group"><label>Email Address *</label><input type="email" id="email" placeholder="jane@email.com"/></div>
+          <div class="form-group"><label for="phone">Phone Number *</label><input type="tel" id="phone" placeholder="(602) 555-0000" autocomplete="tel"/></div>
+          <div class="form-group"><label for="email">Email Address *</label><input type="email" id="email" placeholder="jane@email.com" autocomplete="email"/></div>
         </div>
         <div class="form-row">
-          <div class="form-group"><label>Zip Code *</label><input type="text" id="zip" placeholder="85281"/></div>
-          <div class="form-group"><label>Number of Dogs *</label>
+          <div class="form-group"><label for="zip">Zip Code *</label><input type="text" id="zip" placeholder="85281" inputmode="numeric" autocomplete="postal-code"/></div>
+          <div class="form-group"><label for="dogs">Number of Dogs *</label>
             <select id="dogs"><option value="">Select...</option><option>1 dog</option><option>2 dogs</option><option>3 dogs</option><option>4+ dogs</option></select>
           </div>
         </div>
         <div class="form-row">
-          <div class="form-group full"><label>Preferred Service *</label>
+          <div class="form-group full"><label for="frequency">Preferred Service *</label>
             <select id="frequency"><option value="">Select...</option><option>Weekly</option><option>Bi-Weekly</option><option>Monthly</option><option>One-Time Cleanup</option></select>
           </div>
         </div>
         <div class="form-row">
-          <div class="form-group full"><label>Any additional details?</label><textarea id="details" placeholder="Gate code, access info, specific needs..."></textarea></div>
+          <div class="form-group full"><label for="details">Any additional details?</label><textarea id="details" placeholder="Gate code, access info, specific needs..."></textarea></div>
         </div>
         <button class="form-submit" id="submitBtn" onclick="handleSubmit()">🐾 Submit My Quote Request</button>
         <div class="form-error" id="formError"></div>
@@ -556,45 +710,60 @@
   </div>
 </section>
 
-
 <section class="areas">
   <div class="section-inner">
-    <div class="section-header"><span class="section-label">Service Areas</span><h2>Proudly Serving the East Valley</h2></div>
-    <div class="areas-list">
-      <span class="area-chip">Gilbert</span><span class="area-chip">Chandler</span><span class="area-chip">Mesa</span>
-      <span class="area-chip">Tempe</span><span class="area-chip">Scottsdale</span><span class="area-chip">Queen Creek</span>
-      <span class="area-chip">San Tan Valley</span><span class="area-chip">Ahwatukee</span><span class="area-chip">Phoenix</span>
+    <div class="section-header reveal"><span class="section-label">Service Areas</span><h2>Proudly Serving the East Valley</h2></div>
+    <div class="areas-list reveal">
+      <span class="area-chip">📍 Gilbert</span><span class="area-chip">📍 Chandler</span><span class="area-chip">📍 Mesa</span>
+      <span class="area-chip">📍 Tempe</span><span class="area-chip">📍 Scottsdale</span><span class="area-chip">📍 Queen Creek</span>
+      <span class="area-chip">📍 San Tan Valley</span><span class="area-chip">📍 Ahwatukee</span><span class="area-chip">📍 Phoenix</span>
     </div>
-    <p style="text-align:center;margin-top:1.5rem;font-size:.88rem;color:var(--mid);">Not sure if we cover your area? <a href="#contact" style="color:var(--green-dark);font-weight:700;">Send us your zip code →</a></p>
+    <p class="areas-note">Not sure if we cover your area? <a href="#contact">Send us your zip code →</a></p>
   </div>
 </section>
 
 <footer>
   <div class="footer-grid">
     <div class="footer-brand">
-      <a href="#" class="nav-logo">🐾 Scoop N Go Arizona</a>
+      <a href="#" class="footer-brand-logo"><img src="Scoopngologo.png" alt="Scoop N Go Arizona logo" width="48" height="48"/><span>Scoop N Go Arizona</span></a>
       <p>Professional dog waste removal serving the East Valley. We handle the dirty work so you don't have to.</p>
     </div>
     <div><h4>Services</h4><ul><li><a href="#services">Residential Removal</a></li><li><a href="#services">One-Time Cleanup</a></li><li><a href="#services">Deodorizer Treatment</a></li><li><a href="/tip">Leave a Tip</a></li></ul></div>
     <div><h4>Navigation</h4><ul><li><a href="#">Home</a></li><li><a href="#about">About Us</a></li><li><a href="#pricing">Pricing</a></li><li><a href="#testimonials">Reviews</a></li><li><a href="#contact">Contact Us</a></li></ul></div>
     <div><h4>Contact</h4><ul>
-      <li><a href="tel:+16026220238">602-622-0238</a></li>
-      <li><a href="mailto:scoopngoarizona@gmail.com">scoopngoarizona@gmail.com</a></li>
-      <li style="color:#888;font-size:.85rem;margin-top:.3rem;">Mon–Sat: 6am – 6pm</li>
+      <li><a href="tel:+16026220238">📞 602-622-0238</a></li>
+      <li><a href="mailto:scoopngoarizona@gmail.com">✉️ scoopngoarizona@gmail.com</a></li>
+      <li style="color:#7e9077;font-size:.85rem;margin-top:.3rem;">🕕 Mon–Sat: 6am – 6pm</li>
     </ul></div>
   </div>
-  <div class="footer-bottom"><p>© 2026 Scoop N Go Arizona. All Rights Reserved.</p></div>
+  <div class="footer-bottom"><p>© <span id="year">2026</span> Scoop N Go Arizona. All Rights Reserved. Made with 🐾 in the East Valley.</p></div>
 </footer>
 
 <script>
   const SUPABASE_URL = 'https://emvqtgsjdbyaionxguhq.supabase.co';
   const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVtdnF0Z3NqZGJ5YWlvbnhndWhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA4NDU3NjYsImV4cCI6MjA5NjQyMTc2Nn0.kBq_axQYLZOsbUl12vIJdnYLI5RCSRZh5bVz9mz-6jQ';
 
+  // MOBILE MENU
+  function toggleMenu() {
+    var burger = document.getElementById('navBurger');
+    var menu = document.getElementById('mobileMenu');
+    menu.style.top = document.querySelector('nav').getBoundingClientRect().bottom + 'px';
+    var open = menu.classList.toggle('open');
+    burger.classList.toggle('open', open);
+    burger.setAttribute('aria-expanded', open);
+  }
+  function closeMenu() {
+    document.getElementById('mobileMenu').classList.remove('open');
+    document.getElementById('navBurger').classList.remove('open');
+    document.getElementById('navBurger').setAttribute('aria-expanded', 'false');
+  }
+
   // PRICING CONFIGURATOR
-  var _plan = 'biweekly', _dogs = 1, _deodorizer = false;
+  var _plan = 'weekly', _dogs = 1, _deodorizer = false, _haulAway = false;
 
   var VISITS = { weekly: 4, biweekly: 2, monthly: 1, onetime: 1 };
   var DEOD   = { weekly: 5, biweekly: 10, monthly: 15, onetime: 15 };
+  var HAUL   = { weekly: 5, biweekly: 10, monthly: 15, onetime: 15 }; // haul-away add-on per visit (default: double-bagged in client's bin)
 
   // Price per visit by dog count (index 0 = 1 dog). Beyond table: +$3/dog.
   var PRICE_TABLE = {
@@ -611,7 +780,7 @@
   }
 
   function calcPrice() {
-    return getBasePrice(_plan, _dogs) + (_deodorizer ? DEOD[_plan] : 0);
+    return getBasePrice(_plan, _dogs) + (_deodorizer ? DEOD[_plan] : 0) + (_haulAway ? HAUL[_plan] : 0);
   }
 
   function updatePriceDisplay() {
@@ -624,6 +793,7 @@
     var parts = [];
     parts.push(planName + ' base (' + _dogs + ' dog' + (_dogs>1?'s':'') + '): $' + getBasePrice(_plan, _dogs));
     if (_deodorizer) parts.push('Deodorizer: +$' + DEOD[_plan]);
+    if (_haulAway) parts.push('Haul-away: +$' + HAUL[_plan]);
     document.getElementById('priceBreakdown').textContent = parts.join('  ·  ');
 
     // Big price
@@ -640,6 +810,10 @@
     // Deodorizer include badge + button label
     document.getElementById('deodInclude').style.display = _deodorizer ? 'inline' : 'none';
     document.getElementById('deodPrice').textContent = DEOD[_plan];
+
+    // Waste handling badge + button label
+    document.getElementById('wasteInclude').textContent = _haulAway ? '✓ Waste hauled away' : '✓ Double-bagged in your bin';
+    document.getElementById('haulPrice').textContent = HAUL[_plan];
 
     // CTA button
     var cta = document.getElementById('priceCta');
@@ -675,13 +849,20 @@
     updatePriceDisplay();
   }
 
+  function setHaulAway(val, btn) {
+    _haulAway = val;
+    document.getElementById('haulNo').classList.toggle('active', !val);
+    document.getElementById('haulYes').classList.toggle('active', val);
+    updatePriceDisplay();
+  }
+
   async function doSubscribe() {
     var price = calcPrice();
     var cta = document.getElementById('priceCta');
     cta.disabled = true;
     cta.textContent = '⏳ Loading...';
     try {
-      var label = (_dogs + ' dog' + (_dogs>1?'s':'')) + (_deodorizer ? ' + Deodorizer' : '');
+      var label = (_dogs + ' dog' + (_dogs>1?'s':'')) + (_deodorizer ? ' + Deodorizer' : '') + (_haulAway ? ' + Haul-Away' : '');
       var r = await fetch('/api/stripe-subscription', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -689,6 +870,7 @@
           plan: _plan,
           dogs: _dogs,
           deodorizer: _deodorizer,
+          haul_away: _haulAway,
           amount_cents: price * 100,
           label: label
         })
@@ -706,15 +888,59 @@
   // Init on load
   document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('deodNo').classList.add('active');
+    document.getElementById('haulNo').classList.add('active');
     updatePriceDisplay();
+    document.getElementById('year').textContent = new Date().getFullYear();
+    initReveal();
+    initBaSlider();
   });
 
-function toggleFaq(btn) {
+  // FAQ (animated open/close)
+  function toggleFaq(btn) {
     var answer = btn.nextElementSibling;
     var isOpen = btn.classList.contains('open');
     document.querySelectorAll('.faq-q').forEach(function(b) { b.classList.remove('open'); });
-    document.querySelectorAll('.faq-a').forEach(function(a) { a.classList.remove('open'); });
-    if (!isOpen) { btn.classList.add('open'); answer.classList.add('open'); }
+    document.querySelectorAll('.faq-a').forEach(function(a) { a.style.maxHeight = null; });
+    if (!isOpen) {
+      btn.classList.add('open');
+      answer.style.maxHeight = answer.scrollHeight + 'px';
+    }
+  }
+
+  // SCROLL REVEAL
+  function initReveal() {
+    var els = document.querySelectorAll('.reveal');
+    if (!('IntersectionObserver' in window)) {
+      els.forEach(function(el){ el.classList.add('in'); });
+      return;
+    }
+    var obs = new IntersectionObserver(function(entries) {
+      entries.forEach(function(e) {
+        if (e.isIntersecting) { e.target.classList.add('in'); obs.unobserve(e.target); }
+      });
+    }, { threshold: .12, rootMargin: '0px 0px -40px 0px' });
+    els.forEach(function(el){ obs.observe(el); });
+  }
+
+  // BEFORE/AFTER DRAG SLIDERS
+  function initBaSlider() {
+    document.querySelectorAll('.ba-slider').forEach(function(slider) {
+      function setPos(clientX) {
+        var rect = slider.getBoundingClientRect();
+        var pct = ((clientX - rect.left) / rect.width) * 100;
+        pct = Math.max(2, Math.min(98, pct));
+        slider.style.setProperty('--ba-pos', pct + '%');
+      }
+      var dragging = false;
+      slider.addEventListener('pointerdown', function(e) {
+        dragging = true;
+        try { slider.setPointerCapture(e.pointerId); } catch (err) {}
+        setPos(e.clientX);
+      });
+      slider.addEventListener('pointermove', function(e) { if (dragging) setPos(e.clientX); });
+      slider.addEventListener('pointerup', function() { dragging = false; });
+      slider.addEventListener('pointercancel', function() { dragging = false; });
+    });
   }
 
   async function handleSubmit() {

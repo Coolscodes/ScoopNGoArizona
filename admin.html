@@ -249,30 +249,6 @@
         </div>
       </div>
 
-      <!-- Charge panel -->
-      <div id="chargePanel" style="display:none;background:#fff;border:1px solid #c8e6c9;border-radius:10px;padding:1.25rem 1.5rem;margin-bottom:1.25rem;">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:.5rem;">
-          <div>
-            <strong id="chargePanelTitle" style="font-family:'Montserrat',sans-serif;font-size:1rem;"></strong>
-            <span id="chargePanelSub" style="font-size:.82rem;color:#555;margin-left:.5rem;"></span>
-          </div>
-          <div style="display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;">
-            <label style="display:flex;align-items:center;gap:.4rem;font-size:.82rem;font-weight:600;color:#555;cursor:pointer;margin-right:.5rem;">
-              <input type="checkbox" id="chargeShowAll" onchange="rebuildChargePanel()" style="width:15px;height:15px;accent-color:#2e7d32;cursor:pointer;"/>
-              Show all clients
-            </label>
-            <button class="btn btn-outline btn-sm" onclick="toggleAllChargeClients(true)">Select All</button>
-            <button class="btn btn-outline btn-sm" onclick="toggleAllChargeClients(false)">Deselect All</button>
-            <button class="btn btn-outline btn-sm" onclick="closeChargePanel()">Cancel</button>
-          </div>
-        </div>
-        <div id="chargeClientList" style="display:flex;flex-direction:column;gap:.5rem;margin-bottom:1.1rem;"></div>
-        <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">
-          <button class="btn btn-green" id="chargeSubmitBtn" onclick="runWeeklyCharges()" style="background:#1b5e20;min-width:180px;">⚡ Charge Selected (<span id="chargeSelectedCount">0</span>)</button>
-          <span id="chargeSelectedTotal" style="font-family:'Montserrat',sans-serif;font-weight:700;color:#1b5e20;font-size:1rem;"></span>
-        </div>
-      </div>
-
       <div id="invoiceRunResult" style="display:none;background:#e8f5e9;border:1px solid #a5d6a7;border-radius:8px;padding:.85rem 1.1rem;margin-bottom:1rem;font-size:.88rem;color:#1b5e20;"></div>
       <div class="filter-row">
         <select id="invoiceFilter" onchange="renderInvoices()">
@@ -407,6 +383,39 @@
     <div class="modal-footer">
       <button class="btn btn-outline" onclick="closeModal('invoice')">Cancel</button>
       <button class="btn btn-green" onclick="saveInvoice()">Create Invoice</button>
+    </div>
+  </div>
+</div>
+
+<!-- Charge clients modal -->
+<div class="modal-bg" id="modal-charge">
+  <div class="modal" style="max-width:800px;">
+    <div class="modal-hdr">
+      <h3>⚡ Charge Clients</h3>
+      <button class="modal-close" onclick="closeModal('charge')">×</button>
+    </div>
+    <div class="modal-body" style="padding-top:1rem;">
+      <div class="filter-row" style="margin-bottom:1rem;">
+        <select id="charge-day" onchange="rebuildChargeList()">
+          <option value="today">Today's clients</option>
+          <option value="all">All active clients</option>
+          <option>Monday</option><option>Tuesday</option><option>Wednesday</option>
+          <option>Thursday</option><option>Friday</option><option>Saturday</option><option>Sunday</option>
+        </select>
+        <input id="charge-search" placeholder="🔍 Search name..." oninput="rebuildChargeList()" style="flex:1;min-width:150px;"/>
+        <button class="btn btn-outline btn-sm" onclick="toggleAllChargeClients(true)">All</button>
+        <button class="btn btn-outline btn-sm" onclick="toggleAllChargeClients(false)">None</button>
+      </div>
+      <div id="chargeList" style="display:flex;flex-direction:column;gap:.5rem;max-height:46vh;overflow-y:auto;padding-right:.25rem;"></div>
+      <div id="chargeResults" style="display:none;flex-direction:column;gap:.4rem;max-height:52vh;overflow-y:auto;"></div>
+      <div id="chargeHint" style="display:none;color:#c62828;font-size:.83rem;margin-top:.7rem;font-weight:600;"></div>
+    </div>
+    <div class="modal-footer" style="align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.75rem;">
+      <strong id="chargeTotalLbl" style="font-family:'Montserrat',sans-serif;color:#1b5e20;font-size:1rem;"></strong>
+      <div style="display:flex;gap:.75rem;">
+        <button class="btn btn-outline" onclick="closeModal('charge')">Close</button>
+        <button class="btn btn-green" id="chargeGoBtn" onclick="runCharges()" style="background:#1b5e20;min-width:190px;">⚡ Charge Selected (0)</button>
+      </div>
     </div>
   </div>
 </div>
@@ -827,145 +836,200 @@
     }
   }
 
-  // ── CHARGE PANEL ──
-  let chargePanelClients = []; // customers eligible today
+  // ── CHARGE CLIENTS ──
+  let chargeClients = [];        // clients currently rendered in the modal
+  let chargeConfirmArmed = false;
+  let chargeDisarmTimer = null;
+
+  // Monday of the current week (matches the API's period_start)
+  function weekPeriodStart() {
+    const now = new Date();
+    const diffToMon = (now.getDay() === 0) ? -6 : 1 - now.getDay();
+    const monday = new Date(now);
+    monday.setDate(now.getDate() + diffToMon);
+    return monday.toISOString().split('T')[0];
+  }
 
   function openChargePanel() {
-    document.getElementById('chargeShowAll').checked = false;
-    document.getElementById('chargePanel').style.display = 'block';
-    document.getElementById('openChargeBtn').style.display = 'none';
-    rebuildChargePanel();
+    document.getElementById('charge-day').value = 'today';
+    document.getElementById('charge-search').value = '';
+    document.getElementById('chargeResults').style.display = 'none';
+    document.getElementById('chargeList').style.display = 'flex';
+    document.getElementById('chargeGoBtn').style.display = '';
+    openModal('charge');
+    rebuildChargeList();
   }
 
-  function rebuildChargePanel() {
-    const showAll = document.getElementById('chargeShowAll').checked;
+  function rebuildChargeList() {
     const todayName = new Date().toLocaleDateString('en-US', { weekday: 'long' });
-    chargePanelClients = showAll
-      ? allCustomers.filter(c => c.active)
-      : allCustomers.filter(c => c.active && c.preferred_day === todayName);
-    document.getElementById('chargePanelTitle').textContent = showAll ? 'All Clients' : `${todayName} Clients`;
-    document.getElementById('chargePanelSub').textContent = showAll ? 'Off-day clients start unchecked. Check who you want to charge.' : '';
-    renderChargeClientList(showAll);
-  }
+    const dayVal = document.getElementById('charge-day').value;
+    const q = document.getElementById('charge-search').value.trim().toLowerCase();
+    const paidThisWeek = new Set(
+      allInvoices.filter(i => i.period_start === weekPeriodStart() && i.status === 'paid').map(i => i.customer_id)
+    );
 
-  function closeChargePanel() {
-    document.getElementById('chargePanel').style.display = 'none';
-    document.getElementById('openChargeBtn').style.display = '';
-    document.getElementById('invoiceRunResult').style.display = 'none';
-  }
+    chargeClients = allCustomers
+      .filter(c => c.active)
+      .filter(c => dayVal === 'all' || c.preferred_day === (dayVal === 'today' ? todayName : dayVal))
+      .filter(c => !q || (`${c.first_name} ${c.last_name}`).toLowerCase().includes(q));
 
-  function renderChargeClientList(showAll) {
-    const list = document.getElementById('chargeClientList');
-    const todayName = new Date().toLocaleDateString('en-US', { weekday: 'long' });
-    if (!chargePanelClients.length) {
-      list.innerHTML = '<p style="color:#888;font-size:.88rem;">No active clients scheduled for today. Use "Show all clients" to charge someone off-schedule.</p>';
-      document.getElementById('chargeSubmitBtn').disabled = true;
-      updateChargeSelection();
-      return;
+    const list = document.getElementById('chargeList');
+    if (!chargeClients.length) {
+      list.innerHTML = '<p style="color:#888;font-size:.88rem;padding:.75rem .25rem;">No matching active clients. Try "All active clients" or clear the search.</p>';
+    } else {
+      list.innerHTML = chargeClients.map((c, i) => {
+        const hasCard = !!c.stripe_customer_id;
+        const paid = paidThisWeek.has(c.id);
+        const checked = hasCard && !paid && !!c.price_per_visit;
+        const chips = [];
+        if (paid)     chips.push('<span style="background:#e8f5e9;color:#2e7d32;border-radius:12px;padding:.15rem .55rem;font-size:.72rem;font-weight:700;white-space:nowrap;">✓ Paid this week</span>');
+        if (!hasCard) chips.push('<span style="background:#fff8e1;color:#f57f17;border-radius:12px;padding:.15rem .55rem;font-size:.72rem;font-weight:700;white-space:nowrap;">No card</span>');
+        const cardLinkBtn = !hasCard
+          ? `<button class="btn btn-sm" style="background:#635bff;color:#fff;white-space:nowrap;" onclick="sendCardSetupLink('${c.id}','${c.first_name} ${c.last_name}','${c.email||''}','')">💳 Card Link</button>`
+          : '';
+        return `
+          <div class="charge-row" data-id="${c.id}" data-name="${c.first_name} ${c.last_name}"
+               style="display:flex;align-items:center;gap:.75rem;padding:.55rem .75rem;border-radius:8px;border:1px solid ${paid?'#a5d6a7':'#e0e0e0'};background:${!hasCard?'#fafafa':paid?'#f4faf4':'#fff'};flex-wrap:wrap;">
+            <input type="checkbox" ${!hasCard?'disabled':(checked?'checked':'')} onchange="updateChargeSelection()"
+              style="width:17px;height:17px;accent-color:#2e7d32;cursor:${hasCard?'pointer':'default'};flex-shrink:0;"/>
+            <span style="flex:1;min-width:130px;font-weight:600;">${c.first_name} ${c.last_name}
+              <span style="display:block;font-size:.74rem;font-weight:400;color:#888;">${c.service_type||''}${c.preferred_day ? ' · ' + c.preferred_day : ''}</span>
+            </span>
+            ${chips.join('')}
+            ${cardLinkBtn}
+            <span style="display:flex;align-items:center;gap:.3rem;">
+              <span style="color:#1b5e20;font-weight:700;font-family:'Montserrat',sans-serif;">$</span>
+              <input type="number" min="1" step="0.01" value="${c.price_per_visit||''}" placeholder="0.00" ${!hasCard?'disabled':''}
+                oninput="updateChargeSelection()"
+                style="width:88px;padding:.4rem .55rem;border:2px solid #e0e0e0;border-radius:7px;font-size:.9rem;font-weight:700;font-family:'Montserrat',sans-serif;color:#1b5e20;"/>
+            </span>
+          </div>`;
+      }).join('');
     }
-    list.innerHTML = chargePanelClients.map((c, i) => {
-      const hasCard = !!c.stripe_customer_id;
-      const noPrice = !c.price_per_visit;
-      const disabled = !hasCard || noPrice;
-      const isToday = c.preferred_day === todayName;
-      // In show-all mode only today's clients start checked; off-day clients must be checked manually
-      const checked = !disabled && (!showAll || isToday);
-      const warning = !hasCard ? ' <span style="color:#f57f17;font-size:.75rem;">No card on file</span>'
-                    : noPrice  ? ' <span style="color:#f57f17;font-size:.75rem;">No price set</span>' : '';
-      const dayTag = showAll ? `<span style="color:${isToday?'#2e7d32':'#888'};font-size:.76rem;font-weight:600;min-width:80px;">${c.preferred_day||'No day'}</span>` : '';
-      return `
-        <label style="display:flex;align-items:center;gap:.75rem;padding:.6rem .75rem;border-radius:7px;border:1px solid #e0e0e0;cursor:${disabled?'default':'pointer'};background:${disabled?'#fafafa':'#fff'};">
-          <input type="checkbox" data-idx="${i}" ${disabled ? 'disabled' : (checked ? 'checked' : '')}
-            onchange="updateChargeSelection()"
-            style="width:17px;height:17px;accent-color:#2e7d32;cursor:pointer;flex-shrink:0;"/>
-          <span style="flex:1;font-weight:600;">${c.first_name} ${c.last_name}</span>
-          ${dayTag}
-          <span style="color:#1b5e20;font-weight:700;font-family:'Montserrat',sans-serif;">${c.price_per_visit ? '$'+c.price_per_visit : '—'}</span>
-          ${warning}
-        </label>`;
-    }).join('');
+    disarmCharge();
+  }
+
+  // Read current selection: [{id, name, amount}] + count of checked rows with bad amounts
+  function chargeSelection() {
+    const sel = []; let invalid = 0;
+    document.querySelectorAll('#chargeList .charge-row').forEach(row => {
+      const box = row.querySelector('input[type=checkbox]');
+      const amtEl = row.querySelector('input[type=number]');
+      if (!box || box.disabled || !box.checked) { if (amtEl) amtEl.style.borderColor = '#e0e0e0'; return; }
+      const amt = parseFloat(amtEl.value);
+      if (!amt || amt < 1) { invalid++; amtEl.style.borderColor = '#c62828'; return; }
+      amtEl.style.borderColor = '#e0e0e0';
+      sel.push({ id: row.dataset.id, name: row.dataset.name, amount: Math.round(amt * 100) / 100 });
+    });
+    return { sel, invalid };
+  }
+
+  function disarmCharge() {
+    chargeConfirmArmed = false;
+    clearTimeout(chargeDisarmTimer);
+    const btn = document.getElementById('chargeGoBtn');
+    btn.style.background = '#1b5e20';
     updateChargeSelection();
   }
 
   function updateChargeSelection() {
-    const boxes = document.querySelectorAll('#chargeClientList input[type=checkbox]');
-    let count = 0, total = 0;
-    boxes.forEach(box => {
-      if (box.checked && !box.disabled) {
-        count++;
-        const c = chargePanelClients[parseInt(box.dataset.idx)];
-        total += c.price_per_visit || 0;
-      }
-    });
-    document.getElementById('chargeSelectedCount').textContent = count;
-    document.getElementById('chargeSelectedTotal').textContent = count ? `$${total.toFixed(2)} total` : '';
-    document.getElementById('chargeSubmitBtn').disabled = count === 0;
+    if (chargeConfirmArmed) { chargeConfirmArmed = false; clearTimeout(chargeDisarmTimer); document.getElementById('chargeGoBtn').style.background = '#1b5e20'; }
+    const { sel, invalid } = chargeSelection();
+    const total = sel.reduce((s, x) => s + x.amount, 0);
+    document.getElementById('chargeTotalLbl').textContent = sel.length ? `${sel.length} selected · $${total.toFixed(2)}` : '';
+    const btn = document.getElementById('chargeGoBtn');
+    btn.disabled = sel.length === 0 || invalid > 0;
+    btn.textContent = `⚡ Charge Selected (${sel.length})`;
+    const hint = document.getElementById('chargeHint');
+    if (invalid) { hint.textContent = `${invalid} selected client${invalid>1?'s have':' has'} an invalid amount (minimum $1).`; hint.style.display = 'block'; }
+    else hint.style.display = 'none';
   }
 
   function toggleAllChargeClients(checked) {
-    document.querySelectorAll('#chargeClientList input[type=checkbox]:not(:disabled)')
+    document.querySelectorAll('#chargeList .charge-row input[type=checkbox]:not(:disabled)')
       .forEach(box => { box.checked = checked; });
     updateChargeSelection();
   }
 
-  async function runWeeklyCharges() {
-    const boxes = document.querySelectorAll('#chargeClientList input[type=checkbox]');
-    const selectedIds = [];
-    boxes.forEach(box => {
-      if (box.checked && !box.disabled) {
-        selectedIds.push(chargePanelClients[parseInt(box.dataset.idx)].id);
-      }
-    });
-    if (!selectedIds.length) return;
+  async function runCharges() {
+    const { sel, invalid } = chargeSelection();
+    if (!sel.length || invalid) return;
+    const btn = document.getElementById('chargeGoBtn');
+    const total = sel.reduce((s, x) => s + x.amount, 0);
 
-    const btn = document.getElementById('chargeSubmitBtn');
-    const resultEl = document.getElementById('invoiceRunResult');
+    // Two-tap confirm: first tap arms the button, second tap (within 6s) actually charges
+    if (!chargeConfirmArmed) {
+      chargeConfirmArmed = true;
+      btn.style.background = '#c62828';
+      btn.textContent = `Tap again: charge $${total.toFixed(2)}`;
+      chargeDisarmTimer = setTimeout(disarmCharge, 6000);
+      return;
+    }
+    clearTimeout(chargeDisarmTimer);
+    chargeConfirmArmed = false;
+
     btn.disabled = true;
-    btn.innerHTML = '⏳ Charging...';
-    resultEl.style.display = 'none';
+    btn.style.background = '#1b5e20';
+    btn.textContent = '⏳ Charging…';
+    document.getElementById('chargeHint').style.display = 'none';
 
     try {
+      const amounts = {};
+      sel.forEach(x => { amounts[x.id] = x.amount; });
       const r = await fetch('/api/charge-customers', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'x-admin-password': PW },
-        body: JSON.stringify({ customer_ids: selectedIds }),
+        body: JSON.stringify({ customer_ids: sel.map(x => x.id), amounts }),
       });
       const data = await r.json();
       if (!r.ok) throw new Error(data.error || 'Server error');
 
-      const charged = (data.results || []).filter(x => x.status === 'charged');
-      const failed  = (data.results || []).filter(x => x.status === 'failed');
-      const skipped = (data.results || []).filter(x => x.status === 'skipped');
+      renderChargeResults(data);
 
-      let html = `<strong>Week of ${data.week}</strong><br>`;
-      html += `✅ <strong>${data.charged} charged</strong> — $${(data.total||0).toFixed(2)} total`;
-      if (failed.length)  html += ` &nbsp;|&nbsp; ❌ ${failed.length} failed`;
-      if (skipped.length) html += ` &nbsp;|&nbsp; ⏭ ${skipped.length} skipped`;
-      if (charged.length) html += `<br><span style="opacity:.75;font-size:.83rem;">Charged: ${charged.map(x => x.name + ' ($' + x.amount + ')').join(', ')}</span>`;
-      if (failed.length)  html += `<br><span style="color:#c62828;font-size:.83rem;">Failed: ${failed.map(x => x.name + ' — ' + x.reason).join('; ')}</span>`;
-
-      resultEl.innerHTML = html;
-      resultEl.style.background = failed.length ? '#fff8e1' : '#e8f5e9';
-      resultEl.style.borderColor = failed.length ? '#ffe082' : '#a5d6a7';
-      resultEl.style.color = '#1a1a1a';
-      resultEl.style.display = 'block';
-
-      closeChargePanel();
-
-      const invoices = await api('invoices');
-      allInvoices = Array.isArray(invoices) ? invoices : [];
-      renderInvoices();
-      renderInvoiceStats();
+      // Refresh invoices behind the modal; a refresh failure must NOT look like a
+      // failed charge (the money already moved), so keep it isolated.
+      try {
+        const invoices = await api('invoices');
+        allInvoices = Array.isArray(invoices) ? invoices : [];
+        renderInvoiceStats(); renderInvoices();
+      } catch (e) {}
     } catch (err) {
-      resultEl.innerHTML = '<strong>Error:</strong> ' + err.message;
-      resultEl.style.background = '#ffebee';
-      resultEl.style.borderColor = '#ffcdd2';
-      resultEl.style.color = '#c62828';
-      resultEl.style.display = 'block';
-    } finally {
+      const hint = document.getElementById('chargeHint');
+      hint.textContent = 'Error: ' + err.message;
+      hint.style.display = 'block';
       btn.disabled = false;
-      btn.innerHTML = `⚡ Charge Selected (<span id="chargeSelectedCount">${document.getElementById('chargeSelectedCount')?.textContent||0}</span>)`;
+      updateChargeSelection();
     }
+  }
+
+  function renderChargeResults(data) {
+    document.getElementById('chargeList').style.display = 'none';
+    document.getElementById('chargeGoBtn').style.display = 'none';
+    document.getElementById('chargeTotalLbl').textContent = '';
+
+    const icon = { charged: '✅', failed: '❌', skipped: '⏭' };
+    const res = document.getElementById('chargeResults');
+    res.style.display = 'flex';
+    res.innerHTML = `
+      <div style="background:${data.failed ? '#fff8e1' : '#e8f5e9'};border:1px solid ${data.failed ? '#ffe082' : '#a5d6a7'};border-radius:8px;padding:.8rem 1rem;font-size:.92rem;margin-bottom:.4rem;">
+        <strong>Week of ${data.week}</strong> — ✅ ${data.charged} charged · $${(data.total||0).toFixed(2)}${data.failed ? ` · ❌ ${data.failed} failed` : ''}${data.skipped ? ` · ⏭ ${data.skipped} skipped` : ''}
+      </div>
+      ${(data.results||[]).map(x => `
+        <div style="display:flex;align-items:center;gap:.6rem;padding:.5rem .75rem;border:1px solid #eee;border-radius:7px;font-size:.88rem;">
+          <span>${icon[x.status]||'•'}</span>
+          <strong style="flex:1;">${x.name}</strong>
+          ${x.amount ? `<span style="font-family:'Montserrat',sans-serif;font-weight:700;color:#1b5e20;">$${parseFloat(x.amount).toFixed(2)}</span>` : ''}
+          ${x.reason ? `<span style="color:#888;font-size:.8rem;">${x.reason}</span>` : ''}
+        </div>`).join('')}
+    `;
+
+    // Summary banner behind the modal too
+    const banner = document.getElementById('invoiceRunResult');
+    banner.innerHTML = `<strong>Week of ${data.week}</strong> — ✅ ${data.charged} charged ($${(data.total||0).toFixed(2)})${data.failed ? ` · ❌ ${data.failed} failed` : ''}${data.skipped ? ` · ⏭ ${data.skipped} skipped` : ''}`;
+    banner.style.background = data.failed ? '#fff8e1' : '#e8f5e9';
+    banner.style.borderColor = data.failed ? '#ffe082' : '#a5d6a7';
+    banner.style.color = '#1a1a1a';
+    banner.style.display = 'block';
   }
 
   async function sendPaymentLink(invoiceId, customerName, amount, customerEmail) {
