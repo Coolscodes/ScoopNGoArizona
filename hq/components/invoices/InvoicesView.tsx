@@ -15,6 +15,7 @@ import {
 } from '@/components/ui';
 import { money, shortDate } from '@/lib/format';
 import { InvoiceActions } from './InvoiceActions';
+import { ChargeClientsModal } from './ChargeClientsModal';
 import type { InvoiceStatus } from '@/lib/types';
 import type { ArSummary, ClientBalance, InvoiceRow } from './data';
 
@@ -40,6 +41,7 @@ export function InvoicesView({
   const router = useRouter();
   const toast = useToast();
   const [filter, setFilter] = useState<FilterKey>('all');
+  const [chargeOpen, setChargeOpen] = useState(false);
   // customerId currently being charged / linked (disables that row's buttons).
   const [busy, setBusy] = useState<string | null>(null);
 
@@ -152,6 +154,9 @@ export function InvoicesView({
             </button>
           ))}
           <span className="text-sm text-muted ml-auto">{visibleRows.length} shown</span>
+          <Button variant="primary" size="sm" onClick={() => setChargeOpen(true)}>
+            ⚡ Charge Clients
+          </Button>
         </div>
 
         {visibleRows.length === 0 ? (
@@ -218,6 +223,14 @@ export function InvoicesView({
         busy={busy}
         onCharge={chargeNow}
         onSetupLink={sendSetupLink}
+      />
+
+      <ChargeClientsModal
+        open={chargeOpen}
+        onClose={() => {
+          setChargeOpen(false);
+          router.refresh();
+        }}
       />
     </div>
   );

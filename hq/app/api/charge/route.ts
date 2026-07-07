@@ -140,7 +140,7 @@ async function sendFailureEmail(
   }
 }
 
-async function sendReceiptEmail(c: Customer, weekLabel: string): Promise<void> {
+async function sendReceiptEmail(c: Customer, weekLabel: string, amount: number): Promise<void> {
   const resendKey = process.env.RESEND_API_KEY;
   if (!resendKey || !c.email) return;
   try {
@@ -164,7 +164,7 @@ async function sendReceiptEmail(c: Customer, weekLabel: string): Promise<void> {
             <table style="width:100%;border-collapse:collapse;margin:20px 0;">
               <tr><td style="padding:8px 0;color:#555;">Service Week</td><td style="padding:8px 0;font-weight:bold;">${weekLabel}</td></tr>
               <tr><td style="padding:8px 0;color:#555;">Service Type</td><td style="padding:8px 0;">${c.service_type || 'Weekly'}</td></tr>
-              <tr><td style="padding:8px 0;color:#555;">Amount Charged</td><td style="padding:8px 0;font-weight:bold;color:#1b5e20;">$${(c.price_per_visit ?? 0).toFixed(2)}</td></tr>
+              <tr><td style="padding:8px 0;color:#555;">Amount Charged</td><td style="padding:8px 0;font-weight:bold;color:#1b5e20;">$${amount.toFixed(2)}</td></tr>
             </table>
             <p style="color:#555;font-size:14px;">Thank you for choosing Scoop N Go Arizona! 🐾</p>
             <p style="color:#555;font-size:14px;">Questions? Reply to this email or text us anytime.</p>
@@ -176,6 +176,38 @@ async function sendReceiptEmail(c: Customer, weekLabel: string): Promise<void> {
     });
   } catch {
     // Non-fatal.
+  }
+}
+
+// A failed charge still means the week is owed. Record a 'sent' invoice for
+// the period (unless one already exists for it) so AR shows the balance and
+// the retry buttons on /invoices can pick it up.
+async function recordFailedChargeInvoice(
+  sb: ReturnType<typeof supabaseServer>,
+  c: Customer,
+  week: WeekInfo,
+  amount: number,
+  reason: string
+): Promise<void> {
+  try {
+    const { data } = await sb
+      .from('invoices')
+      .select('id')
+      .eq('customer_id', c.id)
+      .eq('period_start', week.periodStart)
+      .limit(1);
+    if ((data ?? []).length > 0) return;
+    await sb.from('invoices').insert({
+      customer_id: c.id,
+      amount,
+      status: 'sent',
+      due_date: dueDateFor(c, week),
+      period_start: week.periodStart,
+      period_end: week.periodEnd,
+      notes: `Week of ${week.weekLabel}, card charge failed: ${reason}`,
+    });
+  } catch {
+    // Non-fatal; the failure email already went out.
   }
 }
 
@@ -193,9 +225,9 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  let body: { customer_ids?: unknown } = {};
+  let body: { customer_ids?: unknown; amounts?: unknown } = {};
   try {
-    body = (await request.json()) as { customer_ids?: unknown };
+    body = (await request.json()) as { customer_ids?: unknown; amounts?: unknown };
   } catch {
     // Empty body is allowed below; treated as no selection.
   }
@@ -203,6 +235,16 @@ export async function POST(request: Request) {
   const customerIds = Array.isArray(body.customer_ids)
     ? (body.customer_ids as unknown[]).filter((v): v is string => typeof v === 'string')
     : [];
+
+  // Optional per-client amount overrides from the Charge Clients modal. Only
+  // values >= $1 are honored; anything else falls back to price_per_visit.
+  const overrides = new Map<string, number>();
+  if (body.amounts && typeof body.amounts === 'object' && !Array.isArray(body.amounts)) {
+    for (const [id, v] of Object.entries(body.amounts as Record<string, unknown>)) {
+      const n = typeof v === 'number' ? v : parseFloat(String(v));
+      if (!Number.isNaN(n) && n >= 1) overrides.set(id, Math.round(n * 100) / 100);
+    }
+  }
 
   const week = currentWeek();
 
@@ -248,7 +290,8 @@ export async function POST(request: Request) {
       results.push({ name, status: 'skipped', reason: 'Already charged this week' });
       continue;
     }
-    if (!c.price_per_visit) {
+    const chargeAmount = overrides.get(c.id) ?? c.price_per_visit ?? 0;
+    if (!chargeAmount) {
       results.push({ name, status: 'skipped', reason: 'No price set' });
       continue;
     }
@@ -257,7 +300,7 @@ export async function POST(request: Request) {
       continue;
     }
 
-    const amountCents = dollarsToCents(c.price_per_visit);
+    const amountCents = dollarsToCents(chargeAmount);
 
     try {
       // Saved default payment method; fall back to first card on the customer.
@@ -319,6 +362,7 @@ export async function POST(request: Request) {
             .from('invoices')
             .update({
               status: 'paid',
+              amount: chargeAmount,
               notes: `Week of ${week.weekLabel}, charged to card on file`,
               stripe_payment_intent_id: pi.id,
             })
@@ -331,7 +375,7 @@ export async function POST(request: Request) {
             .from('invoices')
             .insert({
               customer_id: c.id,
-              amount: c.price_per_visit,
+              amount: chargeAmount,
               status: 'paid',
               due_date: dueDateStr,
               period_start: week.periodStart,
@@ -348,31 +392,34 @@ export async function POST(request: Request) {
         if (invoiceId) {
           await sb.from('payments').insert({
             invoice_id: invoiceId,
-            amount: c.price_per_visit,
+            amount: chargeAmount,
             method: 'card',
             paid_at: new Date().toISOString(),
             notes: `Stripe ${pi.id}`,
           });
         }
 
-        await sendReceiptEmail(c, week.weekLabel);
+        await sendReceiptEmail(c, week.weekLabel, chargeAmount);
 
-        results.push({ name, status: 'charged', amount: c.price_per_visit });
+        results.push({ name, status: 'charged', amount: chargeAmount });
       } else if (
         pi.status === 'requires_action' ||
         pi.status === 'requires_payment_method'
       ) {
         const reason = `Card declined or requires action (${pi.status})`;
-        await sendFailureEmail(name, c.phone, c.price_per_visit, reason, week.weekLabel);
+        await sendFailureEmail(name, c.phone, chargeAmount, reason, week.weekLabel);
+        await recordFailedChargeInvoice(sb, c, week, chargeAmount, reason);
         results.push({ name, status: 'failed', reason });
       } else {
         const reason = `Unexpected status: ${pi.status}`;
-        await sendFailureEmail(name, c.phone, c.price_per_visit, reason, week.weekLabel);
+        await sendFailureEmail(name, c.phone, chargeAmount, reason, week.weekLabel);
+        await recordFailedChargeInvoice(sb, c, week, chargeAmount, reason);
         results.push({ name, status: 'failed', reason });
       }
     } catch (err) {
       const reason = err instanceof Error ? err.message : 'Charge failed';
-      await sendFailureEmail(name, c.phone, c.price_per_visit ?? 0, reason, week.weekLabel);
+      await sendFailureEmail(name, c.phone, chargeAmount, reason, week.weekLabel);
+      await recordFailedChargeInvoice(sb, c, week, chargeAmount, reason);
       results.push({ name, status: 'failed', reason });
     }
   }
@@ -391,5 +438,68 @@ export async function POST(request: Request) {
     skipped,
     total,
     results,
+  });
+}
+
+// GET /api/charge, eligibility preview for the Charge Clients modal.
+// Returns every active client with the state needed for an accurate run:
+// price, card on file, whether this week is already paid, and any open
+// (sent/overdue) invoice amount for the week (used to pre-fill amounts).
+export async function GET(request: Request) {
+  if (!(await authorized(request))) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  const week = currentWeek();
+  const sb = supabaseServer();
+
+  const { data: custData } = await sb
+    .from('customers')
+    .select('*')
+    .eq('active', true)
+    .order('first_name', { ascending: true });
+  const customers = (custData ?? []) as Customer[];
+
+  const { data: invData } = await sb
+    .from('invoices')
+    .select('customer_id, amount, status')
+    .eq('period_start', week.periodStart);
+  const weekInvoices = (invData ?? []) as {
+    customer_id: string;
+    amount: number;
+    status: string;
+  }[];
+
+  const paid = new Set(
+    weekInvoices.filter((i) => i.status === 'paid').map((i) => i.customer_id)
+  );
+  const openAmount = new Map<string, number>();
+  for (const i of weekInvoices) {
+    if (i.status === 'sent' || i.status === 'overdue') {
+      openAmount.set(
+        i.customer_id,
+        (openAmount.get(i.customer_id) ?? 0) + (Number(i.amount) || 0)
+      );
+    }
+  }
+
+  return NextResponse.json({
+    week: {
+      label: week.weekLabel,
+      periodStart: week.periodStart,
+      periodEnd: week.periodEnd,
+    },
+    clients: customers.map((c) => ({
+      id: c.id,
+      name: `${c.first_name} ${c.last_name}`.trim(),
+      serviceType: c.service_type ?? null,
+      preferredDay: c.preferred_day ?? null,
+      price: c.price_per_visit ?? null,
+      hasCard: Boolean(c.stripe_customer_id),
+      stripeCustomerId: c.stripe_customer_id ?? null,
+      email: c.email ?? null,
+      paidThisWeek: paid.has(c.id),
+      openThisWeek: openAmount.get(c.id) ?? null,
+    })),
   });
 }
