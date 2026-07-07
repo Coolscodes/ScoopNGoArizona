@@ -2,7 +2,7 @@ import { Card, CardBody, EmptyState } from '@/components/ui';
 import { shortDate } from '@/lib/format';
 import type { WeeklyVisitPoint } from './data';
 
-// Inline SVG bar chart — completed visits per week (last 8 weeks), with a red
+// Inline SVG bar chart, completed visits per week (last 8 weeks), with a red
 // dot marker showing how many of that week's visits were flagged with an issue.
 export function WeeklyVisitsChart({ data }: { data: WeeklyVisitPoint[] }) {
   const hasData = data.some((d) => d.count > 0);

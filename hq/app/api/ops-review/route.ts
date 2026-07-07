@@ -1,4 +1,4 @@
-// Briefings module — POST /api/ops-review
+// Briefings module, POST /api/ops-review
 //
 // Generates the reflective "weekly business review": wins with real numbers, revenue
 // vs last week, operational issues (flagged visits), collections concerns, a growth
@@ -134,14 +134,14 @@ export async function POST() {
             '```',
             '',
             'Write the WEEKLY BUSINESS REVIEW. Cover, in this order:',
-            '1. WINS — real numbers: revenue collected this week, visits completed, new customers this month.',
-            '2. REVENUE VS LAST WEEK — compare paymentsThisWeek to paymentsPrevWeek, call out the direction and rough size of the change (use revenueChangePct if present).',
-            '3. OPERATIONAL ISSUES — flagged visits this week (issuesFlaggedThisWeek out of visitsCompletedThisWeek), mention specific issueDetails if any stand out.',
-            '4. COLLECTIONS CONCERNS — reference unpaidInvoices from the snapshot: total outstanding and any client that is significantly overdue.',
-            '5. GROWTH NUDGE — one honest, concrete suggestion tied to the leadStatusCounts or inactiveCustomers numbers.',
-            "6. NEXT WEEK'S FOCUS — one clear focus area.",
+            '1. WINS, real numbers: revenue collected this week, visits completed, new customers this month.',
+            '2. REVENUE VS LAST WEEK, compare paymentsThisWeek to paymentsPrevWeek, call out the direction and rough size of the change (use revenueChangePct if present).',
+            '3. OPERATIONAL ISSUES, flagged visits this week (issuesFlaggedThisWeek out of visitsCompletedThisWeek), mention specific issueDetails if any stand out.',
+            '4. COLLECTIONS CONCERNS, reference unpaidInvoices from the snapshot: total outstanding and any client that is significantly overdue.',
+            '5. GROWTH NUDGE, one honest, concrete suggestion tied to the leadStatusCounts or inactiveCustomers numbers.',
+            "6. NEXT WEEK'S FOCUS, one clear focus area.",
             '',
-            'Tone: warm but honest — an owner-operator reviewing their own week, not a hype machine. Plain text with simple section labels, no markdown tables. Be specific with the numbers given; do not invent numbers not present in the data.',
+            'Tone: warm but honest, an owner-operator reviewing their own week, not a hype machine. Plain text with simple section labels, no markdown tables. Be specific with the numbers given; do not invent numbers not present in the data.',
           ].join('\n'),
         },
       ],

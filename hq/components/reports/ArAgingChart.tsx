@@ -10,7 +10,7 @@ const bucketTone: Record<string, string> = {
   '60d+': 'bg-danger',
 };
 
-// Horizontal bars — outstanding A/R (sent + overdue invoices) bucketed by age.
+// Horizontal bars, outstanding A/R (sent + overdue invoices) bucketed by age.
 export function ArAgingChart({ data }: { data: ArAgingBucket[] }) {
   const total = data.reduce((sum, b) => sum + b.total, 0);
   const max = Math.max(...data.map((b) => b.total), 1);
@@ -25,7 +25,7 @@ export function ArAgingChart({ data }: { data: ArAgingBucket[] }) {
           <span className="text-sm font-semibold text-ink">{money(total)} outstanding</span>
         </div>
         {total === 0 ? (
-          <EmptyState title="No outstanding invoices" hint="All caught up — nothing unpaid." />
+          <EmptyState title="No outstanding invoices" hint="All caught up, nothing unpaid." />
         ) : (
           <div className="space-y-3">
             {data.map((b) => (

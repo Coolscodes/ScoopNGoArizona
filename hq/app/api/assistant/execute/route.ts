@@ -6,7 +6,7 @@
 // proposal against a strict allowlist, then forwards to the existing,
 // battle-tested staff endpoints (same ones the dashboard buttons call),
 // passing the operator's session cookie through so auth is enforced
-// end-to-end. The AI cannot reach this route — only the Confirm button does.
+// end-to-end. The AI cannot reach this route, only the Confirm button does.
 
 import { NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth';
@@ -86,7 +86,7 @@ function toForward(p: ActionProposal): ForwardSpec | null {
 }
 
 export async function POST(request: Request) {
-  // Defense in depth — middleware gates this too.
+  // Defense in depth, middleware gates this too.
   try {
     if (!(await getCurrentUser())) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

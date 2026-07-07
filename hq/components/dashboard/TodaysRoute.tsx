@@ -67,8 +67,8 @@ export function TodaysRoute({ stops }: { stops: RouteStop[] }) {
                   </span>
                 </div>
               </Td>
-              <Td className="text-[0.85rem] text-muted max-w-[260px]">{address || '—'}</Td>
-              <Td className="text-center font-semibold text-ink">{stop.dogCount || '—'}</Td>
+              <Td className="text-[0.85rem] text-muted max-w-[260px]">{address || '·'}</Td>
+              <Td className="text-center font-semibold text-ink">{stop.dogCount || '·'}</Td>
               <Td>
                 <StatusPill status={stop.appointment.status} />
               </Td>

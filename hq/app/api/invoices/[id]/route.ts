@@ -3,7 +3,7 @@
 //   PATCH /api/invoices/:id
 //     { action: 'mark_paid', method?: 'cash'|'venmo'|'zelle'|'check'|'card' }
 //        -> mark the invoice paid and record a payment (for money collected
-//           outside the app — cash, Venmo, Zelle, check, etc.)
+//           outside the app, cash, Venmo, Zelle, check, etc.)
 //     { action: 'charge' }
 //        -> charge the customer's card on file for the invoice amount via Stripe,
 //           then mark it paid and record a card payment.
@@ -19,7 +19,7 @@ export const dynamic = 'force-dynamic';
 const METHODS: PayMethod[] = ['cash', 'venmo', 'zelle', 'check', 'card'];
 
 export async function PATCH(request: Request, { params }: { params: { id: string } }) {
-  // Defense in depth (middleware also gates this) — return clean 401 JSON.
+  // Defense in depth (middleware also gates this), return clean 401 JSON.
   try {
     if (!(await getCurrentUser())) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -87,7 +87,7 @@ export async function PATCH(request: Request, { params }: { params: { id: string
     }
     if (!customer.stripe_customer_id) {
       return NextResponse.json(
-        { error: 'No card on file — send a card setup link first.' },
+        { error: 'No card on file, send a card setup link first.' },
         { status: 400 }
       );
     }
@@ -110,7 +110,7 @@ export async function PATCH(request: Request, { params }: { params: { id: string
       }
       if (!pmId) {
         return NextResponse.json(
-          { error: 'No payment method found — send a card setup link.' },
+          { error: 'No payment method found, send a card setup link.' },
           { status: 400 }
         );
       }
@@ -122,7 +122,7 @@ export async function PATCH(request: Request, { params }: { params: { id: string
         payment_method: pmId,
         confirm: true,
         off_session: true,
-        description: `Scoop N Go Arizona - invoice ${invoice.id}`,
+        description: `Scoop N Go Arizona invoice ${invoice.id}`,
         metadata: { customer_id: customer.id, invoice_id: invoice.id },
       });
 

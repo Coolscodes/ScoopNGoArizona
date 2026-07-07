@@ -1,4 +1,4 @@
-// Shared entity types — mirror the Supabase schema.
+// Shared entity types, mirror the Supabase schema.
 // Owned by Workstream 0 (Foundation). Do not edit in Workstreams 1-8.
 
 export type LeadStatus = 'new' | 'contacted' | 'converted' | 'lost';

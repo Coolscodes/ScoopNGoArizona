@@ -1,6 +1,6 @@
-// Workstream 6 — Manual / weekly auto-charge.
+// Workstream 6, Manual / weekly auto-charge.
 // PORT of the repo-root /api/charge-customers.js, preserving its tested behavior:
-//   - Monday–Sunday week (weekBounds), week label "Mon d - Mon d, YYYY".
+//   - Monday to Sunday week (weekBounds), week label "Mon d - Mon d, YYYY".
 //   - Only skip a customer if they already have a PAID invoice this week
 //     (a 'sent' invoice does NOT cause a skip).
 //   - Skip with a reason when: no price set, no Stripe customer, or no payment
@@ -77,7 +77,7 @@ function currentWeek(now: Date = new Date()): WeekInfo {
   return {
     periodStart: fmt(monday),
     periodEnd: fmt(sunday),
-    weekLabel: `${fmtLabel(monday)} - ${fmtLabel(sunday)}, ${monday.getFullYear()}`,
+    weekLabel: `${fmtLabel(monday)} to ${fmtLabel(sunday)}, ${monday.getFullYear()}`,
     monday,
     sunday,
   };
@@ -136,7 +136,7 @@ async function sendFailureEmail(
       }),
     });
   } catch {
-    // Non-fatal — don't let email failure block the rest.
+    // Non-fatal, don't let email failure block the rest.
   }
 }
 
@@ -155,7 +155,7 @@ async function sendReceiptEmail(c: Customer, weekLabel: string): Promise<void> {
         // Resend restriction: can only send to the verified email in test mode.
         to: OWNER_EMAIL,
         reply_to: c.email,
-        subject: `Receipt: Scoop N Go Arizona - Week of ${weekLabel}`,
+        subject: `Receipt: Scoop N Go Arizona: Week of ${weekLabel}`,
         html: `
           <div style="font-family:Arial,sans-serif;max-width:500px;margin:0 auto;padding:20px;">
             <h2 style="color:#1b5e20;">Payment Receipt</h2>
@@ -229,7 +229,7 @@ export async function POST(request: Request) {
     });
   }
 
-  // Only skip if already PAID this week — don't skip "sent" invoices.
+  // Only skip if already PAID this week, don't skip "sent" invoices.
   const { data: paidData } = await sb
     .from('invoices')
     .select('customer_id')
@@ -278,7 +278,7 @@ export async function POST(request: Request) {
         results.push({
           name,
           status: 'skipped',
-          reason: 'No payment method found — send card setup link',
+          reason: 'No payment method found, send card setup link',
         });
         continue;
       }
@@ -291,7 +291,7 @@ export async function POST(request: Request) {
         payment_method: pmId,
         confirm: true,
         off_session: true,
-        description: `Scoop N Go Arizona - Week of ${week.weekLabel}`,
+        description: `Scoop N Go Arizona: Week of ${week.weekLabel}`,
         metadata: {
           customer_id: c.id,
           customer_name: name,
@@ -319,7 +319,7 @@ export async function POST(request: Request) {
             .from('invoices')
             .update({
               status: 'paid',
-              notes: `Week of ${week.weekLabel} - charged to card on file`,
+              notes: `Week of ${week.weekLabel}, charged to card on file`,
               stripe_payment_intent_id: pi.id,
             })
             .eq('id', existingInv.id)
@@ -336,7 +336,7 @@ export async function POST(request: Request) {
               due_date: dueDateStr,
               period_start: week.periodStart,
               period_end: week.periodEnd,
-              notes: `Week of ${week.weekLabel} - charged to card on file`,
+              notes: `Week of ${week.weekLabel}, charged to card on file`,
               stripe_payment_intent_id: pi.id,
             })
             .select('id')

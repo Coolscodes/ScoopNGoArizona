@@ -1,4 +1,4 @@
-// Dashboard data layer — Workstream 1.
+// Dashboard data layer, Workstream 1.
 // Shared by the /dashboard server component and the /api/dashboard route handler
 // so both return identical metrics. Server-only: it calls supabaseServer(),
 // which throws if ever run in the browser (the service-role key must never ship
@@ -40,7 +40,7 @@ export interface DashboardData {
 }
 
 // Defensive wrapper: never throw, always resolve to an array. The DB may be
-// empty or the env keys may be placeholders — the dashboard must not crash.
+// empty or the env keys may be placeholders, the dashboard must not crash.
 async function safeRows<T>(
   run: () => PromiseLike<{ data: T[] | null; error: unknown }>
 ): Promise<{ rows: T[]; ok: boolean }> {
@@ -109,7 +109,7 @@ export async function getDashboardData(): Promise<DashboardData> {
     (a) => a.status === 'scheduled'
   ).length;
 
-  // Metric: collected this week (sum of payments paid within Mon–Sun).
+  // Metric: collected this week (sum of payments paid within Mon to Sun).
   const collectedThisWeek = paymentsRes.rows.reduce(
     (sum, p) => sum + (Number(p.amount) || 0),
     0
@@ -170,7 +170,7 @@ export async function getDashboardData(): Promise<DashboardData> {
     }))
     .sort((a, b) => b.amount - a.amount);
 
-  // Today's route — ordered by route_position (nulls last), then created time.
+  // Today's route, ordered by route_position (nulls last), then created time.
   const route: RouteStop[] = todaysAppointments
     .slice()
     .sort((a, b) => {

@@ -1,10 +1,10 @@
-// Scoop HQ AI assistant — operator chat grounded in live business data.
+// Scoop HQ AI assistant, operator chat grounded in live business data.
 //   POST /api/assistant  { message, history }  -> 200 { reply, actions, proposals, needsKey? }
 //
 // SAFETY: every tool this route can call is read-only (see components/assistant/tools.ts
-// and proposals.ts). The propose_* tools only VALIDATE and return proposal cards — real
+// and proposals.ts). The propose_* tools only VALIDATE and return proposal cards, real
 // execution happens exclusively in /api/assistant/execute after the operator confirms.
-// No SMS/email ever — draft_sms only returns text for a human to send.
+// No SMS/email ever, draft_sms only returns text for a human to send.
 
 import { NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
@@ -88,7 +88,7 @@ const TOOLS: Anthropic.Tool[] = [
   {
     name: 'draft_sms',
     description:
-      'Request a drafted SMS for a client. This tool never sends anything — it only returns instructions for you to compose the draft text yourself in your final reply, clearly labeled as a draft for the operator to copy.',
+      'Request a drafted SMS for a client. This tool never sends anything, it only returns instructions for you to compose the draft text yourself in your final reply, clearly labeled as a draft for the operator to copy.',
     input_schema: {
       type: 'object',
       properties: {
@@ -102,7 +102,7 @@ const TOOLS: Anthropic.Tool[] = [
   {
     name: 'list_invoices',
     description:
-      "Browse invoice history with optional filters — includes PAID invoices (unlike list_unpaid_invoices). Returns up to 25 newest-first with invoice_id, customer, amount, status, dates, and notes. Use client_id (from search_clients) to see one client's history, or status to filter (draft/sent/paid/overdue).",
+      "Browse invoice history with optional filters, includes PAID invoices (unlike list_unpaid_invoices). Returns up to 25 newest-first with invoice_id, customer, amount, status, dates, and notes. Use client_id (from search_clients) to see one client's history, or status to filter (draft/sent/paid/overdue).",
     input_schema: {
       type: 'object',
       properties: {
@@ -226,15 +226,15 @@ const TOOLS: Anthropic.Tool[] = [
 function systemPrompt(): string {
   return `You are Scoop HQ, the operations copilot for Scoop N Go Arizona, a pet-waste-removal business. Today's date is ${todayISO()}.
 
-Be concise and numbers-first. Ground every factual answer in tool data — never invent client names, balances, addresses, or other details. If you need information, call a tool before answering; don't guess.
+Be concise and numbers-first. Ground every factual answer in tool data, never invent client names, balances, addresses, or other details. If you need information, call a tool before answering; don't guess.
 
-If the operator asks you to text/message/notify a client, use the draft_sms tool, then write the actual SMS draft yourself in your reply. Always clearly label drafts as drafts for the operator to review and send manually — never imply a message was actually sent, because you cannot send messages.
+If the operator asks you to text/message/notify a client, use the draft_sms tool, then write the actual SMS draft yourself in your reply. Always clearly label drafts as drafts for the operator to review and send manually, never imply a message was actually sent, because you cannot send messages.
 
-You can also PREPARE real actions with the propose_* tools: create an invoice, mark an invoice paid, charge a card on file, add a stop to a route, change a stop's status, update a lead's status, or convert a lead into a client. Proposals are not executed — each one appears as a card the operator must confirm. After proposing, tell the operator what you prepared and that it's waiting for their confirmation. Never claim an action was completed. Look up the exact ids first (list_unpaid_invoices, search_clients, get_todays_route) — never guess an id.
+You can also PREPARE real actions with the propose_* tools: create an invoice, mark an invoice paid, charge a card on file, add a stop to a route, change a stop's status, update a lead's status, or convert a lead into a client. Proposals are not executed, each one appears as a card the operator must confirm. After proposing, tell the operator what you prepared and that it's waiting for their confirmation. Never claim an action was completed. Look up the exact ids first (list_unpaid_invoices, search_clients, get_todays_route), never guess an id.
 
-IMPORTANT — creating an invoice does NOT charge anyone. They are separate steps. When the operator's intent includes collecting the money (e.g. "bill and charge them", "invoice her for last week" for a card-paying client), be explicit that the invoice card only CREATES it, and that charging is a second confirmation. Since charging needs the new invoice's id (which doesn't exist until the create is confirmed), tell the operator: "after you confirm the invoice, say 'charge it' and I'll prepare the charge." Never imply money was collected when only the invoice was created.
+IMPORTANT, creating an invoice does NOT charge anyone. They are separate steps. When the operator's intent includes collecting the money (e.g. "bill and charge them", "invoice her for last week" for a card-paying client), be explicit that the invoice card only CREATES it, and that charging is a second confirmation. Since charging needs the new invoice's id (which doesn't exist until the create is confirmed), tell the operator: "after you confirm the invoice, say 'charge it' and I'll prepare the charge." Never imply money was collected when only the invoice was created.
 
-Keep replies short and scannable. Plain text only — no markdown (no **bold**, no tables, no headers); the chat renders raw text. Use simple numbered or dashed lines.`;
+Keep replies short and scannable. Plain text only, no markdown (no **bold**, no tables, no headers); the chat renders raw text. Use simple numbered or dashed lines.`;
 }
 
 function clampHistory(history: ChatTurn[]): ChatTurn[] {
@@ -306,12 +306,12 @@ export async function POST(request: Request) {
             output = await executor(block.input ?? {});
             const label = ACTION_LABELS[block.name]?.(block.input) ?? `Called ${block.name}`;
             actions.push(label);
-            // Proposer tools return { __proposal } — surface it to the UI for confirmation.
+            // Proposer tools return { __proposal }, surface it to the UI for confirmation.
             try {
               const parsed = JSON.parse(output) as { __proposal?: ActionProposal };
               if (parsed.__proposal) proposals.push(parsed.__proposal);
             } catch {
-              // non-JSON output — nothing to collect
+              // non-JSON output, nothing to collect
             }
           } catch (err) {
             output = JSON.stringify({
@@ -337,7 +337,7 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json({
-      reply: finalText || "I wasn't able to put together an answer — try rephrasing.",
+      reply: finalText || "I wasn't able to put together an answer, try rephrasing.",
       actions,
       proposals,
     });

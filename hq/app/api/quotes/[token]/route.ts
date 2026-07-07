@@ -1,4 +1,4 @@
-// Workstream 4 — PUBLIC quote API (by public_token). No auth.
+// Workstream 4, PUBLIC quote API (by public_token). No auth.
 //   GET  /api/quotes/:token                 -> 200 { quote }  (token-scoped only)
 //   POST /api/quotes/:token  { action }      -> approve | decline
 //     approve  -> ensures a customers row (from the linked lead, else quote notes/customer),
@@ -61,7 +61,7 @@ export async function POST(request: Request, { params }: { params: { token: stri
     return NextResponse.json({ error: 'Quote not found' }, { status: 404 });
   }
 
-  // Already resolved — return current state idempotently.
+  // Already resolved, return current state idempotently.
   if (quote.status === 'approved' || quote.status === 'declined') {
     return NextResponse.json({ quote, alreadyResolved: true });
   }

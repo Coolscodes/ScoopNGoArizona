@@ -1,4 +1,4 @@
-// Workstream 2 — recurring-visit generator (cron).
+// Workstream 2, recurring-visit generator (cron).
 //
 // POST /api/jobs/generate
 //   Auth: send the CRON_SECRET either as
@@ -16,7 +16,7 @@
 //    before inserting we query for an existing appointment on that customer/date in
 //    any non-cancelled status. If one exists, we skip the insert.
 // 2. next_visit_date only advances PAST a date once an appointment for it exists, so a
-//    re-run that finds the appointment already there simply advances and moves on — it
+//    re-run that finds the appointment already there simply advances and moves on, it
 //    cannot duplicate. Running the endpoint twice in a row is a no-op.
 
 import { NextResponse } from 'next/server';
@@ -102,7 +102,7 @@ export async function POST(request: Request) {
           status: 'scheduled',
           assigned_to: null,
           // Inherit the client's standing route order so the new route comes up
-          // pre-sorted (undefined before migration 002 — falls back to null).
+          // pre-sorted (undefined before migration 002, falls back to null).
           route_position: c.route_order ?? null,
         });
         if (insErr) throw insErr;

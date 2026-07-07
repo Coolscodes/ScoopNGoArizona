@@ -1,13 +1,13 @@
-# Scoop N Go HQ — Operations Hub Build Plan
+# Scoop N Go HQ, Operations Hub Build Plan
 
 A self-built "Jobber clone" to run Scoop N Go Arizona, living in the website backend.
 Built as an **isolated Next.js app** on top of the existing **Supabase** database and the
 existing **Vercel/Stripe** payment functions. The public marketing site is **not touched**
 until you approve a cutover.
 
-> **How to use this doc.** It is split into **Workstream 0 (Foundation)** plus **Workstreams 1–8**.
-> Workstream 0 must be built and merged **first, alone** — everything else imports it.
-> After that, Workstreams 1–8 can be built **at the same time by separate agents**, because each
+> **How to use this doc.** It is split into **Workstream 0 (Foundation)** plus **Workstreams 1 to 8**.
+> Workstream 0 must be built and merged **first, alone**, everything else imports it.
+> After that, Workstreams 1 to 8 can be built **at the same time by separate agents**, because each
 > one owns its **own folders** and never edits another workstream's files. To dispatch an agent,
 > open a new tab and paste that workstream's **kickoff prompt** (bottom of each section).
 
@@ -39,8 +39,8 @@ These rules are what make simultaneous work safe. Every agent must follow them.
    **only** inside those paths. Never edit a file outside them.
 2. **Shared files are frozen after Foundation.** `lib/types.ts`, `lib/supabase.ts`, `lib/stripe.ts`,
    `tailwind.config.ts`, `app/globals.css`, `package.json`, `.env.example`, and the SQL migration
-   are owned by **Workstream 0** and must **not** be modified by Workstreams 1–8. If you think you
-   need a new type or dependency, it almost certainly already exists in Foundation — re-read it. If
+   are owned by **Workstream 0** and must **not** be modified by Workstreams 1 to 8. If you think you
+   need a new type or dependency, it almost certainly already exists in Foundation, re-read it. If
    it genuinely does not, add it in your branch and note it in your PR description; additions to
    these files merge cleanly, edits to existing lines do not.
 3. **Code to the contract, not to other workstreams.** Your only dependencies are the **database
@@ -48,7 +48,7 @@ These rules are what make simultaneous work safe. Every agent must follow them.
    workstream's components. If you need data another workstream produces (e.g. the customer portal
    needs visit photos), read it from the database via the shared types.
 4. **Server reads use the server Supabase client** (`lib/supabase.ts` → `supabaseServer()`), which
-   uses the service-role key. **This key is server-only** — never import it into a client component
+   uses the service-role key. **This key is server-only**, never import it into a client component
    or expose it to the browser. Client components call your own `app/api/...` route handlers.
 5. **One accent action per screen; match the brand.** Use the shared UI kit and Tailwind brand
    tokens. Greens: `brand` `#1b5e20` / `brand-mid` `#2e7d32` / `brand-light` `#e8f5e9`. Headings in
@@ -63,23 +63,23 @@ These rules are what make simultaneous work safe. Every agent must follow them.
 ## 3. Build order & git strategy
 
 ```
-Step 1 (alone):     Workstream 0 — Foundation   → merge to main, deploy preview
+Step 1 (alone):     Workstream 0, Foundation   → merge to main, deploy preview
 Step 2 (parallel):  Workstreams 1, 2, 3, 4, 5, 6, 7, 8  → each on its own branch
 Step 3:             Merge branches in any order; smoke-test; deploy preview
 Step 4 (you decide): Point /admin or hq. subdomain at the new app (cutover)
 ```
 
-- **Workstream 0 is the only hard prerequisite.** Do not start 1–8 until it is merged.
-- A few **soft** integration points exist (noted per workstream). They never block parallel work —
+- **Workstream 0 is the only hard prerequisite.** Do not start 1 to 8 until it is merged.
+- A few **soft** integration points exist (noted per workstream). They never block parallel work;
   build against the shared types and the seams line up. Example: the customer portal (7) shows
   visit photos from (5) and a pay button from (6); until those land it reads real rows that may be
   empty, which is fine.
 - Recommended: each agent works on its own branch. If you prefer, agents can work on `main`
-  simultaneously since files don't overlap — branches are just safer.
+  simultaneously since files don't overlap, branches are just safer.
 
 ---
 
-## 4. Workstream 0 — Foundation (build first, alone)
+## 4. Workstream 0, Foundation (build first, alone)
 
 **Goal:** stand up the Next.js app, auth, the shared database/types/UI contracts, and the app
 shell with the full navigation, so every other workstream has a stable base to build on.
@@ -114,8 +114,8 @@ hq/supabase/migrations/001_ops_hub.sql  ← full additive migration (Appendix B)
 4. Build Supabase Auth: login page (email + password or magic link), `middleware.ts` to protect
    `(hub)` routes, `lib/auth.ts` for the current user + role.
 5. Build the **app shell** `(hub)/layout.tsx`: brand top bar + the full nav (Appendix D). Every tab
-   links to its route even though feature pages don't exist yet (they 404 until built — expected).
-6. Build the **UI kit** in `components/ui` — the shared primitives every workstream uses.
+   links to its route even though feature pages don't exist yet (they 404 until built, expected).
+6. Build the **UI kit** in `components/ui`, the shared primitives every workstream uses.
 7. Write `lib/types.ts` verbatim from **Appendix A**.
 8. Write `supabase/migrations/001_ops_hub.sql` from **Appendix B** and **run it against Supabase**.
 9. Seed one `technicians` row for the owner (you) and link it to your auth user.
@@ -128,23 +128,23 @@ hq/supabase/migrations/001_ops_hub.sql  ← full additive migration (Appendix B)
 
 **Kickoff prompt:**
 > You are building **Workstream 0 (Foundation)** of the Scoop N Go HQ ops hub. Read
-> `/Users/jettbrown/Desktop/ScoopNGoArizona/OPS_HUB_PLAN.md` in full — especially sections 1–4 and
-> Appendices A–E. Scaffold the Next.js app in `/hq` exactly as described, install all dependencies
+> `/Users/jettbrown/Desktop/ScoopNGoArizona/OPS_HUB_PLAN.md` in full, especially sections 1 to 4 and
+> Appendices A to E. Scaffold the Next.js app in `/hq` exactly as described, install all dependencies
 > from Appendix E, build the auth, shared lib, UI kit, app shell with the full nav, and write +
 > run the SQL migration. Follow the Global Rules in section 2. When done, run the dev server,
 > verify the Acceptance checklist, and commit to branch `ws0-foundation`. Do not build any feature
-> pages (those are Workstreams 1–8).
+> pages (those are Workstreams 1 to 8).
 
 ---
 
-## 5. Workstreams 1–8 (parallel)
+## 5. Workstreams 1 to 8 (parallel)
 
 Each section: **Goal · Owns · Reads/Writes · Screens & Endpoints · Acceptance · Kickoff prompt.**
 All of them depend only on Workstream 0.
 
-### Workstream 1 — Dashboard ("Today")
+### Workstream 1, Dashboard ("Today")
 
-**Goal:** the morning overview — metric cards, a needs-attention strip, and today's route summary.
+**Goal:** the morning overview, metric cards, a needs-attention strip, and today's route summary.
 
 **Owns:**
 ```
@@ -158,17 +158,17 @@ hq/components/dashboard/*
   (sum of `payments` this week), unpaid (sum of `invoices` where status in `sent`/`overdue`),
   new requests (`leads` where status = `new`).
 - Needs-attention strip: failed charges (most recent unpaid/overdue with a card on file).
-- Today's route list (read-only summary; ordering owned by Workstream 2 — read `route_position`).
+- Today's route list (read-only summary; ordering owned by Workstream 2, read `route_position`).
 **Acceptance:** numbers match hand-checked Supabase queries; empty states render; no writes.
 **Kickoff prompt:**
 > You are building **Workstream 1 (Dashboard)** of the Scoop N Go HQ ops hub. Read
-> `/Users/jettbrown/Desktop/ScoopNGoArizona/OPS_HUB_PLAN.md` — Global Rules (section 2), Workstream
-> 1, and Appendices A–B. Foundation (Workstream 0) is merged. Build only the files under your
+> `/Users/jettbrown/Desktop/ScoopNGoArizona/OPS_HUB_PLAN.md`, Global Rules (section 2), Workstream
+> 1, and Appendices A to B. Foundation (Workstream 0) is merged. Build only the files under your
 > "Owns" list, importing shared types/UI/Supabase from `/hq/lib` and `/hq/components/ui`. Do not
 > edit shared or other workstreams' files. Verify the Acceptance checklist, then commit to
 > `ws1-dashboard`.
 
-### Workstream 2 — Route & scheduling
+### Workstream 2, Route & scheduling
 
 **Goal:** the day route view (ordered stops, drag-to-reorder, mark done) and the recurring-visit
 generator that creates weekly appointments from each client's plan.
@@ -191,11 +191,11 @@ hq/components/route/*
 date already generated). Map/drive-time is explicitly **out of scope** for now.
 **Kickoff prompt:**
 > You are building **Workstream 2 (Route & scheduling)** of the Scoop N Go HQ ops hub. Read
-> `/Users/jettbrown/Desktop/ScoopNGoArizona/OPS_HUB_PLAN.md` — Global Rules, Workstream 2,
-> Appendices A–B. Foundation is merged. Build only your "Owns" files. Honor the shared types and
+> `/Users/jettbrown/Desktop/ScoopNGoArizona/OPS_HUB_PLAN.md`, Global Rules, Workstream 2,
+> Appendices A to B. Foundation is merged. Build only your "Owns" files. Honor the shared types and
 > schema; do not modify them. Verify Acceptance, commit to `ws2-route`.
 
-### Workstream 3 — Clients (CRM)
+### Workstream 3, Clients (CRM)
 
 **Goal:** client list + the rich client detail screen (contact, dogs, gate/yard access, billing
 snapshot, visit history) with add/edit.
@@ -217,15 +217,15 @@ for the history panel; reads card-on-file status from `customers.stripe_customer
   recent visits with photo indicator.
 - Create/edit client + dogs.
 **Acceptance:** create/edit/delete persists; detail shows real dogs + history; no Stripe charging
-here (that's Workstream 6 — only read card-on-file status).
+here (that's Workstream 6, only read card-on-file status).
 **Kickoff prompt:**
 > You are building **Workstream 3 (Clients/CRM)** of the Scoop N Go HQ ops hub. Read
-> `/Users/jettbrown/Desktop/ScoopNGoArizona/OPS_HUB_PLAN.md` — Global Rules, Workstream 3,
-> Appendices A–B. Foundation is merged. Build only your "Owns" files. Do not implement charging
-> (Workstream 6 owns Stripe) — only read `stripe_customer_id` to show "card on file". Verify
+> `/Users/jettbrown/Desktop/ScoopNGoArizona/OPS_HUB_PLAN.md`, Global Rules, Workstream 3,
+> Appendices A to B. Foundation is merged. Build only your "Owns" files. Do not implement charging
+> (Workstream 6 owns Stripe), only read `stripe_customer_id` to show "card on file". Verify
 > Acceptance, commit to `ws3-clients`.
 
-### Workstream 4 — Leads & Quotes
+### Workstream 4, Leads & Quotes
 
 **Goal:** the requests inbox (leads from the website), convert a lead into a client, and a quote
 builder with a **public online-approval page** that converts an approved quote into a client + a
@@ -254,14 +254,14 @@ approval creates a customer and marks the quote approved. Public page must not r
 must not expose the service-role key.
 **Kickoff prompt:**
 > You are building **Workstream 4 (Leads & Quotes)** of the Scoop N Go HQ ops hub. Read
-> `/Users/jettbrown/Desktop/ScoopNGoArizona/OPS_HUB_PLAN.md` — Global Rules, Workstream 4,
-> Appendices A–B. Foundation is merged. Build only your "Owns" files. The `/quote/[token]` page is
+> `/Users/jettbrown/Desktop/ScoopNGoArizona/OPS_HUB_PLAN.md`, Global Rules, Workstream 4,
+> Appendices A to B. Foundation is merged. Build only your "Owns" files. The `/quote/[token]` page is
 > public (no auth) and must only use safe server endpoints. Verify Acceptance, commit to
 > `ws4-leads-quotes`.
 
-### Workstream 5 — Field tool (complete a visit)
+### Workstream 5, Field tool (complete a visit)
 
-**Goal:** the mobile, phone-friendly screen used at each stop — mark done, snap/upload a gate photo,
+**Goal:** the mobile, phone-friendly screen used at each stop, mark done, snap/upload a gate photo,
 log notes, flag an issue. Wires up the `service_logs` table and `gate_photo_url` (already in schema).
 
 **Owns:**
@@ -270,7 +270,7 @@ hq/app/field/page.tsx                  (mobile-optimized list of today's stops)
 hq/app/field/[appointmentId]/page.tsx  (complete-a-visit form)
 hq/app/api/visits/route.ts             (create service_log, upload photo URL)
 hq/components/field/*
-hq/lib/storage.ts                      (Supabase Storage upload helper — owns this file)
+hq/lib/storage.ts                      (Supabase Storage upload helper, owns this file)
 ```
 **Reads/Writes:** reads `appointments`, `customers`, `dogs`; writes `service_logs`
 (`gate_photo_url`, `technician_notes`, `issue_flagged`, `completed_by`), and sets
@@ -283,16 +283,16 @@ hq/lib/storage.ts                      (Supabase Storage upload helper — owns 
 working photo URL and flips the appointment to completed.
 **Kickoff prompt:**
 > You are building **Workstream 5 (Field tool)** of the Scoop N Go HQ ops hub. Read
-> `/Users/jettbrown/Desktop/ScoopNGoArizona/OPS_HUB_PLAN.md` — Global Rules, Workstream 5,
-> Appendices A–B. Foundation is merged. Build only your "Owns" files (you also own
+> `/Users/jettbrown/Desktop/ScoopNGoArizona/OPS_HUB_PLAN.md`, Global Rules, Workstream 5,
+> Appendices A to B. Foundation is merged. Build only your "Owns" files (you also own
 > `hq/lib/storage.ts`). Design mobile-first. Create the `visit-photos` Storage bucket. Verify
 > Acceptance on a phone-sized viewport, commit to `ws5-field`.
 
-### Workstream 6 — Invoices & payments
+### Workstream 6, Invoices & payments
 
 **Goal:** invoice list + AR, and the **ported Stripe charging flow** (weekly auto-charge, manual
 charge, receipts, failed-payment alerts) moved from the old `/api` functions into the new app. This
-is the most sensitive workstream — reuse the existing, tested logic.
+is the most sensitive workstream, reuse the existing, tested logic.
 
 **Owns:**
 ```
@@ -316,15 +316,15 @@ payment row; failed charge sends the alert email; behavior matches the current `
 path `/api/stripe/setup` (already specified) so no coordination is needed.
 **Kickoff prompt:**
 > You are building **Workstream 6 (Invoices & payments)** of the Scoop N Go HQ ops hub. Read
-> `/Users/jettbrown/Desktop/ScoopNGoArizona/OPS_HUB_PLAN.md` — Global Rules, Workstream 6,
-> Appendices A–B/E. Foundation is merged. Port the existing functions in the repo's root `/api`
+> `/Users/jettbrown/Desktop/ScoopNGoArizona/OPS_HUB_PLAN.md`, Global Rules, Workstream 6,
+> Appendices A to B/E. Foundation is merged. Port the existing functions in the repo's root `/api`
 > (`charge-customers.js`, `auto-invoice.js`, `stripe-setup.js`, `stripe-webhook.js`) into your
 > "Owns" files, preserving their tested behavior. Do not change the root `/api` files. Verify with
 > Stripe test mode, commit to `ws6-billing`.
 
-### Workstream 7 — Customer portal ("client hub")
+### Workstream 7, Customer portal ("client hub")
 
-**Goal:** the customer-facing self-service page — see next/last visit + photo, pay balance, update
+**Goal:** the customer-facing self-service page, see next/last visit + photo, pay balance, update
 card, skip next visit, refer a friend. Public, separate auth from staff (magic-link via token).
 
 **Owns:**
@@ -345,15 +345,15 @@ hq/components/portal/*
 appointment; no staff data leaks; service-role key never reaches the browser.
 **Kickoff prompt:**
 > You are building **Workstream 7 (Customer portal)** of the Scoop N Go HQ ops hub. Read
-> `/Users/jettbrown/Desktop/ScoopNGoArizona/OPS_HUB_PLAN.md` — Global Rules, Workstream 7,
-> Appendices A–B. Foundation is merged. Build only your "Owns" files. This is a PUBLIC surface —
+> `/Users/jettbrown/Desktop/ScoopNGoArizona/OPS_HUB_PLAN.md`, Global Rules, Workstream 7,
+> Appendices A to B. Foundation is merged. Build only your "Owns" files. This is a PUBLIC surface,
 > authenticate customers by `portal_token`, never expose staff data or the service-role key. For
 > "update card", link to `/api/stripe/setup` (Workstream 6). Verify Acceptance, commit to
 > `ws7-portal`.
 
-### Workstream 8 — Automations & messaging
+### Workstream 8, Automations & messaging
 
-**Goal:** the automations screen (toggles) and the messaging engine — "on my way" SMS, completion +
+**Goal:** the automations screen (toggles) and the messaging engine, "on my way" SMS, completion +
 photo SMS, appointment reminders, review requests. SMS via Twilio; email via Resend.
 
 **Owns:**
@@ -377,14 +377,14 @@ row; the cron respects the on/off toggles.
 complete). Expose that endpoint with a stable contract; they wire to it post-merge.
 **Kickoff prompt:**
 > You are building **Workstream 8 (Automations & messaging)** of the Scoop N Go HQ ops hub. Read
-> `/Users/jettbrown/Desktop/ScoopNGoArizona/OPS_HUB_PLAN.md` — Global Rules, Workstream 8,
-> Appendices A–B/E. Foundation is merged. Build only your "Owns" files (you also own
+> `/Users/jettbrown/Desktop/ScoopNGoArizona/OPS_HUB_PLAN.md`, Global Rules, Workstream 8,
+> Appendices A to B/E. Foundation is merged. Build only your "Owns" files (you also own
 > `hq/lib/twilio.ts`). Log every message to `notifications`. Verify with Twilio test mode, commit
 > to `ws8-automations`.
 
 ---
 
-## Appendix A — Shared TypeScript types (`hq/lib/types.ts`)
+## Appendix A, Shared TypeScript types (`hq/lib/types.ts`)
 
 These mirror the database. Foundation writes this file; nobody else edits it.
 
@@ -471,9 +471,9 @@ export interface Automation {
 
 ---
 
-## Appendix B — Database migration (`hq/supabase/migrations/001_ops_hub.sql`)
+## Appendix B, Database migration (`hq/supabase/migrations/001_ops_hub.sql`)
 
-Additive only — existing tables and data are preserved. Foundation runs this against Supabase.
+Additive only, existing tables and data are preserved. Foundation runs this against Supabase.
 
 ```sql
 -- New: technicians / crew (forward-compatible; single-user today)
@@ -546,21 +546,21 @@ on conflict (key) do nothing;
 
 ---
 
-## Appendix C — Brand tokens (for `tailwind.config.ts` / `globals.css`)
+## Appendix C, Brand tokens (for `tailwind.config.ts` / `globals.css`)
 
 From the current `admin.html`:
 ```
 green:       #2e7d32   green-dark: #1b5e20   green-mid:  #388e3c   green-light: #e8f5e9
 tan:         #f9f6f1   dark:       #1a1a1a   mid:        #555      border:      #e0e0e0
 yellow:      #f9a825   red:        #c62828   blue:       #1565c0   radius:      10px
-Headings: Montserrat (700–900). Body: Open Sans.
+Headings: Montserrat (700 to 900). Body: Open Sans.
 Status badges: new=blue, contacted=yellow, converted/completed=green, lost/cancelled=red,
                scheduled=blue, skipped=purple, draft=gray.
 ```
 
 ---
 
-## Appendix D — Navigation / route map (Foundation builds the shell with all of these)
+## Appendix D, Navigation / route map (Foundation builds the shell with all of these)
 
 | Nav label | Route | Workstream | Auth |
 |---|---|---|---|
@@ -577,7 +577,7 @@ Status badges: new=blue, contacted=yellow, converted/completed=green, lost/cance
 
 ---
 
-## Appendix E — Dependencies & env (Foundation installs/declares all of these)
+## Appendix E, Dependencies & env (Foundation installs/declares all of these)
 
 **Dependencies** (so feature agents never edit `package.json`):
 ```
@@ -587,7 +587,7 @@ stripe
 tailwindcss postcss autoprefixer
 clsx date-fns
 twilio                 (Workstream 8)
-@hello-pangea/dnd      (Workstream 2 — drag/drop reorder)
+@hello-pangea/dnd      (Workstream 2, drag/drop reorder)
 ```
 
 **Environment variables** (`.env.example`):
@@ -607,11 +607,11 @@ NEXT_PUBLIC_BASE_URL=
 
 ---
 
-## Cutover (after all workstreams merge — you decide when)
+## Cutover (after all workstreams merge, you decide when)
 
 1. Deploy the `/hq` app as its own Vercel project (or `hq.scoopngoarizona.com`).
 2. Smoke-test every screen against real data behind login.
 3. Move the weekly-charge cron from the old function to the new `/api/auto-invoice` (or keep the old
-   one running until parity is confirmed — they can coexist; both hit the same Supabase).
+   one running until parity is confirmed, they can coexist; both hit the same Supabase).
 4. Repoint `/admin` to the new app and retire `admin.html`. The public marketing site is unchanged.
 ```

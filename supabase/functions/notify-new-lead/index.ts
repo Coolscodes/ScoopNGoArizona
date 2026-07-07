@@ -30,7 +30,7 @@ Reply to this email or call/text them directly to close the deal!
         from: 'Scoop N Go Arizona <leads@scoopngoarizona.com>',
         to:   'ScoopNgoarizona@gmail.com',
         reply_to: lead.email,
-        subject: `🐾 New Quote Request — ${lead.first_name} ${lead.last_name} (${lead.service_type})`,
+        subject: `🐾 New Quote Request, ${lead.first_name} ${lead.last_name} (${lead.service_type})`,
         text: emailBody,
       }),
     });

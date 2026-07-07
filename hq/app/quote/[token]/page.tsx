@@ -1,4 +1,4 @@
-// PUBLIC quote approval page — /quote/[token]. No auth (middleware exempts /quote/).
+// PUBLIC quote approval page, /quote/[token]. No auth (middleware exempts /quote/).
 // Reads the quote server-side via the service-role client, scoped to the opaque token.
 // Never renders staff data or exposes any key to the browser.
 
@@ -39,7 +39,7 @@ export default async function PublicQuotePage({ params }: { params: { token: str
   const quote = await getQuote(params.token);
   if (!quote) return <NotFound />;
 
-  // Draft quotes have not been sent — don't expose them publicly.
+  // Draft quotes have not been sent, don't expose them publicly.
   if (quote.status === 'draft') return <NotFound />;
 
   const oneTime = (quote.line_items ?? []).filter((l) => !l.recurring);

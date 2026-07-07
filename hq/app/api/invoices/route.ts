@@ -1,4 +1,4 @@
-// Workstream 6 — Invoices API.
+// Workstream 6, Invoices API.
 //   GET /api/invoices?status=sent&customer=<id>
 //     -> 200 { rows, summary, balances, degraded }
 //   POST /api/invoices  { customer_id, amount, due_date?, period_start?, period_end?, notes?, status? }
@@ -43,7 +43,7 @@ export async function GET(request: Request) {
 
 // ---- create an invoice ----
 export async function POST(request: Request) {
-  // Defense in depth (middleware also gates this) — return clean 401 JSON.
+  // Defense in depth (middleware also gates this), return clean 401 JSON.
   try {
     if (!(await getCurrentUser())) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -78,7 +78,7 @@ export async function POST(request: Request) {
   if (!isDate(body.due_date) || !isDate(body.period_start) || !isDate(body.period_end)) {
     return NextResponse.json({ error: 'Dates must be YYYY-MM-DD' }, { status: 400 });
   }
-  // Only draft/sent can be created — paid/overdue are lifecycle states.
+  // Only draft/sent can be created, paid/overdue are lifecycle states.
   const status = body.status === 'draft' ? 'draft' : 'sent';
 
   try {

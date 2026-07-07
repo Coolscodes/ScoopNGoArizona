@@ -70,15 +70,15 @@ export function ClientsTable({
                     <span>
                       <span className="block font-heading font-bold text-ink">{fullName(c) || 'Unnamed'}</span>
                       <span className="block text-xs text-muted">
-                        {c.address ?? '—'}
+                        {c.address ?? '·'}
                         {dogCounts[c.id] ? ` · ${dogCounts[c.id]} dog${dogCounts[c.id] > 1 ? 's' : ''}` : ''}
                       </span>
                     </span>
                   </Link>
                 </Td>
-                <Td className="text-sm">{c.service_type ?? '—'}</Td>
-                <Td className="text-sm">{c.preferred_day ?? '—'}</Td>
-                <Td className="text-sm">{c.price_per_visit != null ? money(c.price_per_visit) : '—'}</Td>
+                <Td className="text-sm">{c.service_type ?? '·'}</Td>
+                <Td className="text-sm">{c.preferred_day ?? '·'}</Td>
+                <Td className="text-sm">{c.price_per_visit != null ? money(c.price_per_visit) : '·'}</Td>
                 <Td className="text-sm">
                   {c.stripe_customer_id ? (
                     <span className="text-brand">Card on file</span>

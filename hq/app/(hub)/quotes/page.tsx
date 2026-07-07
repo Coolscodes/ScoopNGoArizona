@@ -59,7 +59,7 @@ function quoteName(
 }
 
 function lineSummary(items: QuoteLineItem[]): string {
-  if (!items || items.length === 0) return '—';
+  if (!items || items.length === 0) return '·';
   const first = items[0]?.label || 'Item';
   return items.length > 1 ? `${first} +${items.length - 1} more` : first;
 }
@@ -107,7 +107,7 @@ export default async function QuotesPage() {
                 <Td className="text-sm">
                   {q.recurring_amount != null
                     ? `${money(q.recurring_amount)}${q.recurring_interval ? ` / ${q.recurring_interval}` : ''}`
-                    : '—'}
+                    : '·'}
                 </Td>
                 <Td className="text-sm whitespace-nowrap">{shortDate(q.created_at)}</Td>
                 <Td>

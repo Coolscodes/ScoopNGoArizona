@@ -4,7 +4,7 @@ import { getDashboardData } from '@/components/dashboard/data';
 import { NeedsAttention } from '@/components/dashboard/NeedsAttention';
 import { TodaysRoute } from '@/components/dashboard/TodaysRoute';
 
-// Always read fresh — this is the live "Today" overview.
+// Always read fresh, this is the live "Today" overview.
 export const dynamic = 'force-dynamic';
 
 export default async function DashboardPage() {

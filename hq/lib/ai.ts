@@ -1,4 +1,4 @@
-// Shared AI foundation — owned by the AI-hub foundation (like Workstream 0).
+// Shared AI foundation, owned by the AI-hub foundation (like Workstream 0).
 // Feature modules (assistant / briefings / reports) import from here; do not edit.
 //
 // SAFETY: everything in this file is READ-ONLY against the database. AI features
@@ -24,7 +24,7 @@ export function anthropicClient(): Anthropic {
 // Standard friendly payload when ANTHROPIC_API_KEY is missing. Routes should
 // return this with status 200 rather than erroring.
 export const NEEDS_KEY_RESPONSE = {
-  text: 'AI features are offline — add ANTHROPIC_API_KEY to hq/.env.local (key from console.anthropic.com) and restart. Your business data is unaffected.',
+  text: 'AI features are offline, add ANTHROPIC_API_KEY to hq/.env.local (key from console.anthropic.com) and restart. Your business data is unaffected.',
   needsKey: true,
 } as const;
 
@@ -50,7 +50,7 @@ export interface BusinessSnapshot {
 }
 
 // Compact, read-only snapshot of the business used to ground AI prompts.
-// Keep it small — it is injected into every assistant/briefing request.
+// Keep it small, it is injected into every assistant/briefing request.
 export async function getBusinessSnapshot(): Promise<BusinessSnapshot> {
   const db = supabaseServer();
   const today = todayISO();

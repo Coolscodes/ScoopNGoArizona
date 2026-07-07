@@ -1,4 +1,4 @@
-// Workstream 5 — Field tool: complete a visit.
+// Workstream 5, Field tool: complete a visit.
 //
 // JSON / multipart contract
 // =========================
@@ -104,7 +104,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    // Resolve the technician completing the visit (null is fine — single-user today).
+    // Resolve the technician completing the visit (null is fine, single-user today).
     const tech = await getCurrentTechnician();
 
     // 1) Upload the photo, if one was provided.

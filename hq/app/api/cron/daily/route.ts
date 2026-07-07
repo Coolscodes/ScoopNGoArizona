@@ -3,11 +3,11 @@
 // Vercel Cron hits this once a day (GET, with Authorization: Bearer <CRON_SECRET>).
 // It runs the three safe, non-financial automations in order, by calling the
 // existing endpoints against this same deployment:
-//   1. /api/jobs/generate    — materialize each active client's next recurring visit
-//   2. /api/auto-invoice     — create invoices for today's service-day clients (no charge)
-//   3. /api/automations/run  — reminders + review requests (skips if Twilio is unconfigured)
+//   1. /api/jobs/generate, materialize each active client's next recurring visit
+//   2. /api/auto-invoice, create invoices for today's service-day clients (no charge)
+//   3. /api/automations/run, reminders + review requests (skips if Twilio is unconfigured)
 //
-// Charging real cards (/api/charge) is intentionally NOT run here — that stays a
+// Charging real cards (/api/charge) is intentionally NOT run here, that stays a
 // manual, human-in-the-loop action. Using one orchestrator keeps us to a single
 // Vercel cron job (within Hobby-plan limits) and guarantees ordering.
 

@@ -1,4 +1,4 @@
-// Workstream 3 — Dogs API (nested under a client).
+// Workstream 3, Dogs API (nested under a client).
 //   POST   /api/clients/:id/dogs  { name, breed?, notes? }            -> 201 { dog }
 //   PATCH  /api/clients/:id/dogs  { dog_id, name?, breed?, notes? }   -> 200 { dog }
 //   DELETE /api/clients/:id/dogs?dog_id=...                           -> 200 { ok }

@@ -1,4 +1,4 @@
-// Workstream 6 — Stripe webhook.
+// Workstream 6, Stripe webhook.
 // PORT of the repo-root /api/stripe-webhook.js, preserving its tested behavior.
 //
 // Stripe needs the RAW request body for signature verification, so we read

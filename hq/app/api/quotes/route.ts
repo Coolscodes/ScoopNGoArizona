@@ -1,4 +1,4 @@
-// Workstream 4 — Quotes API (collection).
+// Workstream 4, Quotes API (collection).
 //   GET   /api/quotes?status=                     -> 200 { quotes: Quote[] }
 //   POST  /api/quotes   { lead_id?, customer_id?, line_items?, notes? }
 //                                                  -> 201 { quote }  (status 'draft')

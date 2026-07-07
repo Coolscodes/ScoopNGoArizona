@@ -1,6 +1,6 @@
-// Workstream 6 — Weekly invoice generator (cron).
+// Workstream 6, Weekly invoice generator (cron).
 // PORT of the repo-root /api/auto-invoice.js, preserving its tested behavior:
-//   - Monday–Sunday week; period_start = Monday, period_end = Sunday.
+//   - Monday to Sunday week; period_start = Monday, period_end = Sunday.
 //   - Idempotent: skip any customer who already has an invoice for this week's
 //     period_start (any status).
 //   - Skip customers with no price_per_visit.
@@ -10,7 +10,7 @@
 //
 // Auth & scope (per WS6 conventions):
 //   - CRON_SECRET only (Bearer or x-cron-secret); fail closed if unset. The old
-//     ADMIN_PASSWORD path is dropped — staff trigger this from the authed app.
+//     ADMIN_PASSWORD path is dropped, staff trigger this from the authed app.
 //   - Default (cron) scope: only active customers whose preferred_day is today
 //     (matches the original cron behavior).
 //   - Pass ?scope=all to invoice ALL active customers (the original's manual
@@ -61,7 +61,7 @@ async function generate(request: Request) {
 
   const fmtLabel = (d: Date) =>
     d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-  const weekLabel = `${fmtLabel(monday)} - ${fmtLabel(sunday)}, ${monday.getFullYear()}`;
+  const weekLabel = `${fmtLabel(monday)} to ${fmtLabel(sunday)}, ${monday.getFullYear()}`;
 
   const url = new URL(request.url);
   const scopeAll = url.searchParams.get('scope') === 'all';

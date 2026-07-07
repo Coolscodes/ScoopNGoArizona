@@ -10,13 +10,13 @@ export function money(amount?: number | null): string {
 }
 
 export function shortDate(date?: string | Date | null): string {
-  if (!date) return '—';
+  if (!date) return '·';
   const d = typeof date === 'string' ? parseISO(date) : date;
   return format(d, 'MMM d, yyyy');
 }
 
 export function dayMonth(date?: string | Date | null): string {
-  if (!date) return '—';
+  if (!date) return '·';
   const d = typeof date === 'string' ? parseISO(date) : date;
   return format(d, 'EEE, MMM d');
 }

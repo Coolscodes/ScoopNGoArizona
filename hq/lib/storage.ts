@@ -1,4 +1,4 @@
-// Workstream 5 — Supabase Storage helper (server-only).
+// Workstream 5, Supabase Storage helper (server-only).
 //
 // Owns the public `visit-photos` bucket used by the field tool. Ensures the
 // bucket exists (creating it via the service role if missing), uploads a

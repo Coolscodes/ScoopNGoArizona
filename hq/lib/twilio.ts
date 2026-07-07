@@ -1,7 +1,7 @@
-// Workstream 8 — Twilio SMS client (server-only).
+// Workstream 8, Twilio SMS client (server-only).
 //
 // Owns: this file. Other workstreams call the /api/sms/send endpoint, not this
-// module directly — but the messaging engine (/api/automations/run) uses sendSms()
+// module directly, but the messaging engine (/api/automations/run) uses sendSms()
 // straight here on the server.
 //
 // Configuration comes from three env vars:

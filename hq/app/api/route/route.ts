@@ -1,4 +1,4 @@
-// Workstream 2 — Route & scheduling API.
+// Workstream 2, Route & scheduling API.
 //
 // JSON contract
 // =============
@@ -165,7 +165,7 @@ export async function PATCH(request: Request) {
           if (cid) await sb.from('customers').update({ route_order: i + 1 }).eq('id', cid);
         }
       } catch {
-        // route_order column not present yet — standing order will start working
+        // route_order column not present yet, standing order will start working
         // after migration 002 is run. Per-day reorder above still saved.
       }
 
@@ -216,7 +216,7 @@ export async function PATCH(request: Request) {
             }
           }
         } else {
-          // Undo / skip: remove only the auto-created route log — never a
+          // Undo / skip: remove only the auto-created route log, never a
           // field-tool log (which has photos/notes worth keeping).
           await sb
             .from('service_logs')
@@ -232,7 +232,7 @@ export async function PATCH(request: Request) {
     }
 
     return NextResponse.json(
-      { error: "Unknown action — use 'reorder' or 'status'" },
+      { error: "Unknown action, use 'reorder' or 'status'" },
       { status: 400 }
     );
   } catch (err) {

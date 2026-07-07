@@ -3,7 +3,7 @@
 // SAFETY MODEL: the AI can only PROPOSE actions. Each proposer below runs
 // read-only validation (resolve ids, check state) and returns a structured
 // proposal. Nothing executes until the operator clicks Confirm in the UI,
-// which POSTs the proposal to /api/assistant/execute — and that route only
+// which POSTs the proposal to /api/assistant/execute, and that route only
 // forwards to the existing, session-gated staff APIs. The AI never holds a
 // pen; it hands you a filled-in form.
 
@@ -34,7 +34,7 @@ function proposalJson(p: ActionProposal): string {
   // The assistant route detects __proposal in tool output and surfaces it to the UI.
   return JSON.stringify({
     __proposal: p,
-    note: 'Proposal created. It is NOT executed — the operator must confirm it in the UI. Tell the operator what you prepared and that it awaits their confirmation.',
+    note: 'Proposal created. It is NOT executed, the operator must confirm it in the UI. Tell the operator what you prepared and that it awaits their confirmation.',
   });
 }
 
@@ -44,7 +44,7 @@ export async function propose_mark_invoice_paid(args: {
   method?: string;
 }): Promise<string> {
   const { invoice_id } = args ?? {};
-  if (!invoice_id) return JSON.stringify({ error: 'invoice_id is required — find it via list_unpaid_invoices or get_client_details.' });
+  if (!invoice_id) return JSON.stringify({ error: 'invoice_id is required, find it via list_unpaid_invoices or get_client_details.' });
   const method = PAY_METHODS.includes(args?.method as PayMethod) ? (args!.method as PayMethod) : 'cash';
 
   const db = supabaseServer();
@@ -65,7 +65,7 @@ export async function propose_mark_invoice_paid(args: {
 // ---- charge the card on file for an invoice ----
 export async function propose_charge_invoice(args: { invoice_id?: string }): Promise<string> {
   const { invoice_id } = args ?? {};
-  if (!invoice_id) return JSON.stringify({ error: 'invoice_id is required — find it via list_unpaid_invoices or get_client_details.' });
+  if (!invoice_id) return JSON.stringify({ error: 'invoice_id is required, find it via list_unpaid_invoices or get_client_details.' });
 
   const db = supabaseServer();
   const { data: inv } = await db.from('invoices').select('id, customer_id, amount, status').eq('id', invoice_id).single();
@@ -78,7 +78,7 @@ export async function propose_charge_invoice(args: { invoice_id?: string }): Pro
     .single();
   const who = fullName(cust) || 'Unknown client';
   if (!cust?.stripe_customer_id) {
-    return JSON.stringify({ error: `${who} has no card on file — suggest sending a card setup link instead.` });
+    return JSON.stringify({ error: `${who} has no card on file, suggest sending a card setup link instead.` });
   }
 
   return proposalJson({
@@ -100,7 +100,7 @@ export async function propose_create_invoice(args: {
   status?: string;
 }): Promise<string> {
   const { client_id } = args ?? {};
-  if (!client_id) return JSON.stringify({ error: 'client_id is required — find it via search_clients.' });
+  if (!client_id) return JSON.stringify({ error: 'client_id is required, find it via search_clients.' });
   const amount = Number(args?.amount);
   if (!Number.isFinite(amount) || amount <= 0) {
     return JSON.stringify({ error: 'A positive amount is required.' });
@@ -155,7 +155,7 @@ export async function propose_add_stop_to_route(args: {
 }): Promise<string> {
   const { client_id } = args ?? {};
   const date = args?.date ?? todayISO();
-  if (!client_id) return JSON.stringify({ error: 'client_id is required — find it via search_clients.' });
+  if (!client_id) return JSON.stringify({ error: 'client_id is required, find it via search_clients.' });
   if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return JSON.stringify({ error: 'date must be YYYY-MM-DD.' });
 
   const db = supabaseServer();
@@ -176,7 +176,7 @@ export async function propose_add_stop_to_route(args: {
   return proposalJson({
     kind: 'add_stop_to_route',
     label: `Add ${who} to the route on ${date}`,
-    details: { Client: who, Date: date, Active: cust.active ? 'yes' : 'NO — inactive client' },
+    details: { Client: who, Date: date, Active: cust.active ? 'yes' : 'NO, inactive client' },
     payload: { customer_id: cust.id, date },
   });
 }
@@ -187,7 +187,7 @@ export async function propose_update_lead_status(args: {
   status?: string;
 }): Promise<string> {
   const { lead_id, status } = args ?? {};
-  if (!lead_id) return JSON.stringify({ error: 'lead_id is required — find it via list_leads.' });
+  if (!lead_id) return JSON.stringify({ error: 'lead_id is required, find it via list_leads.' });
   const allowed = ['new', 'contacted', 'lost'];
   if (!allowed.includes(status ?? '')) {
     return JSON.stringify({
@@ -215,7 +215,7 @@ export async function propose_update_lead_status(args: {
 // ---- convert a lead into a real client ----
 export async function propose_convert_lead(args: { lead_id?: string }): Promise<string> {
   const { lead_id } = args ?? {};
-  if (!lead_id) return JSON.stringify({ error: 'lead_id is required — find it via list_leads.' });
+  if (!lead_id) return JSON.stringify({ error: 'lead_id is required, find it via list_leads.' });
 
   const db = supabaseServer();
   const { data: lead } = await db
@@ -232,9 +232,9 @@ export async function propose_convert_lead(args: { lead_id?: string }): Promise<
     label: `Convert lead ${who} into a client`,
     details: {
       Lead: who,
-      Phone: lead.phone || '—',
-      'Service asked for': lead.service_type || '—',
-      Dogs: lead.dogs || '—',
+      Phone: lead.phone || '·',
+      'Service asked for': lead.service_type || '·',
+      Dogs: lead.dogs || '·',
       'Current status': lead.status,
     },
     payload: { lead_id: lead.id },
@@ -247,7 +247,7 @@ export async function propose_set_appointment_status(args: {
   status?: string;
 }): Promise<string> {
   const { appointment_id, status } = args ?? {};
-  if (!appointment_id) return JSON.stringify({ error: 'appointment_id is required — find it via get_todays_route.' });
+  if (!appointment_id) return JSON.stringify({ error: 'appointment_id is required, find it via get_todays_route.' });
   if (!APPT_STATUSES.includes(status as (typeof APPT_STATUSES)[number])) {
     return JSON.stringify({ error: "status must be 'completed', 'skipped', or 'scheduled'." });
   }

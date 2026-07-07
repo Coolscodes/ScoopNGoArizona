@@ -110,7 +110,7 @@ export function AccountView({ data, token }: { data: PortalData; token: string }
                 <div key={inv.id} className="flex items-center justify-between gap-3 text-sm">
                   <span className="text-muted">
                     {inv.period_start && inv.period_end
-                      ? `${shortDate(inv.period_start)} – ${shortDate(inv.period_end)}`
+                      ? `${shortDate(inv.period_start)} to ${shortDate(inv.period_end)}`
                       : inv.due_date
                         ? `Due ${shortDate(inv.due_date)}`
                         : 'Invoice'}
@@ -131,7 +131,7 @@ export function AccountView({ data, token }: { data: PortalData; token: string }
         <CardBody className="flex items-center justify-between gap-3">
           <div>
             <div className="font-heading font-bold text-ink">Love the service?</div>
-            <p className="text-sm text-muted">Refer a friend — you both get a free visit.</p>
+            <p className="text-sm text-muted">Refer a friend, you both get a free visit.</p>
           </div>
           <ReferFriend firstName={customer.first_name || fullName(customer)} />
         </CardBody>

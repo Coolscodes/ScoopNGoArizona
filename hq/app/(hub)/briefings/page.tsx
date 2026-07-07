@@ -1,4 +1,4 @@
-// Briefings module — two AI-written briefings grounded in live business data:
+// Briefings module, two AI-written briefings grounded in live business data:
 // a punchy morning ops brief and a reflective weekly business review.
 
 import { PageHeader } from '@/components/ui';
@@ -17,7 +17,7 @@ export default function BriefingsPage() {
       <div className="grid gap-4 grid-cols-1 lg:grid-cols-2">
         <BriefingCard
           title="Morning ops brief"
-          description="Today's route, money watch, stale leads, and one top priority — ready before you head out."
+          description="Today's route, money watch, stale leads, and one top priority, ready before you head out."
           actionLabel="Generate brief"
           endpoint="/api/ops-brief"
         />

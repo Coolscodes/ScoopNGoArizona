@@ -1,4 +1,4 @@
-// Briefings module — POST /api/ops-brief
+// Briefings module, POST /api/ops-brief
 //
 // Generates the 7am "morning ops brief" for the owner-operator: today's route in one
 // line, money watch (outstanding total + oldest unpaid), leads going stale, and one
@@ -45,10 +45,10 @@ export async function POST() {
             '```',
             '',
             'Write the morning ops brief. Cover, in this order:',
-            "1. TODAY'S ROUTE — one line: how many stops, plus any flagged/watch-out clients (pull from each stop's flags/notes, e.g. dog aggressive, gate code issues, cash only).",
-            '2. MONEY WATCH — total outstanding across unpaid invoices, then list the 2-3 oldest unpaid with client name, $ amount, and how many days old.',
-            '3. LEADS GOING STALE — name + how many days old, for leads that are getting cold.',
-            '4. TOP PRIORITY — ONE single top priority for today, stated plainly.',
+            "1. TODAY'S ROUTE, one line: how many stops, plus any flagged/watch-out clients (pull from each stop's flags/notes, e.g. dog aggressive, gate code issues, cash only).",
+            '2. MONEY WATCH, total outstanding across unpaid invoices, then list the 2-3 oldest unpaid with client name, $ amount, and how many days old.',
+            '3. LEADS GOING STALE, name + how many days old, for leads that are getting cold.',
+            '4. TOP PRIORITY, ONE single top priority for today, stated plainly.',
             '',
             'Style: short, punchy, scannable. Plain text with simple ALL-CAPS or Title Case section labels. No markdown tables, no bullet-heavy nesting, no fluff. Owner is reading this over coffee before driving the route.',
           ].join('\n'),

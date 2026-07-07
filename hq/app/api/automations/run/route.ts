@@ -1,4 +1,4 @@
-// Workstream 8 — Automations cron runner (the messaging engine).
+// Workstream 8, Automations cron runner (the messaging engine).
 //
 // POST /api/automations/run
 //   Auth: send the CRON_SECRET either as
@@ -7,10 +7,10 @@
 //   -> 401 if the secret is missing/wrong (fails CLOSED when CRON_SECRET is unset).
 //
 // What it does (each gated by its automations toggle being enabled):
-//   • review_request  — when a customer has reached 4 completed visits, send a one-time
+//   • review_request, when a customer has reached 4 completed visits, send a one-time
 //                       review-request text. Idempotent: skipped if a 'review_request'
 //                       notification already exists for that customer.
-//   • on_my_way       — used here as the umbrella toggle for proactive client texts:
+//   • on_my_way, used here as the umbrella toggle for proactive client texts:
 //                       send a next-day appointment reminder for tomorrow's scheduled
 //                       stops. Idempotent: skipped if a 'reminder' notification already
 //                       exists for that appointment_id.
@@ -54,7 +54,7 @@ function addDaysISO(dateISO: string, days: number): string {
 type Sb = ReturnType<typeof supabaseServer>;
 
 // Send one SMS and log a notifications row. Returns the outcome status.
-// Never throws — failures are captured as 'failed' so one bad number can't abort
+// Never throws, failures are captured as 'failed' so one bad number can't abort
 // the whole cron run.
 async function sendAndLog(
   sb: Sb,

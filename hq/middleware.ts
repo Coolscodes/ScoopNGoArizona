@@ -2,7 +2,7 @@ import { createServerClient, type CookieOptions } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
 // Refreshes the Supabase session cookie and gates staff routes.
-// Everything not listed here — including the staff data APIs under /api — requires
+// Everything not listed here, including the staff data APIs under /api, requires
 // an authenticated session. The exempt API routes self-authenticate by other means
 // (CRON_SECRET, Stripe webhook signature, or a per-customer/quote token), so they're
 // listed explicitly rather than blanket-exempting all of /api.
@@ -11,12 +11,12 @@ const PUBLIC_PREFIXES = [
   '/quote/', // public quote approval page
   '/my-account', // customer portal page
   '/api/portal', // portal lookup + skip (token-gated in handler)
-  '/api/quotes/', // PUBLIC quote-token routes only — NOT the staff /api/quotes list
+  '/api/quotes/', // PUBLIC quote-token routes only, NOT the staff /api/quotes list
   '/api/stripe/', // webhook (signature) + setup (token/session self-auth)
   '/api/cron', // daily cron orchestrator (CRON_SECRET)
   '/api/jobs/', // recurring-visit generator (CRON_SECRET)
   '/api/auto-invoice', // invoice cron (CRON_SECRET)
-  '/api/automations/run', // automations cron (CRON_SECRET) — staff /api/automations stays protected
+  '/api/automations/run', // automations cron (CRON_SECRET), staff /api/automations stays protected
 ];
 
 export async function middleware(request: NextRequest) {

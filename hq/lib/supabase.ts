@@ -1,4 +1,4 @@
-// Supabase clients. Owned by Workstream 0 — do not edit in Workstreams 1-8.
+// Supabase clients. Owned by Workstream 0, do not edit in Workstreams 1-8.
 //
 //   supabaseBrowser()  -> anon client for client components (auth UI).
 //   supabaseServer()   -> service-role client for server data access (server-only).

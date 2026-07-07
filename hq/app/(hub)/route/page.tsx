@@ -1,4 +1,4 @@
-// Workstream 2 — Route view (server component).
+// Workstream 2, Route view (server component).
 // Fetches the selected day's stops with supabaseServer(), then hands them to the
 // client RouteList for drag-to-reorder, mark-done/skip, and add-stop.
 

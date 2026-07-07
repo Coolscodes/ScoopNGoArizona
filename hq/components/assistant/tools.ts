@@ -1,7 +1,7 @@
 // Server-only tool executors for the Scoop HQ AI assistant.
 //
 // SAFETY: every function here is READ-ONLY against the database. No inserts,
-// updates, or deletes. No Stripe calls. No SMS/email is ever sent — draft_sms
+// updates, or deletes. No Stripe calls. No SMS/email is ever sent, draft_sms
 // only returns instructions telling the model to write a draft in its reply
 // for a human to review and send manually.
 
@@ -70,7 +70,7 @@ export async function search_clients(args: { query?: string }): Promise<string> 
   return JSON.stringify({ results });
 }
 
-// get_client_details({ client_id }): full picture of one client — profile,
+// get_client_details({ client_id }): full picture of one client, profile,
 // dogs, recent service history, recent invoices, and lifetime paid total.
 export async function get_client_details(args: { client_id?: string }): Promise<string> {
   const clientId = args?.client_id;
@@ -179,7 +179,7 @@ export async function list_unpaid_invoices(): Promise<string> {
   return JSON.stringify({ invoices: results });
 }
 
-// list_leads({ status? }): the lead pipeline — who's interested, how long
+// list_leads({ status? }): the lead pipeline, who's interested, how long
 // they've been waiting, and where they stand.
 export async function list_leads(args: { status?: string }): Promise<string> {
   const db = supabaseServer();
@@ -211,7 +211,7 @@ export async function list_leads(args: { status?: string }): Promise<string> {
 }
 
 // list_invoices({ client_id?, status?, limit? }): browse invoice history with
-// optional filters — includes paid invoices, unlike list_unpaid_invoices.
+// optional filters, includes paid invoices, unlike list_unpaid_invoices.
 export async function list_invoices(args: {
   client_id?: string;
   status?: string;
@@ -258,7 +258,7 @@ export async function list_invoices(args: {
 }
 
 // get_todays_route(): today's appointments with everything a tech/operator
-// needs at a glance — status, admin flags, yard notes, gate code.
+// needs at a glance, status, admin flags, yard notes, gate code.
 export async function get_todays_route(): Promise<string> {
   const db = supabaseServer();
   const today = new Date();
@@ -320,7 +320,7 @@ export async function draft_sms(args: {
 }): Promise<string> {
   return JSON.stringify({
     instructions:
-      'Compose the SMS draft yourself in your reply, clearly labeled as a draft for the operator to copy — do not imply it was sent.',
+      'Compose the SMS draft yourself in your reply, clearly labeled as a draft for the operator to copy, do not imply it was sent.',
     client_name: args?.client_name ?? undefined,
     purpose: args?.purpose ?? undefined,
     tone: args?.tone ?? 'friendly, professional',
@@ -346,7 +346,7 @@ export const TOOL_EXECUTORS: Record<string, (args: any) => Promise<string>> = {
   list_leads,
   get_todays_route,
   draft_sms,
-  // Action proposers — read-only validation that returns a proposal card for
+  // Action proposers, read-only validation that returns a proposal card for
   // the operator to confirm. Execution happens only via /api/assistant/execute.
   propose_mark_invoice_paid,
   propose_charge_invoice,

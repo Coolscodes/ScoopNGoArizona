@@ -1,4 +1,4 @@
-// Workstream 6 — Stripe card-on-file setup link.
+// Workstream 6, Stripe card-on-file setup link.
 // PORT of the repo-root /api/stripe-setup.js. Exposed at EXACTLY /api/stripe/setup
 // because Workstream 7 (customer portal) links here for "update card".
 //
@@ -11,7 +11,7 @@
 //     setup_intent_data.metadata.customer_id/customer_name).
 //   - Return { url, stripe_customer_id }.
 //
-// Auth (this route is under /api/, which middleware leaves unguarded — so it
+// Auth (this route is under /api/, which middleware leaves unguarded, so it
 // authorizes itself; never trusts the browser for the customer record):
 //   - Staff: send the CRON_SECRET (Bearer or x-cron-secret). The id/name/email
 //     may come in the POST body.

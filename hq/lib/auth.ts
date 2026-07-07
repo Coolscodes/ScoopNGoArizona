@@ -1,4 +1,4 @@
-// Auth helpers. Owned by Workstream 0 — do not edit in Workstreams 1-8.
+// Auth helpers. Owned by Workstream 0, do not edit in Workstreams 1-8.
 //
 // Uses a cookie-bound SSR client (anon key) purely to read the current staff
 // session. Data access still goes through supabaseServer() (service role).
@@ -24,7 +24,7 @@ export async function getSessionClient() {
             cookieStore.set(name, value, options)
           );
         } catch {
-          // Called from a Server Component — middleware refreshes the session instead.
+          // Called from a Server Component, middleware refreshes the session instead.
         }
       },
     },

@@ -99,7 +99,7 @@ export function QuoteBuilder({ quote, baseUrl }: { quote: Quote; baseUrl: string
       const { quote: updated } = await patch({ status: 'sent' });
       setStatus(updated.status);
       setToken(updated.public_token);
-      toast('Quote sent — share the link below');
+      toast('Quote sent, share the link below');
       router.refresh();
     } catch {
       toast('Could not send quote', 'error');
@@ -207,7 +207,7 @@ export function QuoteBuilder({ quote, baseUrl }: { quote: Quote; baseUrl: string
                 disabled={locked}
                 onChange={(e) => setRecurringInterval(e.target.value)}
               >
-                <option value="">—</option>
+                <option value="">·</option>
                 {INTERVALS.map((i) => (
                   <option key={i} value={i}>
                     {i}

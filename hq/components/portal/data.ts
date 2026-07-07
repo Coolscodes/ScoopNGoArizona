@@ -1,4 +1,4 @@
-// Workstream 7 — shared portal data types + token resolver.
+// Workstream 7, shared portal data types + token resolver.
 // Lives outside the route file because Next.js only allows route-handler exports
 // (GET/POST/etc.) from a `route.ts`. Imported by the route, the skip route, and
 // the my-account server page.

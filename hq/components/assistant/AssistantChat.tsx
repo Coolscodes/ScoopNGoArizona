@@ -112,7 +112,7 @@ export function AssistantChat() {
       });
       const data = await res.json().catch(() => ({}));
       if (data.ok) {
-        const dup = data.result?.duplicate ? ' (already existed — nothing changed)' : '';
+        const dup = data.result?.duplicate ? ' (already existed, nothing changed)' : '';
         setProposalState(msgIndex, propIndex, { state: 'done', resultText: `Done${dup}` });
       } else {
         setProposalState(msgIndex, propIndex, {
@@ -132,7 +132,7 @@ export function AssistantChat() {
           <div className="h-full flex flex-col items-center justify-center text-center px-4">
             <p className="font-heading font-bold text-ink mb-1">Ask Scoop HQ anything</p>
             <p className="text-sm text-muted mb-5 max-w-sm">
-              I can look up clients, check invoices, pull today&apos;s route, and draft texts —
+              I can look up clients, check invoices, pull today&apos;s route, and draft texts,
               grounded in your live data.
             </p>
             <div className="flex flex-wrap justify-center gap-2 max-w-md">
@@ -230,7 +230,7 @@ export function AssistantChat() {
                           )}
                           {up.state === 'dismissed' && (
                             <div className="text-[0.8rem] font-heading font-bold text-muted">
-                              Dismissed — nothing was run
+                              Dismissed, nothing was run
                             </div>
                           )}
                         </div>

@@ -1,4 +1,4 @@
-// Workstream 8 — Automations toggles API.
+// Workstream 8, Automations toggles API.
 //
 // JSON contract
 // =============

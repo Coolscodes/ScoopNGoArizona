@@ -1,6 +1,6 @@
 'use client';
 
-// Workstream 5 — Complete-a-visit form (mobile-first client component).
+// Workstream 5, Complete-a-visit form (mobile-first client component).
 // Notes textarea, an "issue flagged" toggle + details, and a gate photo capture.
 // On submit, sends a base64 data URL (+ fields) to /api/visits as JSON.
 
@@ -200,7 +200,7 @@ export function VisitForm({
         )}
       </div>
 
-      {/* Submit — single accent action */}
+      {/* Submit, single accent action */}
       <Button
         variant="primary"
         onClick={submit}

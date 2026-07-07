@@ -1,4 +1,4 @@
-// Workstream 8 — Automations (server component).
+// Workstream 8, Automations (server component).
 // Loads the seeded `automations` rows with supabaseServer(), then hands them to the
 // client AutomationsList for per-row toggles (which persist via /api/automations).
 
@@ -19,7 +19,7 @@ async function loadAutomations(): Promise<Automation[]> {
     if (error) throw error;
     return (data ?? []) as Automation[];
   } catch {
-    // Env keys may be placeholders / table may be empty — never crash the page.
+    // Env keys may be placeholders / table may be empty, never crash the page.
     return [];
   }
 }
@@ -36,7 +36,7 @@ export default async function AutomationsPage() {
 
       {automations.length === 0 ? (
         <p className="text-sm text-muted">
-          No automations found. They are seeded by the database migration — check that
+          No automations found. They are seeded by the database migration, check that
           the migration has run.
         </p>
       ) : (

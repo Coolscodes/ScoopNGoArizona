@@ -1,4 +1,4 @@
-// Stripe webhook — handles payment completion events
+// Stripe webhook, handles payment completion events
 export const config = { api: { bodyParser: false } };
 
 const SUPABASE_URL = 'https://emvqtgsjdbyaionxguhq.supabase.co';

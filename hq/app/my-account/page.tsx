@@ -100,7 +100,7 @@ export default async function MyAccountPage({
 
   const data = await loadPortalData(token);
   if (!data) {
-    // Invalid/expired token — send them to log in again rather than leaking
+    // Invalid/expired token, send them to log in again rather than leaking
     // anything about why it failed.
     redirect('/my-account/login');
   }

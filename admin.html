@@ -303,7 +303,7 @@
         </div>
         <div class="form-group"><label>Day of Week</label>
           <select id="cust-day">
-            <option value="">-- Select --</option>
+            <option value="">Select...</option>
             <option>Monday</option><option>Tuesday</option><option>Wednesday</option>
             <option>Thursday</option><option>Friday</option><option>Saturday</option><option>Sunday</option>
           </select>
@@ -320,7 +320,7 @@
       </div>
       <div class="form-group"><label>Yard Notes</label><textarea id="cust-notes" placeholder="Gate on left side, dogs friendly, watch for sprinkler heads..."></textarea></div>
       <div class="form-group" style="border-top:1px solid var(--border);padding-top:1rem;margin-top:.5rem;">
-        <label style="color:#635bff;">Stripe Customer ID <span style="font-weight:400;opacity:.7;">(optional — paste from Stripe dashboard)</span></label>
+        <label style="color:#635bff;">Stripe Customer ID <span style="font-weight:400;opacity:.7;">(optional, paste from Stripe dashboard)</span></label>
         <input id="cust-stripe-id" placeholder="cus_xxxxxxxxxxxxxxxxxx" style="font-family:monospace;font-size:.85rem;"/>
       </div>
     </div>
@@ -340,7 +340,7 @@
     </div>
     <div class="modal-body">
       <div class="form-group"><label>Customer *</label>
-        <select id="appt-customer"><option value="">-- Select customer --</option></select>
+        <select id="appt-customer"><option value="">Select customer...</option></select>
       </div>
       <div class="form-row-2">
         <div class="form-group"><label>Date *</label><input id="appt-date" type="date"/></div>
@@ -368,7 +368,7 @@
     </div>
     <div class="modal-body">
       <div class="form-group"><label>Customer *</label>
-        <select id="inv-customer"><option value="">-- Select customer --</option></select>
+        <select id="inv-customer"><option value="">Select customer...</option></select>
       </div>
       <div class="form-row-2">
         <div class="form-group"><label>Amount ($) *</label><input id="inv-amount" type="number" step="0.01" placeholder="80.00"/></div>
@@ -527,7 +527,7 @@
         <td>${l.zip||''}</td>
         <td>${l.dogs||''}</td>
         <td>${l.service_type||''}</td>
-        <td style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${l.notes||''}">${l.notes||'—'}</td>
+        <td style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${l.notes||''}">${l.notes||'·'}</td>
         <td style="white-space:nowrap;">${fmtDate(l.created_at)}</td>
         <td>
           <select class="action-select" onchange="updateLeadStatus('${l.id}', this.value, this)">
@@ -558,13 +558,13 @@
       <tr>
         <td><strong>${c.first_name} ${c.last_name}</strong></td>
         <td><a href="tel:${c.phone}" style="color:var(--green);font-weight:600;white-space:nowrap;">${c.phone}</a></td>
-        <td style="font-size:.82rem;max-width:130px;">${c.address||'—'}</td>
-        <td>${c.gate_code||'—'}</td>
-        <td style="font-size:.8rem;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${c.yard_notes||''}">${c.yard_notes||'—'}</td>
-        <td>${c.service_type||'—'}</td>
-        <td>${c.preferred_day||'—'}</td>
-        <td style="white-space:nowrap;">${c.start_date ? new Date(c.start_date+'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '—'}</td>
-        <td>${c.price_per_visit ? '$'+c.price_per_visit : '—'}</td>
+        <td style="font-size:.82rem;max-width:130px;">${c.address||'·'}</td>
+        <td>${c.gate_code||'·'}</td>
+        <td style="font-size:.8rem;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${c.yard_notes||''}">${c.yard_notes||'·'}</td>
+        <td>${c.service_type||'·'}</td>
+        <td>${c.preferred_day||'·'}</td>
+        <td style="white-space:nowrap;">${c.start_date ? new Date(c.start_date+'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '·'}</td>
+        <td>${c.price_per_visit ? '$'+c.price_per_visit : '·'}</td>
         <td><span class="badge badge-${c.active?'active':'inactive'}">${c.active?'Active':'Inactive'}</span></td>
         <td style="white-space:nowrap;">
           <button class="btn btn-outline btn-sm" onclick="editCustomer('${c.id}')">Edit</button>
@@ -661,10 +661,10 @@
       return `<tr>
         <td style="white-space:nowrap;font-weight:600;">${fmtDate(a.scheduled_at)}</td>
         <td><strong>${c.first_name||''} ${c.last_name||''}</strong></td>
-        <td><a href="tel:${c.phone||''}" style="color:var(--green);font-weight:600;">${c.phone||'—'}</a></td>
-        <td style="font-size:.82rem;">${c.address||'—'}</td>
-        <td>${c.gate_code||'—'}</td>
-        <td>${a.service_type||'—'}</td>
+        <td><a href="tel:${c.phone||''}" style="color:var(--green);font-weight:600;">${c.phone||'·'}</a></td>
+        <td style="font-size:.82rem;">${c.address||'·'}</td>
+        <td>${c.gate_code||'·'}</td>
+        <td>${a.service_type||'·'}</td>
         <td>
           <select class="action-select" onchange="updateApptStatus('${a.id}', this.value, this)">
             <option value="scheduled"  ${a.status==='scheduled'?'selected':''}>📅 Scheduled</option>
@@ -744,9 +744,9 @@
         : `<button class="btn btn-sm" style="background:#1565c0;color:#fff;white-space:nowrap;" onclick="sendCardSetupLink('${c.id}','${((c.first_name||'')+' '+(c.last_name||'')).trim()}','${c.email||''}','${c.stripe_customer_id||''}')">💳 Add Card</button>`;
       return `<tr>
         <td><strong>${c.first_name||''} ${c.last_name||''}</strong></td>
-        <td><a href="tel:${c.phone||''}" style="color:var(--green);font-weight:600;">${c.phone||'—'}</a></td>
+        <td><a href="tel:${c.phone||''}" style="color:var(--green);font-weight:600;">${c.phone||'·'}</a></td>
         <td style="font-weight:700;font-size:1rem;">$${parseFloat(i.amount||0).toFixed(2)}</td>
-        <td>${i.due_date ? fmtDate(i.due_date) : '—'}</td>
+        <td>${i.due_date ? fmtDate(i.due_date) : '·'}</td>
         <td>
           <select class="action-select" onchange="updateInvoiceStatus('${i.id}', this.value, this)">
             <option value="draft"   ${i.status==='draft'?'selected':''}>📝 Draft</option>
@@ -803,8 +803,8 @@
   // ── HELPERS ──
   function populateCustomerDropdowns() {
     const opts = allCustomers.map(c => `<option value="${c.id}">${c.first_name} ${c.last_name}</option>`).join('');
-    document.getElementById('appt-customer').innerHTML = '<option value="">-- Select customer --</option>' + opts;
-    document.getElementById('inv-customer').innerHTML  = '<option value="">-- Select customer --</option>' + opts;
+    document.getElementById('appt-customer').innerHTML = '<option value="">Select customer...</option>' + opts;
+    document.getElementById('inv-customer').innerHTML  = '<option value="">Select customer...</option>' + opts;
   }
 
   async function sendCardSetupLink(customerId, customerName, customerEmail, stripeCustomerId) {
@@ -1012,7 +1012,7 @@
     res.style.display = 'flex';
     res.innerHTML = `
       <div style="background:${data.failed ? '#fff8e1' : '#e8f5e9'};border:1px solid ${data.failed ? '#ffe082' : '#a5d6a7'};border-radius:8px;padding:.8rem 1rem;font-size:.92rem;margin-bottom:.4rem;">
-        <strong>Week of ${data.week}</strong> — ✅ ${data.charged} charged · $${(data.total||0).toFixed(2)}${data.failed ? ` · ❌ ${data.failed} failed` : ''}${data.skipped ? ` · ⏭ ${data.skipped} skipped` : ''}
+        <strong>Week of ${data.week}</strong>, ✅ ${data.charged} charged · $${(data.total||0).toFixed(2)}${data.failed ? ` · ❌ ${data.failed} failed` : ''}${data.skipped ? ` · ⏭ ${data.skipped} skipped` : ''}
       </div>
       ${(data.results||[]).map(x => `
         <div style="display:flex;align-items:center;gap:.6rem;padding:.5rem .75rem;border:1px solid #eee;border-radius:7px;font-size:.88rem;">
@@ -1025,7 +1025,7 @@
 
     // Summary banner behind the modal too
     const banner = document.getElementById('invoiceRunResult');
-    banner.innerHTML = `<strong>Week of ${data.week}</strong> — ✅ ${data.charged} charged ($${(data.total||0).toFixed(2)})${data.failed ? ` · ❌ ${data.failed} failed` : ''}${data.skipped ? ` · ⏭ ${data.skipped} skipped` : ''}`;
+    banner.innerHTML = `<strong>Week of ${data.week}</strong>, ✅ ${data.charged} charged ($${(data.total||0).toFixed(2)})${data.failed ? ` · ❌ ${data.failed} failed` : ''}${data.skipped ? ` · ⏭ ${data.skipped} skipped` : ''}`;
     banner.style.background = data.failed ? '#fff8e1' : '#e8f5e9';
     banner.style.borderColor = data.failed ? '#ffe082' : '#a5d6a7';
     banner.style.color = '#1a1a1a';
@@ -1062,7 +1062,7 @@
   }
 
   function fmtDate(d) {
-    if (!d) return '—';
+    if (!d) return '·';
     return new Date(d).toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric', timeZone:'UTC' });
   }
 

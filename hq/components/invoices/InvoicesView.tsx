@@ -50,7 +50,7 @@ export function InvoicesView({
 
   async function chargeNow(b: ClientBalance) {
     if (!b.hasCardOnFile) {
-      toast('No card on file — send a setup link first', 'error');
+      toast('No card on file, send a setup link first', 'error');
       return;
     }
     setBusy(b.customerId);
@@ -110,7 +110,7 @@ export function InvoicesView({
         await navigator.clipboard.writeText(data.url);
         toast('Card setup link copied to clipboard');
       } catch {
-        // Clipboard may be blocked — open it instead.
+        // Clipboard may be blocked, open it instead.
         window.open(data.url, '_blank', 'noopener');
         toast('Card setup link opened');
       }
@@ -186,10 +186,10 @@ export function InvoicesView({
                     )}
                   </Td>
                   <Td className="text-sm text-muted">
-                    {r.invoice.period_start ? shortDate(r.invoice.period_start) : '—'}
+                    {r.invoice.period_start ? shortDate(r.invoice.period_start) : '·'}
                   </Td>
                   <Td className="text-sm text-muted">
-                    {r.invoice.due_date ? shortDate(r.invoice.due_date) : '—'}
+                    {r.invoice.due_date ? shortDate(r.invoice.due_date) : '·'}
                   </Td>
                   <Td className="text-right font-heading font-bold">
                     {money(r.invoice.amount)}

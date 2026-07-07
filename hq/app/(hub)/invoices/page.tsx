@@ -2,7 +2,7 @@ import { PageHeader } from '@/components/ui';
 import { getInvoicesData } from '@/components/invoices/data';
 import { InvoicesView } from '@/components/invoices/InvoicesView';
 
-// Live AR + invoice book — always read fresh.
+// Live AR + invoice book, always read fresh.
 export const dynamic = 'force-dynamic';
 
 export default async function InvoicesPage() {

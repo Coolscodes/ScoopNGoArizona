@@ -1,4 +1,4 @@
-// Workstream 5 — Mobile list of today's stops (client component).
+// Workstream 5, Mobile list of today's stops (client component).
 // Big tap targets, single column. Each row links to the completion form.
 
 import Link from 'next/link';

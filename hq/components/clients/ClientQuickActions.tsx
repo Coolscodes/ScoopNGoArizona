@@ -25,7 +25,7 @@ export function ClientQuickActions({
 
   async function chargeNow() {
     if (!hasCard) {
-      toast('No card on file — send a setup link first', 'error');
+      toast('No card on file, send a setup link first', 'error');
       return;
     }
     setBusy(true);

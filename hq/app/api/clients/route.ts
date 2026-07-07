@@ -1,4 +1,4 @@
-// Workstream 3 — Clients API (collection).
+// Workstream 3, Clients API (collection).
 //   GET  /api/clients?search=         -> 200 { clients: Customer[] }
 //   POST /api/clients   { ...customer } -> 201 { client: Customer }
 

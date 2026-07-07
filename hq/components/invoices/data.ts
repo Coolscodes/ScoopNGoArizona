@@ -1,4 +1,4 @@
-// Invoices data layer — Workstream 6.
+// Invoices data layer, Workstream 6.
 // Shared by the /invoices server component and the /api/invoices route handler
 // so both return identical shapes. Server-only: it calls supabaseServer(), which
 // throws if ever run in the browser (the service-role key must never reach the
@@ -159,7 +159,7 @@ export async function getInvoicesData(opts?: {
     .filter((b) => b.balance > 0)
     .sort((a, b) => b.balance - a.balance);
 
-  // Visible list — apply the status / customer filters here.
+  // Visible list, apply the status / customer filters here.
   const visible = allInvoices.filter((i) => {
     if (opts?.customerId && i.customer_id !== opts.customerId) return false;
     if (opts?.status && i.status !== opts.status) return false;

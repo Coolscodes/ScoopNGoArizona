@@ -1,7 +1,7 @@
-// Workstream 3 — Clients API (single record).
+// Workstream 3, Clients API (single record).
 //   GET    /api/clients/:id  -> 200 { client, dogs }
 //   PATCH  /api/clients/:id  { ...fields } -> 200 { client }
-//   DELETE /api/clients/:id  -> 200 { ok }  (soft archive: active=false — preserves history)
+//   DELETE /api/clients/:id  -> 200 { ok }  (soft archive: active=false, preserves history)
 
 import { NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase';

@@ -1,4 +1,4 @@
-// Workstream 5 — Field tool: today's stops (mobile-first server component).
+// Workstream 5, Field tool: today's stops (mobile-first server component).
 // Lists TODAY's scheduled appointments with customer name + address; each row
 // links to the completion form. Auth-gated by middleware (not a public prefix).
 
@@ -70,7 +70,7 @@ async function loadTodayStops(date: string): Promise<FieldStop[]> {
       dog_count: dogCounts.get(a.customer_id) ?? 0,
     }));
   } catch {
-    // Placeholder env keys / empty DB — never crash the page.
+    // Placeholder env keys / empty DB, never crash the page.
     return [];
   }
 }

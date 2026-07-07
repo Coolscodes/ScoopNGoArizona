@@ -10,7 +10,7 @@ import { PortalShell } from '@/components/portal/PortalShell';
 // them to /my-account?token=... .
 //
 // To avoid leaking which emails are customers, the API returns { token: null }
-// for unknown emails — we surface the same neutral message either way.
+// for unknown emails, we surface the same neutral message either way.
 export default function PortalLoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState('');
@@ -38,7 +38,7 @@ export default function PortalLoginPage() {
         router.push(`/my-account?token=${encodeURIComponent(data.token)}`);
         return;
       }
-      // Unknown email — neutral message, no enumeration.
+      // Unknown email, neutral message, no enumeration.
       setNotFound(true);
     } catch {
       setError('Something went wrong. Please try again.');

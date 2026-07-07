@@ -1,4 +1,4 @@
-// Workstream 5 — Field tool: complete-a-visit form (mobile-first server component).
+// Workstream 5, Field tool: complete-a-visit form (mobile-first server component).
 // Loads the appointment + customer (gate code / yard notes / dogs) for context,
 // then renders the client VisitForm which POSTs to /api/visits.
 
@@ -91,7 +91,7 @@ export default async function VisitPage({
         <PageHeader title={name} subtitle={addressLine(customer)} />
       </div>
 
-      {/* Stop context — gate code, dogs, yard notes, phone */}
+      {/* Stop context, gate code, dogs, yard notes, phone */}
       <div className="bg-white rounded-card border border-line p-4 mb-4 flex flex-col gap-2.5 text-sm">
         {customer.gate_code && (
           <div className="flex items-center justify-between gap-3">

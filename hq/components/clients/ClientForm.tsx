@@ -98,7 +98,7 @@ export function ClientForm({
               value={draft.service_type ?? ''}
               onChange={(e) => set('service_type', e.target.value as Customer['service_type'])}
             >
-              <option value="">—</option>
+              <option value="">·</option>
               {SERVICE_TYPES.map((s) => (
                 <option key={s} value={s}>{s}</option>
               ))}
@@ -106,7 +106,7 @@ export function ClientForm({
           </FormField>
           <FormField label="Preferred day">
             <Select value={draft.preferred_day ?? ''} onChange={(e) => set('preferred_day', e.target.value)}>
-              <option value="">—</option>
+              <option value="">·</option>
               {DAYS.map((d) => (
                 <option key={d} value={d}>{d}</option>
               ))}

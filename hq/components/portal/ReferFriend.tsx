@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Button, useToast } from '@/components/ui';
 
-// Client action: refer a friend. No backend yet — copies a shareable referral
+// Client action: refer a friend. No backend yet, copies a shareable referral
 // message (with the customer's first name) to the clipboard, or falls back to the
 // native share sheet on mobile.
 export function ReferFriend({ firstName }: { firstName: string }) {
@@ -24,13 +24,13 @@ export function ReferFriend({ firstName }: { firstName: string }) {
       if (typeof navigator !== 'undefined' && navigator.clipboard) {
         await navigator.clipboard.writeText(message);
         setCopied(true);
-        toast('Referral message copied — paste it to a friend!');
+        toast('Referral message copied, paste it to a friend!');
         setTimeout(() => setCopied(false), 2500);
         return;
       }
       toast('Copy this message to share with a friend.', 'error');
     } catch {
-      // User cancelled the share sheet — silently ignore.
+      // User cancelled the share sheet, silently ignore.
     }
   }
 

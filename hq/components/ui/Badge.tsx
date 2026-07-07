@@ -44,7 +44,7 @@ export function StatusPill({ status }: { status?: string | null }) {
   const key = (status ?? '').toLowerCase();
   return (
     <Badge className={statusStyles[key] ?? 'bg-[#f5f5f5] text-[#616161]'}>
-      {status ?? '—'}
+      {status ?? '·'}
     </Badge>
   );
 }

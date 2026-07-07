@@ -39,7 +39,7 @@ export function QuoteApproval({
   if (status === 'approved') {
     return (
       <div className="rounded-card border border-line bg-brand-light px-5 py-4 text-center">
-        <p className="font-heading font-bold text-brand-dark">Quote approved — thank you!</p>
+        <p className="font-heading font-bold text-brand-dark">Quote approved, thank you!</p>
         <p className="text-sm text-muted mt-1">
           We&apos;ll be in touch shortly to get your first visit scheduled.
         </p>

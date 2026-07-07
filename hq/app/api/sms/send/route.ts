@@ -1,20 +1,20 @@
-// Workstream 8 — Send an SMS via Twilio and log it to `notifications`.
+// Workstream 8, Send an SMS via Twilio and log it to `notifications`.
 //
-// JSON contract  (STABLE — other workstreams call this; do not break it)
+// JSON contract  (STABLE, other workstreams call this; do not break it)
 // =====================================================================
 // POST /api/sms/send
 //   body: {
-//     to: string,              // REQUIRED — destination phone (E.164 preferred, e.g. +14805551234)
-//     body: string,            // REQUIRED — message text
-//     customer_id?: string,    // optional — the customer this relates to (logged on notifications)
-//     type?: string,           // optional — notification type tag, e.g. 'on_the_way' | 'completed'
+//     to: string,              // REQUIRED, destination phone (E.164 preferred, e.g. +14805551234)
+//     body: string,            // REQUIRED, message text
+//     customer_id?: string,    // optional, the customer this relates to (logged on notifications)
+//     type?: string,           // optional, notification type tag, e.g. 'on_the_way' | 'completed'
 //                              //            | 'reminder' | 'review_request'. Defaults to 'manual'.
-//     appointment_id?: string  // optional — link to an appointment
+//     appointment_id?: string  // optional, link to an appointment
 //   }
 //
 //   -> 200 { ok: true,  status: 'sent',    sid, notification_id? }   on a successful send
 //   -> 200 { ok: false, status: 'skipped', reason }  when Twilio is not configured
-//            (we DO NOT crash — we still log the attempt as status='skipped')
+//            (we DO NOT crash, we still log the attempt as status='skipped')
 //   -> 400 { ok: false, status: 'invalid', error }   on a malformed body
 //   -> 500 { ok: false, status: 'failed',  error }   on a Twilio/database error
 //            (a 'failed' notification row is logged when possible)
@@ -44,7 +44,7 @@ interface SendBody {
 type LogStatus = 'sent' | 'skipped' | 'failed';
 
 // Best-effort insert into notifications. Skips silently if there's no customer_id
-// (the column is NOT NULL) or if the insert errors — logging must never break a send.
+// (the column is NOT NULL) or if the insert errors, logging must never break a send.
 async function logNotification(opts: {
   customer_id?: string;
   type: string;

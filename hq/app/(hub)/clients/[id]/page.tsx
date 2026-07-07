@@ -34,7 +34,7 @@ function Row({ label, value }: { label: string; value?: string | null }) {
   return (
     <div>
       <div className="text-[0.72rem] uppercase tracking-wide text-muted">{label}</div>
-      <div className="text-sm text-ink">{value || '—'}</div>
+      <div className="text-sm text-ink">{value || '·'}</div>
     </div>
   );
 }

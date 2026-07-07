@@ -28,7 +28,7 @@ async function sendFailureEmail(customerName, phone, amount, reason, weekLabel, 
       }),
     });
   } catch (e) {
-    // Non-fatal — don't let email failure block the rest
+    // Non-fatal, don't let email failure block the rest
   }
 }
 
@@ -84,7 +84,7 @@ export default async function handler(req, res) {
   const fmtLabel = d => d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
   const periodStart = fmt(monday);
   const periodEnd   = fmt(sunday);
-  const weekLabel   = `${fmtLabel(monday)} - ${fmtLabel(sunday)}, ${monday.getFullYear()}`;
+  const weekLabel   = `${fmtLabel(monday)} to ${fmtLabel(sunday)}, ${monday.getFullYear()}`;
 
   // Accept explicit list of customer IDs from the admin panel
   const { customer_ids, amounts } = req.body || {};
@@ -101,7 +101,7 @@ export default async function handler(req, res) {
     return res.status(200).json({ message: 'No customers found', week: weekLabel, results: [] });
   }
 
-  // Only skip if already PAID this week — don't skip "sent" invoices
+  // Only skip if already PAID this week, don't skip "sent" invoices
   const invRes = await supa(`invoices?period_start=eq.${periodStart}&status=eq.paid`);
   const existing = await invRes.json();
   const existingIds = new Set((Array.isArray(existing) ? existing : []).map(i => i.customer_id));
@@ -147,7 +147,7 @@ export default async function handler(req, res) {
       }
 
       if (!pmId) {
-        results.push({ name, status: 'skipped', reason: 'No payment method found — send card setup link' });
+        results.push({ name, status: 'skipped', reason: 'No payment method found, send card setup link' });
         continue;
       }
 
@@ -159,7 +159,7 @@ export default async function handler(req, res) {
         payment_method: pmId,
         confirm: 'true',
         off_session: 'true',
-        description: `Scoop N Go Arizona - Week of ${weekLabel}`,
+        description: `Scoop N Go Arizona: Week of ${weekLabel}`,
         'metadata[customer_id]': c.id,
         'metadata[customer_name]': name,
         'metadata[period_start]': periodStart,
@@ -173,7 +173,7 @@ export default async function handler(req, res) {
         dueDate.setDate(monday.getDate() + ((serviceDayNum - 1 + 7) % 7));
         const dueDateStr = fmt(dueDate <= sunday ? dueDate : sunday);
 
-        // Check if a sent invoice already exists for this week — update it instead of creating a new one
+        // Check if a sent invoice already exists for this week, update it instead of creating a new one
         const existingInvRes = await supa(`invoices?customer_id=eq.${c.id}&period_start=eq.${periodStart}&status=eq.sent`);
         const existingInvData = await existingInvRes.json();
         const existingInv = Array.isArray(existingInvData) && existingInvData[0];
@@ -182,7 +182,7 @@ export default async function handler(req, res) {
           await supa(`invoices?id=eq.${existingInv.id}`, 'PATCH', {
             status: 'paid',
             amount: chargeAmount,
-            notes: `Week of ${weekLabel} - charged to card on file`,
+            notes: `Week of ${weekLabel}, charged to card on file`,
             stripe_payment_intent_id: pi.id,
           });
         } else {
@@ -193,7 +193,7 @@ export default async function handler(req, res) {
             due_date:     dueDateStr,
             period_start: periodStart,
             period_end:   periodEnd,
-            notes:        `Week of ${weekLabel} - charged to card on file`,
+            notes:        `Week of ${weekLabel}, charged to card on file`,
             stripe_payment_intent_id: pi.id,
           });
         }
@@ -210,7 +210,7 @@ export default async function handler(req, res) {
               from: 'Scoop N Go Arizona <onboarding@resend.dev>',
               to: 'scoopngoarizona@gmail.com', // Resend restriction: can only send to verified email in test mode
               reply_to: c.email,
-              subject: `Receipt: Scoop N Go Arizona - Week of ${weekLabel}`,
+              subject: `Receipt: Scoop N Go Arizona: Week of ${weekLabel}`,
               html: `
                 <div style="font-family:Arial,sans-serif;max-width:500px;margin:0 auto;padding:20px;">
                   <h2 style="color:#1b5e20;">Payment Receipt</h2>

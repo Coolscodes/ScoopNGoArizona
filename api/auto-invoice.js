@@ -37,7 +37,7 @@ export default async function handler(req, res) {
 
   // Human-readable week label e.g. "Jun 9 - Jun 15, 2026"
   const fmtLabel = d => d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-  const weekLabel = `${fmtLabel(monday)} - ${fmtLabel(sunday)}, ${monday.getFullYear()}`;
+  const weekLabel = `${fmtLabel(monday)} to ${fmtLabel(sunday)}, ${monday.getFullYear()}`;
 
   // When triggered by cron, only invoice customers whose service day matches today
   // When triggered manually by admin, invoice all active customers

@@ -7,7 +7,7 @@ import { LeadFunnelChart } from '@/components/reports/LeadFunnelChart';
 import { WeeklyVisitsChart } from '@/components/reports/WeeklyVisitsChart';
 import { TopClientsTable } from '@/components/reports/TopClientsTable';
 
-// Always read fresh — reports reflect the live books.
+// Always read fresh, reports reflect the live books.
 export const dynamic = 'force-dynamic';
 
 export default async function ReportsPage() {

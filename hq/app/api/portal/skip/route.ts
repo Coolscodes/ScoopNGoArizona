@@ -1,9 +1,9 @@
-// Workstream 7 — Customer portal: skip the next visit.
+// Workstream 7, Customer portal: skip the next visit.
 //
 // PUBLIC surface, token-gated. The customer can skip ONLY their own next
 // scheduled appointment. We resolve the token to the owning customer first,
 // then update an appointment that is BOTH the next scheduled one AND belongs to
-// that customer — so a token can never affect another customer's schedule.
+// that customer, so a token can never affect another customer's schedule.
 //
 //   POST /api/portal/skip  { token }  -> 200 { ok: true, skipped: <appointment_id> | null }
 
@@ -49,7 +49,7 @@ export async function POST(request: Request) {
     if (findErr) throw findErr;
 
     if (!next) {
-      // Nothing upcoming to skip — not an error, just a no-op.
+      // Nothing upcoming to skip, not an error, just a no-op.
       return NextResponse.json({ ok: true, skipped: null });
     }
 

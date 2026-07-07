@@ -8,7 +8,7 @@ const stages: { key: keyof LeadFunnelData['counts']; label: string; tone: string
   { key: 'lost', label: 'Lost', tone: 'bg-danger' },
 ];
 
-// Horizontal bars — lead funnel by status, plus an all-time conversion callout.
+// Horizontal bars, lead funnel by status, plus an all-time conversion callout.
 export function LeadFunnelChart({ data }: { data: LeadFunnelData }) {
   const max = Math.max(...stages.map((s) => data.counts[s.key]), 1);
 

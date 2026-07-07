@@ -139,17 +139,17 @@ export function LeadsInbox({ leads }: { leads: Lead[] }) {
                     <Avatar initials={initials(l)} className="w-9 h-9 text-xs" />
                     <div>
                       <div className="font-heading font-bold text-ink">{fullName(l) || 'Unnamed'}</div>
-                      <div className="text-xs text-muted">{l.zip || '—'}</div>
+                      <div className="text-xs text-muted">{l.zip || '·'}</div>
                     </div>
                   </div>
                 </Td>
                 <Td className="text-sm">
-                  <div>{fmtPhone(l.phone) || '—'}</div>
-                  <div className="text-xs text-muted">{l.email || '—'}</div>
+                  <div>{fmtPhone(l.phone) || '·'}</div>
+                  <div className="text-xs text-muted">{l.email || '·'}</div>
                 </Td>
                 <Td className="text-sm">
-                  <div>{l.dogs || '—'}</div>
-                  <div className="text-xs text-muted">{l.service_type || '—'}</div>
+                  <div>{l.dogs || '·'}</div>
+                  <div className="text-xs text-muted">{l.service_type || '·'}</div>
                   {l.notes && <div className="text-xs text-muted mt-1 max-w-[16rem]">{l.notes}</div>}
                 </Td>
                 <Td className="text-sm whitespace-nowrap">{shortDate(l.created_at)}</Td>

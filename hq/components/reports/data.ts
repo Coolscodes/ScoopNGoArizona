@@ -1,4 +1,4 @@
-// Reports data layer — Reports & Insights module.
+// Reports data layer, Reports & Insights module.
 // Shared by the /reports server component and the /api/reports route handler
 // so both return identical numbers. Server-only: it calls supabaseServer(),
 // which throws if ever run in the browser (the service-role key must never
@@ -57,7 +57,7 @@ export interface ReportsData {
 }
 
 // Defensive wrapper: never throw, always resolve to an array. The DB may be
-// empty or the env keys may be placeholders — reports must not crash.
+// empty or the env keys may be placeholders, reports must not crash.
 async function safeRows<T>(
   run: () => PromiseLike<{ data: T[] | null; error: unknown }>
 ): Promise<{ rows: T[]; ok: boolean }> {
@@ -92,7 +92,7 @@ function visitsPerMonth(c: Pick<Customer, 'frequency_weeks' | 'service_type'>): 
     return 2.17;
   }
   if (type.includes('weekly')) return 4.33;
-  return 0; // one-time / unknown — don't count toward recurring MRR
+  return 0; // one-time / unknown, don't count toward recurring MRR
 }
 
 // UTC-safe start-of-month string (YYYY-MM-01).

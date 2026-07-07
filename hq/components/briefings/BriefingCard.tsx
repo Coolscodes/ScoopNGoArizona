@@ -1,6 +1,6 @@
 'use client';
 
-// Briefings module — shared card used for both the morning ops brief and the
+// Briefings module, shared card used for both the morning ops brief and the
 // weekly business review. Calls the given endpoint, renders the result as
 // plain readable text, and offers browser read-aloud once text exists.
 

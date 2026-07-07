@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 
 // Lightweight branded shell for the public customer portal. It deliberately does
-// NOT use the staff (hub) layout — customers never see staff nav. Pure
+// NOT use the staff (hub) layout, customers never see staff nav. Pure
 // presentational wrapper.
 export function PortalShell({ children }: { children: ReactNode }) {
   return (

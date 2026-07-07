@@ -2,7 +2,7 @@ import { Card, CardBody, EmptyState } from '@/components/ui';
 import { money } from '@/lib/format';
 import type { MonthlyRevenuePoint } from './data';
 
-// Inline SVG bar chart — last 6 calendar months of collected payments.
+// Inline SVG bar chart, last 6 calendar months of collected payments.
 export function MonthlyRevenueChart({ data }: { data: MonthlyRevenuePoint[] }) {
   const hasData = data.some((d) => d.total > 0);
 

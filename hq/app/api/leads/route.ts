@@ -1,4 +1,4 @@
-// Workstream 4 — Leads API (collection).
+// Workstream 4, Leads API (collection).
 //   GET   /api/leads?status=          -> 200 { leads: Lead[] }
 //   PATCH /api/leads                   -> update status OR convert-to-client
 //     { id, status }                   -> 200 { lead }            (status update)

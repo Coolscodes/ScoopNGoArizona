@@ -1,8 +1,8 @@
-// Workstream 7 — Customer portal API (the magic-link / token gate).
+// Workstream 7, Customer portal API (the magic-link / token gate).
 //
 // This is a PUBLIC surface. There is NO staff auth here. The ONLY credential is
 // the customer's `customers.portal_token`. Every read is scoped to the single
-// customer that the token (or email) resolves to — we never return rows that
+// customer that the token (or email) resolves to, we never return rows that
 // belong to another customer, and we never echo the service-role key or any
 // staff data to the browser.
 //
@@ -44,7 +44,7 @@ export async function GET(request: Request) {
     const sb = supabaseServer();
     const nowISO = new Date().toISOString();
 
-    // Every query below is scoped by `customer_id = customer.id` — the only
+    // Every query below is scoped by `customer_id = customer.id`, the only
     // customer the token unlocked. No cross-customer reads are possible.
     const [{ data: upcoming }, { data: lastLog }, { data: unpaid }] = await Promise.all([
       // Next scheduled visit: earliest still-scheduled appointment from now on.
