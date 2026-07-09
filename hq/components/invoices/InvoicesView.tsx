@@ -126,7 +126,9 @@ export function InvoicesView({
 
   return (
     <div className="grid gap-6 lg:grid-cols-[1fr_320px] items-start">
-      <div>
+      {/* min-w-0 lets this column shrink below the invoice table's intrinsic
+          width; without it the table forces the page wide on phones. */}
+      <div className="min-w-0">
         <div className="grid gap-3 grid-cols-2 lg:grid-cols-4 mb-6">
           <StatCard label="Outstanding" value={money(summary.outstanding)} tone="warn" />
           <StatCard label="Overdue" value={money(summary.overdue)} tone="danger" />

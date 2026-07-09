@@ -9,7 +9,7 @@ import {
   type DropResult,
 } from '@hello-pangea/dnd';
 import { Button, EmptyState, StatusPill, Avatar, Select, useToast, cn } from '@/components/ui';
-import { fullName, initials, phone } from '@/lib/format';
+import { fullName, initials, phone, money } from '@/lib/format';
 
 export interface RouteStop {
   id: string;
@@ -31,12 +31,44 @@ export interface RouteStop {
   } | null;
   dog_count: number;
   flags: string[];
+  auto_charge: boolean;
+}
+
+// Charge outcome returned by PATCH /api/route when a stop is marked done
+// (charge-on-completion for opted-in clients).
+interface ChargeOutcome {
+  attempted: boolean;
+  reason?: string;
+  result?:
+    | { name: string; status: 'charged'; amount: number }
+    | { name: string; status: 'skipped' | 'failed'; reason: string };
 }
 
 function addressLine(c: RouteStop['customer']): string {
   if (!c) return 'No address on file';
   const parts = [c.address, c.city, c.zip].filter(Boolean);
   return parts.length ? parts.join(', ') : 'No address on file';
+}
+
+function chargeFailed(charge: ChargeOutcome | null): boolean {
+  return Boolean(charge?.attempted && charge.result?.status === 'failed');
+}
+
+function doneMessage(
+  next: RouteStop['status'],
+  noCharge: boolean,
+  charge: ChargeOutcome | null
+): string {
+  if (next === 'skipped') return 'Stop skipped';
+  if (next === 'scheduled') return 'Stop reopened';
+  if (noCharge) return 'Stop marked done, no charge';
+  if (charge?.attempted && charge.result) {
+    const r = charge.result;
+    if (r.status === 'charged') return `Stop marked done, charged ${money(r.amount)}`;
+    if (r.status === 'failed') return `Stop done, but card charge failed: ${r.reason}`;
+    return `Stop marked done, charge skipped: ${r.reason}`;
+  }
+  return 'Stop marked done';
 }
 
 // Flags that read as a warning get a red badge; the rest are neutral/amber.
@@ -99,7 +131,7 @@ export function RouteList({
     void persistOrder(renumbered);
   }
 
-  async function setStatus(stop: RouteStop, next: RouteStop['status']) {
+  async function setStatus(stop: RouteStop, next: RouteStop['status'], noCharge = false) {
     const prevStatus = stop.status;
     setSavingId(stop.id);
     setStops((prev) => prev.map((s) => (s.id === stop.id ? { ...s, status: next } : s)));
@@ -107,10 +139,11 @@ export function RouteList({
       const res = await fetch('/api/route', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'status', id: stop.id, status: next }),
+        body: JSON.stringify({ action: 'status', id: stop.id, status: next, no_charge: noCharge }),
       });
       if (!res.ok) throw new Error('status failed');
-      toast(next === 'completed' ? 'Stop marked done' : next === 'skipped' ? 'Stop skipped' : 'Stop reopened');
+      const data = (await res.json().catch(() => ({}))) as { charge?: ChargeOutcome | null };
+      toast(doneMessage(next, noCharge, data.charge ?? null), chargeFailed(data.charge ?? null) ? 'error' : undefined);
     } catch {
       setStops((prev) => prev.map((s) => (s.id === stop.id ? { ...s, status: prevStatus } : s)));
       toast('Could not update the stop', 'error');
@@ -193,7 +226,7 @@ export function RouteList({
                           ref={dp.innerRef}
                           {...dp.draggableProps}
                           className={cn(
-                            'bg-white rounded-card border border-line flex items-center gap-3 p-3 transition-shadow',
+                            'bg-white rounded-card border border-line flex items-center gap-3 p-3 transition-shadow flex-wrap',
                             snapshot.isDragging && 'shadow-lg border-brand',
                             dimmed && 'opacity-70'
                           )}
@@ -217,7 +250,7 @@ export function RouteList({
 
                           <Avatar initials={initials(cust ?? undefined)} />
 
-                          <div className="min-w-0 flex-1">
+                          <div className="min-w-0 flex-1 basis-[12rem]">
                             <div className="flex items-center gap-2 flex-wrap">
                               <span className="font-heading font-bold text-ink truncate">
                                 {cust ? fullName(cust) : 'Unknown customer'}
@@ -241,12 +274,17 @@ export function RouteList({
                             </div>
                           </div>
 
-                          <div className="flex items-center gap-1.5 shrink-0">
+                          <div className="flex items-center gap-1.5 shrink-0 flex-wrap justify-end ml-auto">
                             {stop.status === 'scheduled' ? (
                               <>
                                 <Button variant="primary" size="sm" disabled={savingId === stop.id} onClick={() => setStatus(stop, 'completed')}>
-                                  Mark done
+                                  {stop.auto_charge ? 'Done + charge' : 'Mark done'}
                                 </Button>
+                                {stop.auto_charge && (
+                                  <Button variant="outline" size="sm" disabled={savingId === stop.id} onClick={() => setStatus(stop, 'completed', true)}>
+                                    Done, no charge
+                                  </Button>
+                                )}
                                 <Button variant="outline" size="sm" disabled={savingId === stop.id} onClick={() => setStatus(stop, 'skipped')}>
                                   Skip
                                 </Button>

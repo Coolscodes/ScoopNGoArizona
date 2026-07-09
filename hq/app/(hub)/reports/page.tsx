@@ -29,12 +29,14 @@ export default async function ReportsPage() {
         <StatCard label="Outstanding A/R" value={money(headline.outstandingAR)} tone="warn" />
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-2 mb-4">
+      {/* [&>*]:min-w-0 lets each card shrink below its chart's scrollable
+          width; otherwise the SVG min-width forces the page wide on phones. */}
+      <div className="grid gap-4 lg:grid-cols-2 mb-4 [&>*]:min-w-0">
         <MonthlyRevenueChart data={monthlyRevenue} />
         <ArAgingChart data={arAging} />
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-2 mb-4">
+      <div className="grid gap-4 lg:grid-cols-2 mb-4 [&>*]:min-w-0">
         <LeadFunnelChart data={leadFunnel} />
         <WeeklyVisitsChart data={weeklyVisits} />
       </div>

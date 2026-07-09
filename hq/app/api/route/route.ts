@@ -22,6 +22,7 @@
 
 import { NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase';
+import { autoChargeOnCompletion, type AutoChargeOutcome } from '@/lib/charge-core';
 import { todayISO } from '@/lib/format';
 import type { Appointment, ApptStatus, Customer } from '@/lib/types';
 
@@ -175,6 +176,9 @@ export async function PATCH(request: Request) {
     if (action === 'status') {
       const id = payload.id;
       const status = payload.status;
+      // "Done, no charge": complete the stop but skip auto-charge (client paid
+      // another way this week: cash, Venmo, etc.).
+      const noCharge = payload.no_charge === true;
       const allowed: ApptStatus[] = ['completed', 'scheduled', 'skipped'];
       if (typeof id !== 'string' || !allowed.includes(status as ApptStatus)) {
         return NextResponse.json(
@@ -188,6 +192,8 @@ export async function PATCH(request: Request) {
         .update({ status })
         .eq('id', id);
       if (error) throw error;
+
+      let chargeOutcome: AutoChargeOutcome | null = null;
 
       // Keep service_logs in sync so analytics / client history / the AI see
       // visits marked done from the route (not just field-tool completions).
@@ -211,8 +217,16 @@ export async function PATCH(request: Request) {
                 appointment_id: id,
                 completed_at: new Date().toISOString(),
                 issue_flagged: false,
-                technician_notes: ROUTE_DONE_NOTE,
+                technician_notes: noCharge
+                  ? `${ROUTE_DONE_NOTE} (no charge, paid another way)`
+                  : ROUTE_DONE_NOTE,
               });
+            }
+            // Charge-on-completion: bill the card on file for opted-in clients
+            // unless the operator chose "Done, no charge". Never blocks the
+            // completion itself.
+            if (appt && !noCharge) {
+              chargeOutcome = await autoChargeOnCompletion(appt.customer_id);
             }
           }
         } else {
@@ -222,13 +236,16 @@ export async function PATCH(request: Request) {
             .from('service_logs')
             .delete()
             .eq('appointment_id', id)
-            .eq('technician_notes', ROUTE_DONE_NOTE);
+            .in('technician_notes', [
+              ROUTE_DONE_NOTE,
+              `${ROUTE_DONE_NOTE} (no charge, paid another way)`,
+            ]);
         }
       } catch {
         // Log sync is best-effort; the status change itself already succeeded.
       }
 
-      return NextResponse.json({ ok: true, id, status });
+      return NextResponse.json({ ok: true, id, status, charge: chargeOutcome });
     }
 
     return NextResponse.json(

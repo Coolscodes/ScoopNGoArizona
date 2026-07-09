@@ -13,6 +13,16 @@ export interface VisitFormProps {
   customerId: string;
   customerName: string;
   alreadyCompleted: boolean;
+  autoCharge: boolean;
+}
+
+// Charge outcome returned by POST /api/visits (charge-on-completion).
+interface ChargeOutcome {
+  attempted: boolean;
+  reason?: string;
+  result?:
+    | { name: string; status: 'charged'; amount: number }
+    | { name: string; status: 'skipped' | 'failed'; reason: string };
 }
 
 // Read a File as a base64 data URL.
@@ -30,6 +40,7 @@ export function VisitForm({
   customerId,
   customerName,
   alreadyCompleted,
+  autoCharge,
 }: VisitFormProps) {
   const router = useRouter();
   const toast = useToast();
@@ -38,6 +49,7 @@ export function VisitForm({
   const [notes, setNotes] = useState('');
   const [issueFlagged, setIssueFlagged] = useState(false);
   const [issueDetails, setIssueDetails] = useState('');
+  const [noCharge, setNoCharge] = useState(false);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -78,6 +90,7 @@ export function VisitForm({
           notes: notes.trim() || null,
           issue_flagged: issueFlagged,
           issue_details: issueFlagged ? issueDetails.trim() : null,
+          no_charge: noCharge,
           photo,
         }),
       });
@@ -85,8 +98,17 @@ export function VisitForm({
         const data = await res.json().catch(() => ({}));
         throw new Error((data as { error?: string }).error || 'Request failed');
       }
+      const data = (await res.json().catch(() => ({}))) as { charge?: ChargeOutcome | null };
       setDone(true);
-      toast('Visit completed');
+      const charge = data.charge ?? null;
+      if (charge?.attempted && charge.result) {
+        const r = charge.result;
+        if (r.status === 'charged') toast(`Visit completed, charged $${r.amount.toFixed(2)}`);
+        else if (r.status === 'failed') toast(`Visit saved, but card charge failed: ${r.reason}`, 'error');
+        else toast(`Visit completed, charge skipped: ${r.reason}`);
+      } else {
+        toast('Visit completed');
+      }
       // Refresh server data, then return to the stop list.
       router.refresh();
       setTimeout(() => router.push('/field'), 700);
@@ -198,6 +220,25 @@ export function VisitForm({
             />
           </div>
         )}
+
+        {autoCharge && (
+          <label className="flex items-start gap-3 cursor-pointer select-none mt-3">
+            <input
+              type="checkbox"
+              checked={noCharge}
+              onChange={(e) => setNoCharge(e.target.checked)}
+              className="w-5 h-5 accent-brand mt-0.5"
+            />
+            <span>
+              <span className="font-heading font-bold text-sm text-ink block">
+                Paid another way, skip card charge
+              </span>
+              <span className="text-xs text-muted">
+                This client is on auto-charge. Completing the visit bills their card unless you check this.
+              </span>
+            </span>
+          </label>
+        )}
       </div>
 
       {/* Submit, single accent action */}
@@ -207,7 +248,11 @@ export function VisitForm({
         disabled={submitting}
         className="w-full py-4 text-base"
       >
-        {submitting ? 'Saving…' : 'Complete visit'}
+        {submitting
+          ? 'Saving…'
+          : autoCharge && !noCharge
+            ? 'Complete visit + charge card'
+            : 'Complete visit'}
       </Button>
     </div>
   );

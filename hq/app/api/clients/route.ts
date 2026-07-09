@@ -12,7 +12,7 @@ export const dynamic = 'force-dynamic';
 const EDITABLE: (keyof Customer)[] = [
   'first_name', 'last_name', 'phone', 'email', 'address', 'city', 'zip',
   'gate_code', 'yard_notes', 'service_type', 'preferred_day', 'price_per_visit',
-  'active', 'frequency_weeks', 'start_date', 'next_visit_date',
+  'active', 'auto_charge', 'frequency_weeks', 'start_date', 'next_visit_date',
 ];
 
 function pick(body: Record<string, unknown>): Partial<Customer> {

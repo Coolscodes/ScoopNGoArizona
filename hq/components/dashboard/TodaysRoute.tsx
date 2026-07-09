@@ -6,6 +6,16 @@ import { Table, Th, Td, StatusPill, Avatar, EmptyState, useToast } from '@/compo
 import { fullName, initials } from '@/lib/format';
 import type { RouteStop } from './data';
 
+// Charge outcome returned by PATCH /api/route when a stop is marked done
+// (charge-on-completion for opted-in clients).
+interface ChargeOutcome {
+  attempted: boolean;
+  reason?: string;
+  result?:
+    | { name: string; status: 'charged'; amount: number }
+    | { name: string; status: 'skipped' | 'failed'; reason: string };
+}
+
 // Today's stops, ordered by route_position. Mark a stop done in place.
 export function TodaysRoute({ stops }: { stops: RouteStop[] }) {
   const router = useRouter();
@@ -21,7 +31,15 @@ export function TodaysRoute({ stops }: { stops: RouteStop[] }) {
         body: JSON.stringify({ action: 'status', id, status }),
       });
       if (!res.ok) throw new Error();
-      toast(status === 'completed' ? 'Stop marked done' : 'Stop reopened');
+      const data = (await res.json().catch(() => ({}))) as { charge?: ChargeOutcome | null };
+      const r = data.charge?.attempted ? data.charge.result : undefined;
+      if (status === 'completed' && r?.status === 'charged') {
+        toast(`Stop marked done, charged $${r.amount.toFixed(2)}`);
+      } else if (status === 'completed' && r?.status === 'failed') {
+        toast(`Stop done, but card charge failed: ${r.reason}`, 'error');
+      } else {
+        toast(status === 'completed' ? 'Stop marked done' : 'Stop reopened');
+      }
       router.refresh();
     } catch {
       toast('Could not update the stop', 'error');

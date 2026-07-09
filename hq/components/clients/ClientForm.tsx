@@ -69,10 +69,10 @@ export function ClientForm({
         </div>
         <div className="grid grid-cols-2 gap-x-3">
           <FormField label="Phone">
-            <Input value={draft.phone ?? ''} onChange={(e) => set('phone', e.target.value)} />
+            <Input type="tel" inputMode="tel" value={draft.phone ?? ''} onChange={(e) => set('phone', e.target.value)} />
           </FormField>
           <FormField label="Email">
-            <Input value={draft.email ?? ''} onChange={(e) => set('email', e.target.value)} />
+            <Input type="email" spellCheck={false} value={draft.email ?? ''} onChange={(e) => set('email', e.target.value)} />
           </FormField>
         </div>
         <FormField label="Address">
@@ -83,7 +83,7 @@ export function ClientForm({
             <Input value={draft.city ?? ''} onChange={(e) => set('city', e.target.value)} />
           </FormField>
           <FormField label="ZIP">
-            <Input value={draft.zip ?? ''} onChange={(e) => set('zip', e.target.value)} />
+            <Input inputMode="numeric" value={draft.zip ?? ''} onChange={(e) => set('zip', e.target.value)} />
           </FormField>
         </div>
         <FormField label="Gate code">
@@ -118,6 +118,7 @@ export function ClientForm({
             <Input
               type="number"
               step="0.01"
+              inputMode="decimal"
               value={draft.price_per_visit ?? ''}
               onChange={(e) => set('price_per_visit', e.target.value === '' ? undefined : Number(e.target.value))}
             />
@@ -132,13 +133,27 @@ export function ClientForm({
             />
           </FormField>
         </div>
-        <label className="flex items-center gap-2 mb-4 text-sm">
+        <label className="flex items-center gap-2 mb-2 text-sm">
           <input
             type="checkbox"
             checked={draft.active ?? true}
             onChange={(e) => set('active', e.target.checked)}
           />
           Active
+        </label>
+        <label className="flex items-start gap-2 mb-4 text-sm">
+          <input
+            type="checkbox"
+            checked={draft.auto_charge ?? false}
+            onChange={(e) => set('auto_charge', e.target.checked)}
+            className="mt-0.5"
+          />
+          <span>
+            Auto-charge card when a visit is completed
+            <span className="block text-xs text-muted">
+              Uses the price per visit. Needs a card on file. Skipped if the week is already paid.
+            </span>
+          </span>
         </label>
         <div className="flex gap-2">
           <Button variant="primary" onClick={save} disabled={saving}>

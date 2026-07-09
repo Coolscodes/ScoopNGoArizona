@@ -76,6 +76,7 @@ async function loadStops(date: string): Promise<RouteStop[]> {
           : null,
         dog_count: dogCounts.get(a.customer_id) ?? 0,
         flags: c?.flags ?? [],
+        auto_charge: Boolean(c?.auto_charge),
       };
     });
   } catch {

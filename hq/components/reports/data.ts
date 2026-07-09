@@ -166,9 +166,18 @@ export async function getReportsData(): Promise<ReportsData> {
           .select('id, customer_id, completed_at, issue_flagged')
           .gte('completed_at', eightWeeksAgoStart)
     ),
-    // Needed for top-clients lifetime revenue: map invoice_id -> customer_id.
-    safeRows<{ id: string; customer_id: string }>(() =>
-      sb.from('invoices').select('id, customer_id')
+    // All invoices: paid ones are the source of truth for revenue. Legacy
+    // charges (pre-payments-table) exist ONLY as paid invoices, so computing
+    // revenue from the payments table alone undercounts.
+    safeRows<{
+      id: string;
+      customer_id: string;
+      amount: number | null;
+      status: string;
+      period_start: string | null;
+      created_at: string;
+    }>(() =>
+      sb.from('invoices').select('id, customer_id, amount, status, period_start, created_at')
     ),
   ]);
 
@@ -188,27 +197,40 @@ export async function getReportsData(): Promise<ReportsData> {
     return sum + price * visitsPerMonth(c);
   }, 0);
 
+  // Revenue source of truth: PAID invoices. The payments table only exists in
+  // the new schema, so legacy charges are paid invoices with no payments row.
+  // When a payment row exists we use its paid_at as the revenue date; otherwise
+  // fall back to the invoice's period_start, then created_at.
+  const paidAtByInvoice = new Map<string, string>();
+  for (const p of paymentsAllRes.rows) {
+    if (p.paid_at) paidAtByInvoice.set(p.invoice_id, p.paid_at);
+  }
+  const paidInvoices = invoicesAllRes.rows.filter((i) => i.status === 'paid');
+  const revenueDate = (inv: (typeof paidInvoices)[number]): string =>
+    paidAtByInvoice.get(inv.id) ?? inv.period_start ?? inv.created_at ?? '';
+
   const monthStartThis = monthStartISO(0, now).iso;
-  const collectedThisMonth = paymentsAllRes.rows
-    .filter((p) => (p.paid_at ?? '') >= monthStartThis)
-    .reduce((sum, p) => sum + (Number(p.amount) || 0), 0);
+  const collectedThisMonth = paidInvoices
+    .filter((i) => revenueDate(i) >= monthStartThis)
+    .reduce((sum, i) => sum + (Number(i.amount) || 0), 0);
 
   const outstandingAR = invoicesUnpaidRes.rows.reduce(
     (sum, i) => sum + (Number(i.amount) || 0),
     0
   );
 
-  // ---- Monthly revenue (last 6 calendar months of payments) ----
+  // ---- Monthly revenue (last 6 calendar months of paid invoices) ----
   const months = Array.from({ length: 6 }, (_, i) => monthStartISO(5 - i, now));
   const monthTotals = new Map<string, number>(months.map((m) => [m.iso, 0]));
-  for (const p of paymentsAllRes.rows) {
-    if (!p.paid_at) continue;
+  for (const inv of paidInvoices) {
+    const date = revenueDate(inv);
+    if (!date) continue;
     const bucket = months
       .slice()
       .reverse()
-      .find((m) => p.paid_at! >= m.iso);
+      .find((m) => date >= m.iso);
     if (bucket) {
-      monthTotals.set(bucket.iso, (monthTotals.get(bucket.iso) ?? 0) + (Number(p.amount) || 0));
+      monthTotals.set(bucket.iso, (monthTotals.get(bucket.iso) ?? 0) + (Number(inv.amount) || 0));
     }
   }
   const monthlyRevenue: MonthlyRevenuePoint[] = months.map((m) => ({
@@ -266,22 +288,12 @@ export async function getReportsData(): Promise<ReportsData> {
     issues: weekBuckets.get(w)?.issues ?? 0,
   }));
 
-  // ---- Top clients (all-time payments total, joined invoices -> payments) ----
-  const invoiceCustomer = new Map<string, string>();
-  for (const inv of invoicesAllRes.rows) invoiceCustomer.set(inv.id, inv.customer_id);
-
-  // Need all-time payments (not just last 6 months) for lifetime totals.
-  const paymentsAllTimeRes = await safeRows<{ amount: number | null; invoice_id: string }>(() =>
-    sb.from('payments').select('amount, invoice_id')
-  );
-
+  // ---- Top clients (lifetime collected = all-time PAID invoices) ----
   const totalsByCustomer = new Map<string, number>();
-  for (const p of paymentsAllTimeRes.rows) {
-    const customerId = invoiceCustomer.get(p.invoice_id);
-    if (!customerId) continue;
+  for (const inv of paidInvoices) {
     totalsByCustomer.set(
-      customerId,
-      (totalsByCustomer.get(customerId) ?? 0) + (Number(p.amount) || 0)
+      inv.customer_id,
+      (totalsByCustomer.get(inv.customer_id) ?? 0) + (Number(inv.amount) || 0)
     );
   }
 

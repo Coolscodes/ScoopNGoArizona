@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "scoopngo": {
+      "command": "node",
+      "args": ["scoopngo-mcp-server/dist/index.js"]
+    }
+  }
+}

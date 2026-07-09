@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
 import { getCurrentUser, getCurrentTechnician } from '@/lib/auth';
-import { NavBar } from '@/components/ui';
+import { NavBar, AutoRefresh } from '@/components/ui';
 
 export default async function HubLayout({ children }: { children: React.ReactNode }) {
   const user = await getCurrentUser();
@@ -12,6 +12,7 @@ export default async function HubLayout({ children }: { children: React.ReactNod
   return (
     <div>
       <NavBar name={name} />
+      <AutoRefresh />
       <main className="max-w-6xl mx-auto px-6 py-7">{children}</main>
     </div>
   );

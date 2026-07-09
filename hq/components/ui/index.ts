@@ -12,3 +12,4 @@ export { Avatar } from './Avatar';
 export { ToastProvider, useToast } from './Toast';
 export { PageHeader } from './PageHeader';
 export { NavBar } from './NavBar';
+export { AutoRefresh } from './AutoRefresh';

@@ -20,6 +20,7 @@ interface EligibleClient {
   email: string | null;
   paidThisWeek: boolean;
   openThisWeek: number | null;
+  autoCharge: boolean;
 }
 
 interface ChargeRunResult {
@@ -121,6 +122,16 @@ export function ChargeClientsModal({
       if (disarmTimer.current) clearTimeout(disarmTimer.current);
     };
   }, []);
+
+  // Escape closes the modal (unless a charge run is in flight).
+  useEffect(() => {
+    if (!open) return;
+    function onKey(e: KeyboardEvent) {
+      if (e.key === 'Escape' && !submitting) onClose();
+    }
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [open, submitting, onClose]);
 
   const visible = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -243,6 +254,9 @@ export function ChargeClientsModal({
       <div
         className="m-auto w-full max-w-2xl px-4"
         onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Charge clients"
       >
         <div className="bg-white rounded-card border border-line flex flex-col max-h-[88vh]">
           {/* Header */}
@@ -281,7 +295,8 @@ export function ChargeClientsModal({
                       disarm();
                       setDayFilter(e.target.value);
                     }}
-                    className="border-2 border-line rounded-[7px] px-2.5 py-1.5 text-sm bg-white"
+                    aria-label="Filter by service day"
+                    className="border-2 border-line rounded-[7px] px-2.5 py-1.5 text-sm bg-white text-ink"
                   >
                     <option value="today">Today&apos;s clients</option>
                     <option value="all">All active clients</option>
@@ -298,6 +313,7 @@ export function ChargeClientsModal({
                       setSearch(e.target.value);
                     }}
                     placeholder="Search name…"
+                    aria-label="Search clients by name"
                     className="border-2 border-line rounded-[7px] px-2.5 py-1.5 text-sm flex-1 min-w-[140px]"
                   />
                   <Button size="sm" onClick={() => toggleAll(true)}>
@@ -337,6 +353,7 @@ export function ChargeClientsModal({
                             checked={r.checked && c.hasCard}
                             disabled={!c.hasCard}
                             onChange={(e) => setRow(c.id, { checked: e.target.checked })}
+                            aria-label={`Charge ${c.name}`}
                             className="w-4 h-4 accent-brand shrink-0"
                           />
                           <div className="flex-1 min-w-[130px]">
@@ -348,6 +365,14 @@ export function ChargeClientsModal({
                                 'No schedule'}
                             </span>
                           </div>
+                          {c.autoCharge && (
+                            <span
+                              title="Auto-charge on visit completion is on for this client"
+                              className="text-[0.7rem] font-bold rounded-full px-2 py-0.5 bg-brand/10 text-brand-dark whitespace-nowrap"
+                            >
+                              ⚡ Auto
+                            </span>
+                          )}
                           {c.paidThisWeek && (
                             <span className="text-[0.7rem] font-bold rounded-full px-2 py-0.5 bg-brand-light text-brand-dark whitespace-nowrap">
                               ✓ Paid this week
@@ -378,12 +403,14 @@ export function ChargeClientsModal({
                               type="number"
                               min={1}
                               step="0.01"
+                              inputMode="decimal"
                               value={r.amount}
                               disabled={!c.hasCard}
                               onChange={(e) => setRow(c.id, { amount: e.target.value })}
                               placeholder="0.00"
+                              aria-label={`Charge amount for ${c.name}`}
                               className={
-                                'w-20 border-2 rounded-[7px] px-2 py-1 text-sm font-heading font-bold text-brand ' +
+                                'w-20 border-2 rounded-[7px] px-2 py-1 text-sm font-heading font-bold text-brand tabular-nums ' +
                                 (amountBad ? 'border-danger' : 'border-line')
                               }
                             />

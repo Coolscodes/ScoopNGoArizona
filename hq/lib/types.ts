@@ -47,6 +47,7 @@ export interface Customer {
   portal_token?: string; // new (customer portal)
   route_order?: number; // new: standing position within their day's route
   flags?: string[]; // new: admin flags (e.g. "dog aggressive", "cash only")
+  auto_charge?: boolean; // new: charge card on file when a visit is completed (migration 003)
 }
 
 export interface Dog {

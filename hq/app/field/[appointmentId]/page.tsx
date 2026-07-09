@@ -130,6 +130,7 @@ export default async function VisitPage({
         customerId={customer.id}
         customerName={name}
         alreadyCompleted={appointment.status === 'completed'}
+        autoCharge={Boolean(customer.auto_charge)}
       />
     </div>
   );

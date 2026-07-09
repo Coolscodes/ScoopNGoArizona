@@ -32,17 +32,21 @@ function WeeklyBars({ data }: { data: WeeklyVisitPoint[] }) {
   const height = 220;
   const barGap = 14;
   const barWidth = (width - barGap * (data.length - 1)) / data.length;
-  const chartHeight = 150;
-  const baseline = chartHeight + 10;
+  const chartHeight = 140;
+  // Headroom above the tallest bar: the count label sits 8px above it and the
+  // red issue dot 20px above with a 6px radius, so it needs ~26px of clearance.
+  const topPad = 36;
+  const baseline = topPad + chartHeight;
 
   return (
     <div>
-      <svg
-        viewBox={`0 0 ${width} ${height}`}
-        className="w-full h-auto"
-        role="img"
-        aria-label="Weekly visits bar chart"
-      >
+      <div className="overflow-x-auto overscroll-x-contain">
+        <svg
+          viewBox={`0 0 ${width} ${height}`}
+          className="w-full h-auto min-w-[560px]"
+          role="img"
+          aria-label="Weekly visits bar chart"
+        >
         {data.map((d, i) => {
           const barHeight = max > 0 ? (d.count / max) * chartHeight : 0;
           const x = i * (barWidth + barGap);
@@ -105,7 +109,8 @@ function WeeklyBars({ data }: { data: WeeklyVisitPoint[] }) {
           className="stroke-line"
           strokeWidth={1}
         />
-      </svg>
+        </svg>
+      </div>
       <div className="flex items-center gap-2 mt-2 text-[0.72rem] text-muted">
         <span className="inline-block w-2.5 h-2.5 rounded-full bg-danger" />
         red dot = visits with a flagged issue that week

@@ -24,13 +24,20 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   const show = useCallback((message: string, tone: ToastTone = 'success') => {
     const id = Date.now() + Math.random();
     setItems((prev) => [...prev, { id, message, tone }]);
-    setTimeout(() => setItems((prev) => prev.filter((t) => t.id !== id)), 3500);
+    // Errors carry follow-up detail (declined cards, failed saves), give them
+    // longer on screen.
+    const ttl = tone === 'error' ? 6500 : 3500;
+    setTimeout(() => setItems((prev) => prev.filter((t) => t.id !== id)), ttl);
   }, []);
 
   return (
     <ToastContext.Provider value={show}>
       {children}
-      <div className="fixed bottom-5 right-5 z-[100] flex flex-col gap-2">
+      <div
+        role="status"
+        aria-live="polite"
+        className="fixed bottom-5 right-5 z-[100] flex flex-col gap-2"
+      >
         {items.map((t) => (
           <div
             key={t.id}

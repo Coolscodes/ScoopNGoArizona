@@ -18,7 +18,9 @@ export function MonthlyRevenueChart({ data }: { data: MonthlyRevenuePoint[] }) {
             hint="Payments collected each month will show up here."
           />
         ) : (
-          <MonthlyBars data={data} />
+          <div className="overflow-x-auto overscroll-x-contain">
+            <MonthlyBars data={data} />
+          </div>
         )}
       </CardBody>
     </Card>
@@ -31,13 +33,16 @@ function MonthlyBars({ data }: { data: MonthlyRevenuePoint[] }) {
   const height = 220;
   const barGap = 24;
   const barWidth = (width - barGap * (data.length - 1)) / data.length;
-  const chartHeight = 160;
-  const baseline = chartHeight + 10;
+  const chartHeight = 150;
+  // Headroom above the tallest bar so its value label isn't clipped by the
+  // viewBox (label sits 8px above the bar and the 12px text ascends from there).
+  const topPad = 26;
+  const baseline = topPad + chartHeight;
 
   return (
     <svg
       viewBox={`0 0 ${width} ${height}`}
-      className="w-full h-auto"
+      className="w-full h-auto min-w-[480px]"
       role="img"
       aria-label="Monthly revenue bar chart"
     >

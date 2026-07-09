@@ -35,6 +35,7 @@
 
 import { NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase';
+import { autoChargeOnCompletion, type AutoChargeOutcome } from '@/lib/charge-core';
 import { getCurrentTechnician } from '@/lib/auth';
 import { uploadVisitPhoto, decodeDataUrl } from '@/lib/storage';
 import type { ServiceLog } from '@/lib/types';
@@ -47,6 +48,7 @@ interface VisitInput {
   notes: string | null;
   issue_flagged: boolean;
   issue_details: string | null;
+  no_charge: boolean; // completed, but paid another way: skip auto-charge
   photoDataUrl: string | null;
   photoFile: File | null;
 }
@@ -73,6 +75,7 @@ async function parseInput(request: Request): Promise<VisitInput> {
       notes: cleanStr(form.get('notes')),
       issue_flagged: asBool(form.get('issue_flagged')),
       issue_details: cleanStr(form.get('issue_details')),
+      no_charge: asBool(form.get('no_charge')),
       photoDataUrl: null,
       photoFile: photo instanceof File && photo.size > 0 ? photo : null,
     };
@@ -86,6 +89,7 @@ async function parseInput(request: Request): Promise<VisitInput> {
     notes: cleanStr(body.notes),
     issue_flagged: asBool(body.issue_flagged),
     issue_details: cleanStr(body.issue_details),
+    no_charge: asBool(body.no_charge),
     photoDataUrl: photo && photo.startsWith('data:') ? photo : null,
     photoFile: null,
   };
@@ -153,12 +157,21 @@ export async function POST(request: Request) {
       if (apptError) throw apptError;
     }
 
+    // 4) Charge-on-completion for opted-in clients, unless the tech marked
+    //    this visit "paid another way". Billing problems never block the
+    //    completion (the failure email + AR invoice handle follow-up).
+    let chargeOutcome: AutoChargeOutcome | null = null;
+    if (!input.no_charge) {
+      chargeOutcome = await autoChargeOnCompletion(input.customer_id);
+    }
+
     return NextResponse.json(
       {
         ok: true,
         service_log: serviceLog as ServiceLog,
         appointment_id: input.appointmentId,
         photo_url: photoUrl,
+        charge: chargeOutcome,
       },
       { status: 201 }
     );

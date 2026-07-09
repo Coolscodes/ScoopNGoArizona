@@ -4,10 +4,10 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Scoop N Go Arizona | Dog Waste Removal Service</title>
-  <meta name="description" content="Professional dog waste removal serving the East Valley of Arizona. Weekly, bi-weekly, monthly and one-time cleanup services. Fully insured. Serving Gilbert, Chandler, Mesa, Tempe, Scottsdale, Queen Creek and more."/>
+  <meta name="description" content="Professional dog waste removal serving the East Valley of Arizona. First cleanup FREE when you prepay your first 4 weeks of recurring service. Weekly, bi-weekly, monthly and one-time cleanups. Fully insured. Serving Gilbert, Chandler, Mesa, Tempe, Scottsdale, Queen Creek and more."/>
   <link rel="canonical" href="https://scoopngoarizona.com"/>
   <meta property="og:title" content="Scoop N Go Arizona | Dog Waste Removal Service"/>
-  <meta property="og:description" content="Never pick up dog poop again! Professional, reliable yard waste removal serving the East Valley. Fully insured. Get a free quote today."/>
+  <meta property="og:description" content="Never pick up dog poop again! First cleanup FREE when you sign up for recurring service and prepay your first 4 weeks. Professional, reliable yard waste removal serving the East Valley. Fully insured."/>
   <meta property="og:image" content="https://scoopngoarizona.com/Scoopngologo.png"/>
   <meta property="og:url" content="https://scoopngoarizona.com"/>
   <meta property="og:type" content="website"/>
@@ -66,7 +66,12 @@
       {
         "@type": "Question",
         "name": "How much does dog waste removal cost?",
-        "acceptedAnswer": { "@type": "Answer", "text": "Weekly service starts at $15/visit for 1 dog. Bi-weekly starts at $25 and monthly starts at $45. Use our pricing configurator on the website to get an exact price based on your number of dogs and preferred frequency." }
+        "acceptedAnswer": { "@type": "Answer", "text": "Weekly service starts at $15/visit for 1 dog. Bi-weekly starts at $25 and monthly starts at $45. Recurring plans bill your first 4 weeks at signup and your first cleanup is free. Use our pricing configurator on the website to get an exact price based on your number of dogs and preferred frequency." }
+      },
+      {
+        "@type": "Question",
+        "name": "Is the first cleanup really free?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Yes! Sign up for any recurring plan (weekly, bi-weekly, or monthly) and pay for your first 4 weeks up front, and your very first cleanup is completely free, no matter how big or small the job is. On a weekly plan that means 5 visits for the price of 4." }
       },
       {
         "@type": "Question",
@@ -110,6 +115,7 @@
     }
     html { scroll-behavior: smooth; }
     body { font-family: var(--font-body); color: var(--ink); line-height: 1.65; background: var(--cream); }
+    .ic { flex-shrink: 0; display: inline-block; vertical-align: -.18em; }
     section { scroll-margin-top: 90px; }
     img { max-width: 100%; height: auto; display: block; }
 
@@ -197,7 +203,8 @@
     .how-card { position: relative; background: var(--cream); border: 1px solid var(--line); border-radius: 20px; padding: 2.2rem 1.8rem 1.9rem; transition: transform .25s, box-shadow .25s; }
     .how-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-md); }
     .how-num { position: absolute; top: -18px; left: 1.6rem; width: 40px; height: 40px; border-radius: 12px; background: var(--orange); color: #fff; font-family: var(--font-display); font-weight: 800; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 6px 16px rgba(232,132,44,.4); }
-    .how-icon { font-size: 2.1rem; margin-bottom: .9rem; }
+    .how-icon { color: var(--pine); margin-bottom: .9rem; }
+    .how-icon svg { width: 34px; height: 34px; }
     .how-card h3 { font-family: var(--font-display); font-size: 1.12rem; font-weight: 700; color: var(--pine-deep); margin-bottom: .5rem; }
     .how-card p { font-size: .92rem; color: var(--mid); }
 
@@ -206,7 +213,8 @@
     .service-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.6rem; }
     .service-card { background: var(--white); border-radius: 20px; overflow: hidden; border: 1px solid var(--line); box-shadow: var(--shadow-sm); transition: box-shadow .25s, transform .25s; display: flex; flex-direction: column; }
     .service-card:hover { box-shadow: var(--shadow-md); transform: translateY(-5px); }
-    .service-img { height: 150px; display: flex; align-items: center; justify-content: center; font-size: 3.6rem; position: relative; }
+    .service-img { height: 150px; display: flex; align-items: center; justify-content: center; position: relative; color: var(--pine-deep); }
+    .service-img svg { width: 56px; height: 56px; }
     .service-img.green  { background: linear-gradient(135deg, #dcebd4, #b9d8ab); }
     .service-img.orange { background: linear-gradient(135deg, #fbe6cd, #f5c791); }
     .service-img.blue   { background: linear-gradient(135deg, #ddeef4, #b5d8e6); }
@@ -217,6 +225,10 @@
     /* ---------- Pricing configurator ---------- */
     .pricing { background: var(--white); padding: 84px 5%; position: relative; overflow: hidden; }
     .pricing::before { content: '🐾'; position: absolute; font-size: 14rem; opacity: .04; top: 40px; left: -40px; transform: rotate(-20deg); }
+    .offer-banner { max-width: 660px; margin: 0 auto 2.2rem; background: linear-gradient(120deg, var(--orange) 0%, var(--orange-deep) 100%); color: #fff; border-radius: 18px; padding: 1.05rem 1.6rem; text-align: center; font-family: var(--font-display); font-weight: 700; font-size: 1.02rem; box-shadow: 0 8px 24px rgba(232,132,44,.3); position: relative; }
+    .offer-banner strong { font-weight: 800; }
+    .offer-banner .sub { display: block; font-family: var(--font-body); font-weight: 500; font-size: .82rem; opacity: .93; margin-top: .3rem; }
+    .hero-offer { display: inline-flex; align-items: center; gap: .5rem; background: var(--orange-soft); border: 1.5px solid var(--orange); color: var(--orange-deep); border-radius: 999px; padding: .45rem 1.1rem; font-size: .86rem; font-weight: 700; margin-bottom: 1.3rem; }
     .pricing-configurator { max-width: 660px; margin: 0 auto; background: var(--cream); border-radius: 24px; border: 1px solid var(--line); overflow: hidden; box-shadow: var(--shadow-lg); position: relative; }
     .config-step { padding: 1.7rem 2.2rem; border-bottom: 1px solid var(--line); }
     .config-label { font-family: var(--font-display); font-size: .95rem; font-weight: 700; color: var(--pine-deep); margin-bottom: 1rem; display: flex; align-items: baseline; gap: .5rem; flex-wrap: wrap; }
@@ -238,6 +250,7 @@
     .price-monthly { font-family: var(--font-display); font-size: 1rem; font-weight: 700; color: #f5b56e; text-align: right; }
     .price-includes { display: flex; flex-wrap: wrap; gap: .5rem .6rem; margin-bottom: 1.6rem; }
     .price-includes span { font-size: .78rem; font-weight: 600; background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.16); border-radius: 999px; padding: .3rem .8rem; }
+    .price-includes span.free-badge { background: var(--orange); border-color: var(--orange); font-weight: 800; }
     .price-cta { width: 100%; padding: 1.05rem; background: var(--orange); color: #fff; border: none; border-radius: 999px; font-family: var(--font-display); font-size: 1.1rem; font-weight: 800; cursor: pointer; transition: background .2s, transform .15s; box-shadow: 0 8px 24px rgba(0,0,0,.25); }
     .price-cta:hover:not(:disabled) { background: var(--orange-deep); transform: translateY(-2px); }
     .price-cta:disabled { opacity: .7; cursor: not-allowed; }
@@ -267,7 +280,8 @@
     .why-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.4rem; }
     .why-card { background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.12); border-radius: 18px; padding: 1.8rem; transition: background .25s, transform .25s; }
     .why-card:hover { background: rgba(255,255,255,.11); transform: translateY(-4px); }
-    .why-icon { width: 48px; height: 48px; border-radius: 13px; background: rgba(232,132,44,.2); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 1rem; }
+    .why-icon { width: 48px; height: 48px; border-radius: 13px; background: rgba(232,132,44,.2); display: flex; align-items: center; justify-content: center; color: #f5b56e; margin-bottom: 1rem; }
+    .why-icon svg { width: 24px; height: 24px; }
     .why-card h3 { font-family: var(--font-display); font-size: 1.02rem; font-weight: 700; margin-bottom: .45rem; }
     .why-card p { font-size: .89rem; opacity: .78; }
 
@@ -346,6 +360,7 @@
     .areas .section-header { margin-bottom: 2rem; }
     .areas-list { display: flex; flex-wrap: wrap; justify-content: center; gap: .6rem; max-width: 900px; margin: 0 auto; }
     .area-chip { background: var(--white); border: 1px solid var(--line); border-radius: 999px; padding: .5rem 1.2rem; font-size: .88rem; font-weight: 600; color: var(--pine-deep); transition: all .2s; display: inline-flex; align-items: center; gap: .4rem; }
+    .area-chip .pin { width: 14px; height: 14px; color: var(--orange-deep); }
     .area-chip:hover { background: var(--orange-soft); border-color: var(--orange); color: var(--orange-deep); transform: translateY(-2px); }
     .areas-note { margin-top: 1.6rem; font-size: .9rem; color: var(--mid); }
     .areas-note a { color: var(--orange-deep); font-weight: 700; text-decoration: none; }
@@ -404,14 +419,21 @@
 </head>
 <body>
 
+<!-- Shared SVG symbols -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="pin-ic" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-5.5-7-11a7 7 0 0 1 14 0c0 5.5-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></g></symbol>
+  </defs>
+</svg>
+
 <!-- Sticky mobile action bar -->
 <div class="sticky-call">
-  <a class="call" href="tel:+16026220238">📞 Call Now</a>
+  <a class="call" href="tel:+16026220238"><svg class="ic" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 2 .7 2.9a2 2 0 0 1-.5 2.1L8.1 10a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.9.5 2.9.7a2 2 0 0 1 1.6 2z"/></svg> Call Now</a>
   <a class="quote" href="#pricing">Get My Price</a>
 </div>
 
 <div class="top-bar">
-  📞 <a href="tel:+16026220238">602-622-0238</a><span class="dot">•</span><span class="hide-sm">Serving the East Valley<span class="dot">•</span></span><a class="quote-link" href="#contact">Get a Free Quote →</a>
+  <svg class="ic" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 2 .7 2.9a2 2 0 0 1-.5 2.1L8.1 10a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.9.5 2.9.7a2 2 0 0 1 1.6 2z"/></svg> <a href="tel:+16026220238">602-622-0238</a><span class="dot">•</span><span class="hide-sm">Serving the East Valley<span class="dot">•</span></span><a class="quote-link" href="#contact">Get a Free Quote →</a>
 </div>
 
 <nav>
@@ -446,9 +468,10 @@
       <div class="hero-rating reveal in"><span class="stars">★★★★★</span> Loved by East Valley dog owners</div>
       <h1 class="reveal in">Never pick up<br/>dog poop <em>again.<svg viewBox="0 0 200 14" preserveAspectRatio="none"><path d="M3 11 C 60 2, 140 2, 197 8" stroke="#e8842c" stroke-width="5" fill="none" stroke-linecap="round"/></svg></em></h1>
       <p class="lede reveal in reveal-d1">Professional, reliable dog waste removal across the East Valley. We scoop it, double-bag it, and leave your yard spotless. You just enjoy it.</p>
+      <div class="reveal in reveal-d1"><span class="hero-offer">🎉 New client special: <strong>First cleanup FREE</strong> with any prepaid recurring plan</span></div>
       <div class="hero-btns reveal in reveal-d2">
         <a href="#pricing" class="btn-primary">Get My Price →</a>
-        <a href="tel:+16026220238" class="btn-ghost">📞 602-622-0238</a>
+        <a href="tel:+16026220238" class="btn-ghost"><svg class="ic" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 2 .7 2.9a2 2 0 0 1-.5 2.1L8.1 10a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.9.5 2.9.7a2 2 0 0 1 1.6 2z"/></svg> 602-622-0238</a>
       </div>
       <div class="hero-checks reveal in reveal-d3">
         <span><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="8" fill="#4c8f4a"/><path d="M4.5 8.2 7 10.5l4.5-5" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Fully Insured</span>
@@ -460,7 +483,7 @@
     <div class="hero-visual reveal in reveal-d1">
       <img src="Scoopngologo.png" alt="Scoop N Go Arizona, weekly dog poop cleanup mascot" width="400" height="400"/>
       <div class="hero-chip chip-1">Starting at <span class="big">$15</span>/visit</div>
-      <div class="hero-chip chip-2">📸 Gate photo, every visit</div>
+      <div class="hero-chip chip-2"><svg class="ic" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#c96a15" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8a2 2 0 0 1 2-2h2l1.2-1.6A1 1 0 0 1 9 4h6a1 1 0 0 1 .8.4L17 6h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8Z"/><circle cx="12" cy="12.5" r="3.2"/></svg> Gate photo, every visit</div>
     </div>
   </div>
   <svg class="hero-wave" viewBox="0 0 1440 70" preserveAspectRatio="none" aria-hidden="true"><path d="M0,40 C240,75 480,5 720,25 C960,45 1200,70 1440,30 L1440,70 L0,70 Z" fill="#ffffff"/></svg>
@@ -474,9 +497,9 @@
       <p class="section-sub">From messy yard to spotless in three easy steps. No contracts, no hassle, no gross Saturday chores.</p>
     </div>
     <div class="how-grid">
-      <div class="how-card reveal"><div class="how-num">1</div><div class="how-icon">📱</div><h3>Pick Your Plan</h3><p>Use the price builder below to choose weekly, bi-weekly, monthly, or one-time service. See your exact price instantly and subscribe online in under a minute.</p></div>
-      <div class="how-card reveal reveal-d1"><div class="how-num">2</div><div class="how-icon">🧹</div><h3>We Scoop &amp; Sanitize</h3><p>Your tech texts you on the way, does a full-yard sweep, and double-bags everything into your outdoor trash bin, or adds haul-away and we take it with us. Equipment is sanitized between every yard.</p></div>
-      <div class="how-card reveal reveal-d2"><div class="how-num">3</div><div class="how-icon">📸</div><h3>Gate Photo &amp; Done</h3><p>You get a "job complete" text with a photo of your securely closed gate. Let the dogs out, the yard is clean and your weekend is yours.</p></div>
+      <div class="how-card reveal"><div class="how-num">1</div><div class="how-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 21v-5"/><path d="M4 12V3"/><path d="M12 21v-9"/><path d="M12 8V3"/><path d="M20 21v-7"/><path d="M20 10V3"/><circle cx="4" cy="14" r="2"/><circle cx="12" cy="10" r="2"/><circle cx="20" cy="12" r="2"/></svg></div><h3>Pick Your Plan</h3><p>Use the price builder below to choose weekly, bi-weekly, monthly, or one-time service. See your exact price instantly and subscribe online in under a minute.</p></div>
+      <div class="how-card reveal reveal-d1"><div class="how-num">2</div><div class="how-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5l1.7 4.8 4.8 1.7-4.8 1.7L12 16.5l-1.7-4.8-4.8-1.7 4.8-1.7L12 3.5z"/><path d="M19 15.5v3"/><path d="M17.5 17h3"/><path d="M5 17.5v3"/><path d="M3.5 19h3"/></svg></div><h3>We Scoop &amp; Sanitize</h3><p>Your tech texts you on the way, does a full-yard sweep, and double-bags everything into your outdoor trash bin, or adds haul-away and we take it with us. Equipment is sanitized between every yard.</p></div>
+      <div class="how-card reveal reveal-d2"><div class="how-num">3</div><div class="how-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8a2 2 0 0 1 2-2h2l1.2-1.6A1 1 0 0 1 9 4h6a1 1 0 0 1 .8.4L17 6h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8Z"/><circle cx="12" cy="12.5" r="3.2"/></svg></div><h3>Gate Photo &amp; Done</h3><p>You get a "job complete" text with a photo of your securely closed gate. Let the dogs out, the yard is clean and your weekend is yours.</p></div>
     </div>
   </div>
 </section>
@@ -485,9 +508,9 @@
   <div class="section-inner">
     <div class="section-header reveal"><span class="section-label">What We Offer</span><h2>Services Built for AZ Dog Owners</h2></div>
     <div class="service-grid">
-      <div class="service-card reveal"><div class="service-img green">🏡</div><div class="service-body"><h3>Recurring Waste Removal</h3><p>We keep your backyard clean and safe on a regular schedule, weekly, bi-weekly, or monthly, so you and your dogs can enjoy the space worry-free.</p></div></div>
-      <div class="service-card reveal reveal-d1"><div class="service-img orange">🧹</div><div class="service-body"><h3>One-Time Cleanups</h3><p>Moving in, hosting a party, or just overdue for a cleanout? We'll do a full yard cleanup and leave it spotless, no recurring commitment needed.</p></div></div>
-      <div class="service-card reveal reveal-d2"><div class="service-img blue">✨</div><div class="service-body"><h3>Deodorizer Treatment</h3><p>After we scoop, we can apply a pet-safe deodorizer to treated areas so your yard smells as fresh as it looks. Big help in the summer heat.</p></div></div>
+      <div class="service-card reveal"><div class="service-img green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M10 21v-6h4v6"/></svg></div><div class="service-body"><h3>Recurring Waste Removal</h3><p>We keep your backyard clean and safe on a regular schedule, weekly, bi-weekly, or monthly, so you and your dogs can enjoy the space worry-free.</p></div></div>
+      <div class="service-card reveal reveal-d1"><div class="service-img orange"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16"/><path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/><path d="M6 7l1 13h10l1-13"/><path d="M10 11v5"/><path d="M14 11v5"/></svg></div><div class="service-body"><h3>One-Time Cleanups</h3><p>Moving in, hosting a party, or just overdue for a cleanout? We'll do a full yard cleanup and leave it spotless, no recurring commitment needed.</p></div></div>
+      <div class="service-card reveal reveal-d2"><div class="service-img blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 4.5l1.9 5.6 5.6 1.9-5.6 1.9L11 19.5l-1.9-5.6-5.6-1.9 5.6-1.9L11 4.5z"/><path d="M19.5 3v4"/><path d="M17.5 5h4"/></svg></div><div class="service-body"><h3>Deodorizer Treatment</h3><p>After we scoop, we can apply a pet-safe deodorizer to treated areas so your yard smells as fresh as it looks. Big help in the summer heat.</p></div></div>
     </div>
   </div>
 </section>
@@ -499,6 +522,8 @@
       <h2>Build Your Plan</h2>
       <p class="section-sub">Customize your service and see your exact price instantly. No quotes to wait on, no surprises.</p>
     </div>
+
+    <div class="offer-banner reveal">🎉 New Client Special: <strong>Your first cleanup is FREE</strong> when you sign up for recurring service and prepay your first 4 weeks.<span class="sub">No matter how big or small the first job is. On a weekly plan that is 5 visits for the price of 4.</span></div>
 
     <div class="pricing-configurator reveal">
       <!-- Step 1: Frequency -->
@@ -552,14 +577,15 @@
           <div class="price-monthly" id="priceMonthly"></div>
         </div>
         <div class="price-includes">
+          <span class="free-badge" id="freeCleanInclude">🎉 First cleanup FREE</span>
           <span>✓ Full yard scoop</span>
           <span id="wasteInclude">✓ Double-bagged in your bin</span>
           <span>✓ Gate secured</span>
           <span>✓ Service text</span>
           <span id="deodInclude" style="display:none;">✓ Deodorizer</span>
         </div>
-        <button class="price-cta" id="priceCta" onclick="doSubscribe()">Subscribe Online →</button>
-        <p class="price-fineprint">🔒 Powered by Stripe · Cancel anytime · No contracts</p>
+        <button class="price-cta" id="priceCta" onclick="doSubscribe()">Subscribe · First Cleanup FREE →</button>
+        <p class="price-fineprint"><svg class="ic" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg> Powered by Stripe · First 4 weeks billed at signup · Cancel anytime · No contracts</p>
       </div>
     </div>
   </div>
@@ -595,12 +621,12 @@
       <h2>Why Scoop N Go Arizona?</h2>
     </div>
     <div class="why-grid">
-      <div class="why-card reveal"><div class="why-icon">📸</div><h3>Gate Photos</h3><p>We send a photo after every visit confirming your gate is securely closed. Peace of mind, every time.</p></div>
-      <div class="why-card reveal reveal-d1"><div class="why-icon">📱</div><h3>Service Notifications</h3><p>You'll get a text when we're on our way and again when we're done. No guessing, no surprises.</p></div>
-      <div class="why-card reveal reveal-d2"><div class="why-icon">🐕</div><h3>Pet Safety First</h3><p>We sanitize our equipment after every yard to minimize the spread of germs and keep your pets healthy.</p></div>
-      <div class="why-card reveal"><div class="why-icon">💯</div><h3>Satisfaction Guaranteed</h3><p>If you're not 100% satisfied, contact us within 24 hours and we'll make it right. No fuss, no hassle.</p></div>
-      <div class="why-card reveal reveal-d1"><div class="why-icon">📅</div><h3>Flexible Scheduling</h3><p>Weekly, bi-weekly, or one-time. We work around your schedule so you never have to worry about it.</p></div>
-      <div class="why-card reveal reveal-d2"><div class="why-icon">🤝</div><h3>No Contract Required</h3><p>No long-term commitments. Start or stop service whenever you need. We earn your business every visit.</p></div>
+      <div class="why-card reveal"><div class="why-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8a2 2 0 0 1 2-2h2l1.2-1.6A1 1 0 0 1 9 4h6a1 1 0 0 1 .8.4L17 6h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8Z"/><circle cx="12" cy="12.5" r="3.2"/></svg></div><h3>Gate Photos</h3><p>We send a photo after every visit confirming your gate is securely closed. Peace of mind, every time.</p></div>
+      <div class="why-card reveal reveal-d1"><div class="why-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.5 8.5 0 0 1-8.5 8.5c-1.5 0-3-.4-4.2-1.1L3 20l1.1-5.3A8.5 8.5 0 1 1 21 11.5z"/><path d="M8.5 11.5h.01"/><path d="M12.5 11.5h.01"/><path d="M16.5 11.5h.01"/></svg></div><h3>Service Notifications</h3><p>You'll get a text when we're on our way and again when we're done. No guessing, no surprises.</p></div>
+      <div class="why-card reveal reveal-d2"><div class="why-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l7 3v5c0 4.5-3 8.2-7 10-4-1.8-7-5.5-7-10V6l7-3z"/><path d="M9 11.5l2 2 4-4.5"/></svg></div><h3>Pet Safety First</h3><p>We sanitize our equipment after every yard to minimize the spread of germs and keep your pets healthy.</p></div>
+      <div class="why-card reveal"><div class="why-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 11v9"/><path d="M7 11.5l4.2-7.5c.9 0 1.9.8 1.9 2l-.7 3.5H18a2 2 0 0 1 2 2.4l-1.1 5.6A2 2 0 0 1 17 19H7"/></svg></div><h3>Satisfaction Guaranteed</h3><p>If you're not 100% satisfied, contact us within 24 hours and we'll make it right. No fuss, no hassle.</p></div>
+      <div class="why-card reveal reveal-d1"><div class="why-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4"/><path d="M16 3v4"/><path d="M3 10h18"/></svg></div><h3>Flexible Scheduling</h3><p>Weekly, bi-weekly, or one-time. We work around your schedule so you never have to worry about it.</p></div>
+      <div class="why-card reveal reveal-d2"><div class="why-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 7.7-1.4"/></svg></div><h3>No Contract Required</h3><p>No long-term commitments. Start or stop service whenever you need. We earn your business every visit.</p></div>
     </div>
   </div>
 </section>
@@ -657,7 +683,8 @@
       <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">How often do you visit? <span class="faq-arrow">▼</span></button><div class="faq-a"><div>We offer weekly, bi-weekly, and one-time cleanups. Most customers love weekly service to keep the yard consistently clean and odor-free.</div></div></div>
       <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">Do I need to be home when you come? <span class="faq-arrow">▼</span></button><div class="faq-a"><div>Not at all! As long as we can access your yard, we'll handle everything. You'll get a text when we're done, plus a photo of your closed and secured gate, so you always know the job is complete.</div></div></div>
       <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">What do you do with the waste? <span class="faq-arrow">▼</span></button><div class="faq-a"><div>We scoop everything and double-bag it, then place it neatly in your outdoor trash can, no extra charge. Want it gone completely? Add haul-away ($5/visit weekly, $10 bi-weekly, $15 monthly) and we'll take it off your property. Either way, you never touch it.</div></div></div>
-      <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">How much does it cost? <span class="faq-arrow">▼</span></button><div class="faq-a"><div>Weekly service starts at $15/visit for 1 dog. Bi-weekly starts at $25 and monthly starts at $45. Additional dogs are just a few dollars more. Use the pricing configurator above to get your exact price instantly!</div></div></div>
+      <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">How much does it cost? <span class="faq-arrow">▼</span></button><div class="faq-a"><div>Weekly service starts at $15/visit for 1 dog. Bi-weekly starts at $25 and monthly starts at $45. Additional dogs are just a few dollars more. Recurring plans bill your first 4 weeks at signup and your first cleanup is free. Use the pricing configurator above to get your exact price instantly!</div></div></div>
+      <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">Is the first cleanup really free? <span class="faq-arrow">▼</span></button><div class="faq-a"><div>Yes! Sign up for any recurring plan (weekly, bi-weekly, or monthly) and pay for your first 4 weeks up front, and your very first cleanup is completely free, no matter how big or small the job is. On a weekly plan that means 5 visits for the price of 4.</div></div></div>
       <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">What areas do you serve? <span class="faq-arrow">▼</span></button><div class="faq-a"><div>We serve the entire East Valley: Gilbert, Chandler, Mesa, Tempe, Scottsdale, Queen Creek, San Tan Valley, Ahwatukee, and surrounding communities. Not sure if we cover your zip? Just ask!</div></div></div>
       <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">Is there a contract or long-term commitment? <span class="faq-arrow">▼</span></button><div class="faq-a"><div>No contracts required! You can start or stop service at any time. We believe in earning your business with great service, not locking you in.</div></div></div>
     </div>
@@ -704,7 +731,7 @@
         </div>
         <button class="form-submit" id="submitBtn" onclick="handleSubmit()">🐾 Submit My Quote Request</button>
         <div class="form-error" id="formError"></div>
-        <p class="form-note">⚡ We typically respond within 2 hours. No spam, ever.</p>
+        <p class="form-note">We typically respond within 2 hours. No spam, ever.</p>
       </div>
     </div>
   </div>
@@ -714,9 +741,9 @@
   <div class="section-inner">
     <div class="section-header reveal"><span class="section-label">Service Areas</span><h2>Proudly Serving the East Valley</h2></div>
     <div class="areas-list reveal">
-      <span class="area-chip">📍 Gilbert</span><span class="area-chip">📍 Chandler</span><span class="area-chip">📍 Mesa</span>
-      <span class="area-chip">📍 Tempe</span><span class="area-chip">📍 Scottsdale</span><span class="area-chip">📍 Queen Creek</span>
-      <span class="area-chip">📍 San Tan Valley</span><span class="area-chip">📍 Ahwatukee</span><span class="area-chip">📍 Phoenix</span>
+      <span class="area-chip"><svg class="ic pin" aria-hidden="true"><use href="#pin-ic"/></svg> Gilbert</span><span class="area-chip"><svg class="ic pin" aria-hidden="true"><use href="#pin-ic"/></svg> Chandler</span><span class="area-chip"><svg class="ic pin" aria-hidden="true"><use href="#pin-ic"/></svg> Mesa</span>
+      <span class="area-chip"><svg class="ic pin" aria-hidden="true"><use href="#pin-ic"/></svg> Tempe</span><span class="area-chip"><svg class="ic pin" aria-hidden="true"><use href="#pin-ic"/></svg> Scottsdale</span><span class="area-chip"><svg class="ic pin" aria-hidden="true"><use href="#pin-ic"/></svg> Queen Creek</span>
+      <span class="area-chip"><svg class="ic pin" aria-hidden="true"><use href="#pin-ic"/></svg> San Tan Valley</span><span class="area-chip"><svg class="ic pin" aria-hidden="true"><use href="#pin-ic"/></svg> Ahwatukee</span><span class="area-chip"><svg class="ic pin" aria-hidden="true"><use href="#pin-ic"/></svg> Phoenix</span>
     </div>
     <p class="areas-note">Not sure if we cover your area? <a href="#contact">Send us your zip code →</a></p>
   </div>
@@ -731,9 +758,9 @@
     <div><h4>Services</h4><ul><li><a href="#services">Residential Removal</a></li><li><a href="#services">One-Time Cleanup</a></li><li><a href="#services">Deodorizer Treatment</a></li><li><a href="/tip">Leave a Tip</a></li></ul></div>
     <div><h4>Navigation</h4><ul><li><a href="#">Home</a></li><li><a href="#about">About Us</a></li><li><a href="#pricing">Pricing</a></li><li><a href="#testimonials">Reviews</a></li><li><a href="#contact">Contact Us</a></li></ul></div>
     <div><h4>Contact</h4><ul>
-      <li><a href="tel:+16026220238">📞 602-622-0238</a></li>
-      <li><a href="mailto:scoopngoarizona@gmail.com">✉️ scoopngoarizona@gmail.com</a></li>
-      <li style="color:#7e9077;font-size:.85rem;margin-top:.3rem;">🕕 Mon to Sat: 6am to 6pm</li>
+      <li><a href="tel:+16026220238"><svg class="ic" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 2 .7 2.9a2 2 0 0 1-.5 2.1L8.1 10a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.9.5 2.9.7a2 2 0 0 1 1.6 2z"/></svg> 602-622-0238</a></li>
+      <li><a href="mailto:scoopngoarizona@gmail.com"><svg class="ic" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg> scoopngoarizona@gmail.com</a></li>
+      <li style="color:#7e9077;font-size:.85rem;margin-top:.3rem;"><svg class="ic" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg> Mon to Sat: 6am to 6pm</li>
     </ul></div>
   </div>
   <div class="footer-bottom"><p>© <span id="year">2026</span> Scoop N Go Arizona. All Rights Reserved. Made with 🐾 in the East Valley.</p></div>
@@ -800,12 +827,17 @@
     document.getElementById('pricePerVisit').textContent = '$' + price;
     document.getElementById('pricePer').textContent = '/visit';
 
-    // Monthly estimate
+    // Billing estimate (recurring plans bill 4 weeks up front)
     if (_plan === 'onetime') {
       document.getElementById('priceMonthly').textContent = 'One-time visit';
+    } else if (_plan === 'monthly') {
+      document.getElementById('priceMonthly').textContent = '$' + monthly + ' billed monthly';
     } else {
-      document.getElementById('priceMonthly').textContent = '~$' + monthly + '/month (' + visits + ' visits)';
+      document.getElementById('priceMonthly').textContent = '$' + monthly + ' every 4 weeks (' + visits + ' visits)';
     }
+
+    // Free first cleanup badge (recurring plans only)
+    document.getElementById('freeCleanInclude').style.display = _plan === 'onetime' ? 'none' : 'inline';
 
     // Deodorizer include badge + button label
     document.getElementById('deodInclude').style.display = _deodorizer ? 'inline' : 'none';
@@ -821,7 +853,7 @@
       cta.textContent = 'Get a Quote →';
       cta.onclick = function() { document.getElementById('contact').scrollIntoView({behavior:'smooth'}); };
     } else {
-      cta.textContent = 'Subscribe Online →';
+      cta.textContent = 'Subscribe · First Cleanup FREE →';
       cta.onclick = doSubscribe;
     }
 
@@ -860,7 +892,7 @@
     var price = calcPrice();
     var cta = document.getElementById('priceCta');
     cta.disabled = true;
-    cta.textContent = '⏳ Loading...';
+    cta.textContent = 'Loading…';
     try {
       var label = (_dogs + ' dog' + (_dogs>1?'s':'')) + (_deodorizer ? ' + Deodorizer' : '') + (_haulAway ? ' + Haul-Away' : '');
       var r = await fetch('/api/stripe-subscription', {
@@ -880,7 +912,7 @@
       else throw new Error(data.error);
     } catch(err) {
       cta.disabled = false;
-      cta.textContent = 'Subscribe Online →';
+      cta.textContent = 'Subscribe · First Cleanup FREE →';
       alert('Something went wrong. Please call us at 602-622-0238.');
     }
   }
@@ -963,7 +995,7 @@
 
     var btn = document.getElementById('submitBtn');
     btn.disabled = true;
-    btn.textContent = '⏳ Sending your request...';
+    btn.textContent = 'Sending your request…';
 
     const response = await fetch(SUPABASE_URL + '/rest/v1/leads', {
       method: 'POST',

@@ -118,7 +118,7 @@ export function QuoteBuilder({ quote, baseUrl }: { quote: Quote; baseUrl: string
 
   return (
     <div className="grid gap-4 lg:grid-cols-[1fr_20rem] items-start">
-      <Card className="p-5">
+      <Card className="p-5 min-w-0">
         <div className="flex items-center justify-between mb-4">
           <div className="font-heading font-bold">Line items</div>
           <StatusPill status={status} />
