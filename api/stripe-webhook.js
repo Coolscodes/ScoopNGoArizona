@@ -117,6 +117,10 @@ export default async function handler(req, res) {
       const [firstName, ...rest] = name.split(' ');
       const lastName = rest.join(' ');
 
+      // Service address collected at checkout (billing_address_collection: 'required')
+      const addr = session.customer_details?.address || {};
+      const street = [addr.line1, addr.line2].filter(Boolean).join(', ');
+
       const planLabel = { weekly: 'Weekly', biweekly: 'Bi-Weekly', monthly: 'Monthly' }[plan] || plan;
       const dogCount = parseInt(dogs) || 1;
       const hasDeod = deodorizer === 'true';
@@ -127,9 +131,9 @@ export default async function handler(req, res) {
         last_name: lastName || 'Subscriber',
         email,
         phone,
-        address: '',
-        city: '',
-        zip: '',
+        address: street,
+        city: addr.city || '',
+        zip: addr.postal_code || '',
         service_type: planLabel,
         status: 'active',
         stripe_customer_id: stripeCustomerId || '',
@@ -169,6 +173,7 @@ New subscription payment received!
 Name:     ${name || 'Unknown'}
 Email:    ${email || 'Not provided'}
 Phone:    ${phone || 'Not provided'}
+Address:  ${[street, addr.city, addr.state, addr.postal_code].filter(Boolean).join(', ') || 'Not provided'}
 Plan:     ${planLabel}
 Dogs:     ${dogCount}
 Deod:     ${hasDeod ? 'Yes' : 'No'}
