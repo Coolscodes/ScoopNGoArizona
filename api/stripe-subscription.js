@@ -70,6 +70,7 @@ export default async function handler(req, res) {
     'metadata[deodorizer]': String(deodorizer),
     'metadata[haul_away]': String(haul_away || false),
     'phone_number_collection[enabled]': 'true',
+    'billing_address_collection': 'required',
   });
 
   // Attach the intro offer: one-time prepay line item + a trial so recurring per-visit billing
