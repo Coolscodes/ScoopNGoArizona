@@ -3,7 +3,9 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { first_name, last_name, phone, email, zip, dogs, service_type, notes } = req.body;
+  const { first_name, last_name, phone, email, address, zip, dogs, service_type, notes, source } = req.body;
+
+  const fullAddress = [address, zip].filter(Boolean).join(', ');
 
   const emailBody = `
 New quote request from your website!
@@ -11,9 +13,10 @@ New quote request from your website!
 Name:      ${first_name} ${last_name}
 Phone:     ${phone}
 Email:     ${email}
-Zip Code:  ${zip}
+Address:   ${fullAddress || 'Not provided'}
 Dogs:      ${dogs}
 Service:   ${service_type}
+Source:    ${source || 'Direct'}
 Notes:     ${notes || 'None'}
 
 Reply to this email or call/text them to close the deal! 🐾

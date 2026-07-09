@@ -716,6 +716,11 @@
           <div class="form-group"><label for="email">Email Address *</label><input type="email" id="email" placeholder="jane@email.com" autocomplete="email"/></div>
         </div>
         <div class="form-row">
+          <div class="form-group full"><label for="address">Service Address *</label><input type="text" id="address" placeholder="123 N Example St, Gilbert" autocomplete="street-address"/></div>
+        </div>
+        <!-- Honeypot: hidden from humans, bots tend to fill it. If filled, we drop the submission. -->
+        <div aria-hidden="true" style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;"><label for="company">Company</label><input type="text" id="company" name="company" tabindex="-1" autocomplete="off"/></div>
+        <div class="form-row">
           <div class="form-group"><label for="zip">Zip Code *</label><input type="text" id="zip" placeholder="85281" inputmode="numeric" autocomplete="postal-code"/></div>
           <div class="form-group"><label for="dogs">Number of Dogs *</label>
             <select id="dogs"><option value="">Select...</option><option>1 dog</option><option>2 dogs</option><option>3 dogs</option><option>4+ dogs</option></select>
@@ -986,23 +991,53 @@
     });
   }
 
+  // Figures out where this lead came from (ad campaign, search, referral) for ROI tracking.
+  function getLeadSource() {
+    try {
+      var p = new URLSearchParams(window.location.search);
+      var utmSource = p.get('utm_source');
+      if (utmSource) {
+        return [utmSource, p.get('utm_medium'), p.get('utm_campaign')].filter(Boolean).join(' / ');
+      }
+      if (p.get('gclid')) return 'Google Ads (gclid)';
+      if (p.get('fbclid')) return 'Facebook/Meta (fbclid)';
+      var ref = document.referrer || '';
+      if (ref && ref.indexOf(window.location.host) === -1) return 'Referrer: ' + ref;
+      return 'Direct';
+    } catch (e) { return 'Direct'; }
+  }
+
   async function handleSubmit() {
+    // Honeypot: real users never see or fill this. Bots do — silently accept and drop.
+    if (document.getElementById('company').value) {
+      document.getElementById('quoteForm').style.display = 'none';
+      document.getElementById('formSuccess').classList.add('show');
+      return;
+    }
+
     var firstName = document.getElementById('firstName').value.trim();
     var lastName  = document.getElementById('lastName').value.trim();
     var phone     = document.getElementById('phone').value.trim();
     var email     = document.getElementById('email').value.trim();
+    var address   = document.getElementById('address').value.trim();
     var zip       = document.getElementById('zip').value.trim();
     var dogs      = document.getElementById('dogs').value;
     var frequency = document.getElementById('frequency').value;
     var details   = document.getElementById('details').value.trim();
     var errorEl   = document.getElementById('formError');
 
-    if (!firstName || !lastName || !phone || !email || !zip || !dogs || !frequency) {
+    if (!firstName || !lastName || !phone || !email || !address || !zip || !dogs || !frequency) {
       errorEl.textContent = 'Please fill out all required fields marked with *.';
       errorEl.classList.add('show');
       return;
     }
     errorEl.classList.remove('show');
+
+    var source = getLeadSource();
+
+    // Fold service address + lead source into notes (leads table has no dedicated columns yet).
+    var meta = ['Service address: ' + address + (zip ? ', ' + zip : ''), 'Lead source: ' + source];
+    var fullNotes = details ? (details + '\n\n' + meta.join('\n')) : meta.join('\n');
 
     var btn = document.getElementById('submitBtn');
     btn.disabled = true;
@@ -1024,7 +1059,7 @@
         zip:          zip,
         dogs:         dogs,
         service_type: frequency,
-        notes:        details,
+        notes:        fullNotes,
         status:       'new'
       })
     });
@@ -1039,7 +1074,7 @@
       fetch('/api/notify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ first_name: firstName, last_name: lastName, phone, email, zip, dogs, service_type: frequency, notes: details })
+        body: JSON.stringify({ first_name: firstName, last_name: lastName, phone, email, address, zip, dogs, service_type: frequency, notes: details, source: source })
       }).catch(() => {}); // silent fail, Supabase already has the data
 
       document.getElementById('quoteForm').style.display = 'none';
