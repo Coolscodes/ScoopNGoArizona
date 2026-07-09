@@ -17,7 +17,9 @@ import { fileURLToPath } from "node:url";
 import { dirname, resolve } from "node:path";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+// PostgREST client directly (not supabase-js): identical query builder for
+// reads, and it avoids realtime-js, which demands native WebSocket (Node 22+).
+import { PostgrestClient } from "@supabase/postgrest-js";
 import { z } from "zod";
 
 // --- env ---------------------------------------------------------------------
@@ -44,8 +46,8 @@ function loadHqEnvFallback(): void {
   }
 }
 
-let _sb: SupabaseClient | null = null;
-function sb(): SupabaseClient {
+let _sb: PostgrestClient | null = null;
+function sb(): PostgrestClient {
   if (_sb) return _sb;
   const url = process.env.SUPABASE_URL;
   const key = process.env.SUPABASE_SERVICE_KEY;
@@ -54,7 +56,9 @@ function sb(): SupabaseClient {
       "SUPABASE_URL and SUPABASE_SERVICE_KEY are required (or run next to hq/.env.local)"
     );
   }
-  _sb = createClient(url, key, { auth: { persistSession: false } });
+  _sb = new PostgrestClient(`${url}/rest/v1`, {
+    headers: { apikey: key, Authorization: `Bearer ${key}` },
+  });
   return _sb;
 }
 
