@@ -40,7 +40,10 @@
     <p>Your technician will be so grateful. Tips like yours make a huge difference and inspire us to keep delivering the best service possible. 🙏</p>
   </div>
   <div class="sub-msg" id="sub-msg">
-    <p>Welcome to the Scoop N Go family! We'll be in touch shortly to confirm your start date and schedule. Get ready to enjoy a poop-free yard! 🏡</p>
+    <p>Welcome to the Scoop N Go family! We got your preferred day and we'll text you shortly to confirm your first cleanup. Get ready to enjoy a poop-free yard! 🏡</p>
+  </div>
+  <div class="onetime-msg" id="onetime-msg" style="display:none;">
+    <p>Your one-time cleanup is booked and paid! We got your preferred day and we'll text you shortly to confirm exactly when we're coming. 🐾</p>
   </div>
 
   <a href="/" class="btn">← Back to Home</a>
@@ -59,6 +62,11 @@
     document.getElementById('title').textContent = 'You\'re Subscribed!';
     document.getElementById('msg').textContent = '';
     document.getElementById('sub-msg').style.display = 'block';
+  } else if (type === 'onetime') {
+    document.getElementById('icon').textContent = '🧹';
+    document.getElementById('title').textContent = 'Cleanup Booked!';
+    document.getElementById('msg').textContent = '';
+    document.getElementById('onetime-msg').style.display = 'block';
   } else if (type === 'card_saved') {
     const name = params.get('name') || 'your account';
     document.getElementById('icon').textContent = '💳';
