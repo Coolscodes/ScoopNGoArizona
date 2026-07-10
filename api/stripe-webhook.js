@@ -125,8 +125,8 @@ export default async function handler(req, res) {
       const firstCleanValue = (session.custom_fields || []).find((f) => f.key === 'first_cleanup')?.dropdown?.value;
       const firstCleanLabel = {
         asap: 'As soon as possible',
-        this_week: 'Later this week',
-        next_week: 'Next week',
+        thisweek: 'Later this week',
+        nextweek: 'Next week',
         flexible: 'Flexible, text to schedule',
       }[firstCleanValue] || '';
 

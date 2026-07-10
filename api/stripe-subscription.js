@@ -86,9 +86,9 @@ export default async function handler(req, res) {
   params.set('custom_fields[0][dropdown][options][0][label]', 'As soon as possible');
   params.set('custom_fields[0][dropdown][options][0][value]', 'asap');
   params.set('custom_fields[0][dropdown][options][1][label]', 'Later this week');
-  params.set('custom_fields[0][dropdown][options][1][value]', 'this_week');
+  params.set('custom_fields[0][dropdown][options][1][value]', 'thisweek');
   params.set('custom_fields[0][dropdown][options][2][label]', 'Next week');
-  params.set('custom_fields[0][dropdown][options][2][value]', 'next_week');
+  params.set('custom_fields[0][dropdown][options][2][value]', 'nextweek');
   params.set('custom_fields[0][dropdown][options][3][label]', 'Flexible, text me to schedule');
   params.set('custom_fields[0][dropdown][options][3][value]', 'flexible');
 
