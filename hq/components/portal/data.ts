@@ -65,7 +65,7 @@ export function toPortalCustomer(c: Customer): PortalCustomer {
     frequency_weeks: c.frequency_weeks,
     next_visit_date: c.next_visit_date,
     active: c.active,
-    has_card_on_file: Boolean(c.stripe_customer_id),
+    has_card_on_file: Boolean(c.stripe_payment_method_id),
   };
 }
 

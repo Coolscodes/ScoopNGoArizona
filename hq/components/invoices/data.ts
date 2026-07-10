@@ -151,7 +151,7 @@ export async function getInvoicesData(opts?: {
         customerId,
         customerName: fullName(c),
         balance: round2(balance),
-        hasCardOnFile: Boolean(c?.stripe_customer_id),
+        hasCardOnFile: Boolean(c?.stripe_payment_method_id),
         stripeCustomerId: c?.stripe_customer_id,
         email: c?.email,
       };
@@ -171,7 +171,7 @@ export async function getInvoicesData(opts?: {
     return {
       invoice,
       customerName: fullName(c),
-      hasCardOnFile: Boolean(c?.stripe_customer_id),
+      hasCardOnFile: Boolean(c?.stripe_payment_method_id),
       pastDue: isPastDue(invoice),
     };
   });

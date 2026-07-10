@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { Table, Th, Td, StatusPill, Avatar, Input, EmptyState } from '@/components/ui';
 import { ClientForm } from './ClientForm';
+import { CardLinkButton } from './CardLinkButton';
 import { money, phone as fmtPhone, fullName, initials } from '@/lib/format';
 import type { Customer } from '@/lib/types';
 
@@ -80,11 +81,14 @@ export function ClientsTable({
                 <Td className="text-sm">{c.preferred_day ?? '·'}</Td>
                 <Td className="text-sm">{c.price_per_visit != null ? money(c.price_per_visit) : '·'}</Td>
                 <Td className="text-sm">
-                  {c.stripe_customer_id ? (
-                    <span className="text-brand">Card on file</span>
-                  ) : (
-                    <span className="text-muted">No card</span>
-                  )}
+                  <span className="flex items-center gap-2">
+                    {c.stripe_payment_method_id ? (
+                      <span className="text-brand">Card on file</span>
+                    ) : (
+                      <span className="text-muted">No card</span>
+                    )}
+                    <CardLinkButton client={c} />
+                  </span>
                 </Td>
                 <Td>
                   <StatusPill status={c.active ? 'active' : 'inactive'} />

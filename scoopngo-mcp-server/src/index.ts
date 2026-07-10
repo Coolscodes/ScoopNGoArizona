@@ -99,6 +99,7 @@ interface CustomerRow {
   flags: string[] | null;
   auto_charge: boolean | null;
   stripe_customer_id: string | null;
+  stripe_payment_method_id: string | null;
 }
 
 function clientSummary(c: CustomerRow) {
@@ -114,7 +115,7 @@ function clientSummary(c: CustomerRow) {
     frequency_weeks: c.frequency_weeks,
     next_visit_date: c.next_visit_date,
     active: c.active,
-    has_card: Boolean(c.stripe_customer_id),
+    has_card: Boolean(c.stripe_payment_method_id),
     auto_charge: Boolean(c.auto_charge),
     flags: c.flags ?? [],
   };

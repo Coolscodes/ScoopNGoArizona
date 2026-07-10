@@ -68,7 +68,7 @@ async function loadPortalData(token: string): Promise<PortalData | null> {
       frequency_weeks: customer.frequency_weeks,
       next_visit_date: customer.next_visit_date,
       active: customer.active,
-      has_card_on_file: Boolean(customer.stripe_customer_id),
+      has_card_on_file: Boolean(customer.stripe_payment_method_id),
     },
     nextVisit: nextRow
       ? { scheduled_at: nextRow.scheduled_at, service_type: nextRow.service_type }

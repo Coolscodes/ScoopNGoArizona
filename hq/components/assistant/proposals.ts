@@ -73,11 +73,11 @@ export async function propose_charge_invoice(args: { invoice_id?: string }): Pro
   if (inv.status === 'paid') return JSON.stringify({ error: 'That invoice is already paid.' });
   const { data: cust } = await db
     .from('customers')
-    .select('first_name, last_name, stripe_customer_id')
+    .select('first_name, last_name, stripe_customer_id, stripe_payment_method_id')
     .eq('id', inv.customer_id)
     .single();
   const who = fullName(cust) || 'Unknown client';
-  if (!cust?.stripe_customer_id) {
+  if (!cust?.stripe_payment_method_id) {
     return JSON.stringify({ error: `${who} has no card on file, suggest sending a card setup link instead.` });
   }
 

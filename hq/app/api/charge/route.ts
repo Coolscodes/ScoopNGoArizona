@@ -197,7 +197,7 @@ export async function GET(request: Request) {
       serviceType: c.service_type ?? null,
       preferredDay: c.preferred_day ?? null,
       price: c.price_per_visit ?? null,
-      hasCard: Boolean(c.stripe_customer_id),
+      hasCard: Boolean(c.stripe_payment_method_id),
       stripeCustomerId: c.stripe_customer_id ?? null,
       email: c.email ?? null,
       paidThisWeek: paid.has(c.id),

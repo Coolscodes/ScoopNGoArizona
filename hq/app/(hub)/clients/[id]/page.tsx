@@ -65,7 +65,7 @@ export default async function ClientDetailPage({ params }: { params: { id: strin
                 customerName={fullName(client)}
                 email={client.email}
                 stripeCustomerId={client.stripe_customer_id}
-                hasCard={Boolean(client.stripe_customer_id)}
+                hasCard={Boolean(client.stripe_payment_method_id)}
               />
               <ClientForm client={client} />
             </div>
@@ -88,7 +88,7 @@ export default async function ClientDetailPage({ params }: { params: { id: strin
             <Row label="Address" value={[client.address, client.city, client.zip].filter(Boolean).join(', ')} />
             <Row label="Gate code" value={client.gate_code} />
             <Row label="Frequency" value={client.frequency_weeks ? `Every ${client.frequency_weeks} wk` : undefined} />
-            <Row label="Card on file" value={client.stripe_customer_id ? 'Yes' : 'No'} />
+            <Row label="Card on file" value={client.stripe_payment_method_id ? 'Yes' : 'No'} />
             <Row label="Balance" value={money(balance)} />
           </div>
           {client.yard_notes && (

@@ -1,0 +1,42 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "loan-assistant-demo",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["/Users/jettbrown/Desktop/ai LO assistant/demo-server.js"],
+      "port": 3999
+    },
+    {
+      "name": "lifemaxx",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "/Users/jettbrown/Desktop/LIFEMAXX", "run", "dev", "--", "-p", "3100"],
+      "port": 3100
+    },
+    {
+      "name": "scoopngo-site",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["-y", "serve", "/Users/jettbrown/Desktop/ScoopNGoArizona"],
+      "port": 4173,
+      "autoPort": true
+    },
+    {
+      "name": "tomswelding-site",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["-y", "serve", "-l", "4190", "/Users/jettbrown/Desktop/TomsWelding"],
+      "port": 4190
+    },
+    {
+      "name": "breezywelding-site",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["-y", "serve", "-l", "4180", "/Users/jettbrown/Desktop/BreezyWelding"],
+      "port": 4180
+    },
+    {
+      "name": "scoopngo-hq",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "/Users/jettbrown/Desktop/ScoopNGoArizona/hq", "run", "dev", "--", "-p", "3200"],
+      "port": 3200
+    }
+  ]
+}

@@ -738,7 +738,7 @@
     if (!filtered.length) { tbody.innerHTML = '<tr class="empty-row"><td colspan="6">No invoices found.</td></tr>'; return; }
     tbody.innerHTML = filtered.map(i => {
       const c = allCustomers.find(x => x.id === i.customer_id) || i.customers || {};
-      const hasCard = !!c.stripe_customer_id;
+      const hasCard = !!c.stripe_payment_method_id;
       const cardBtn = hasCard
         ? `<span style="background:#e8f5e9;color:#2e7d32;border:1px solid #a5d6a7;border-radius:6px;padding:.28rem .7rem;font-size:.76rem;font-weight:700;font-family:'Montserrat',sans-serif;white-space:nowrap;">✅ Card on File</span>`
         : `<button class="btn btn-sm" style="background:#1565c0;color:#fff;white-space:nowrap;" onclick="sendCardSetupLink('${c.id}','${((c.first_name||'')+' '+(c.last_name||'')).trim()}','${c.email||''}','${c.stripe_customer_id||''}')">💳 Add Card</button>`;
@@ -878,7 +878,7 @@
       list.innerHTML = '<p style="color:#888;font-size:.88rem;padding:.75rem .25rem;">No matching active clients. Try "All active clients" or clear the search.</p>';
     } else {
       list.innerHTML = chargeClients.map((c, i) => {
-        const hasCard = !!c.stripe_customer_id;
+        const hasCard = !!c.stripe_payment_method_id;
         const paid = paidThisWeek.has(c.id);
         const checked = hasCard && !paid && !!c.price_per_visit;
         const chips = [];

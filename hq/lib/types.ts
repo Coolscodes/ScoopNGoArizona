@@ -41,6 +41,7 @@ export interface Customer {
   price_per_visit?: number;
   active: boolean;
   stripe_customer_id?: string; // existing
+  stripe_payment_method_id?: string; // existing: set by the webhook only when a card actually attaches
   frequency_weeks?: number; // new: 1 weekly, 2 bi-weekly
   start_date?: string; // new
   next_visit_date?: string; // new (generator)
