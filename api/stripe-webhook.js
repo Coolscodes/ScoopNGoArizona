@@ -121,7 +121,17 @@ export default async function handler(req, res) {
       const addr = session.customer_details?.address || {};
       const street = [addr.line1, addr.line2].filter(Boolean).join(', ');
 
-      const planLabel = { weekly: 'Weekly', biweekly: 'Bi-Weekly', monthly: 'Monthly' }[plan] || plan;
+      // "When should we do your first cleanup?" dropdown answered at checkout
+      const firstCleanValue = (session.custom_fields || []).find((f) => f.key === 'first_cleanup')?.dropdown?.value;
+      const firstCleanLabel = {
+        asap: 'As soon as possible',
+        this_week: 'Later this week',
+        next_week: 'Next week',
+        flexible: 'Flexible, text to schedule',
+      }[firstCleanValue] || '';
+
+      const planLabel = { weekly: 'Weekly', biweekly: 'Bi-Weekly', monthly: 'Monthly', onetime: 'One-Time' }[plan] || plan;
+      const isOneTime = plan === 'onetime';
       const dogCount = parseInt(dogs) || 1;
       const hasDeod = deodorizer === 'true';
 
@@ -137,7 +147,7 @@ export default async function handler(req, res) {
         service_type: planLabel,
         status: 'active',
         stripe_customer_id: stripeCustomerId || '',
-        notes: `Subscribed online via Stripe. ${dogCount} dog${dogCount > 1 ? 's' : ''}${hasDeod ? ' + deodorizer' : ''}.`,
+        notes: `${isOneTime ? 'Booked one-time cleanup online via Stripe (paid).' : 'Subscribed online via Stripe.'} ${dogCount} dog${dogCount > 1 ? 's' : ''}${hasDeod ? ' + deodorizer' : ''}.${firstCleanLabel ? ` First cleanup: ${firstCleanLabel}.` : ''}`,
       });
 
       const custData = await custRes.json();
@@ -166,20 +176,23 @@ export default async function handler(req, res) {
           from: 'Scoop N Go Arizona <onboarding@resend.dev>',
           to: 'scoopngoarizona@gmail.com',
           reply_to: email || 'noreply@stripe.com',
-          subject: `💳 New Online Subscriber: ${name || 'New Client'} (${planLabel})`,
+          subject: isOneTime
+            ? `💰 One-Time Cleanup Booked & Paid: ${name || 'New Client'}`
+            : `💳 New Online Subscriber: ${name || 'New Client'} (${planLabel})`,
           text: `
-New subscription payment received!
+${isOneTime ? 'One-time cleanup booked and PAID online!' : 'New subscription payment received!'}
 
-Name:     ${name || 'Unknown'}
-Email:    ${email || 'Not provided'}
-Phone:    ${phone || 'Not provided'}
-Address:  ${[street, addr.city, addr.state, addr.postal_code].filter(Boolean).join(', ') || 'Not provided'}
-Plan:     ${planLabel}
-Dogs:     ${dogCount}
-Deod:     ${hasDeod ? 'Yes' : 'No'}
+Name:        ${name || 'Unknown'}
+Email:       ${email || 'Not provided'}
+Phone:       ${phone || 'Not provided'}
+Address:     ${[street, addr.city, addr.state, addr.postal_code].filter(Boolean).join(', ') || 'Not provided'}
+Plan:        ${planLabel}
+Dogs:        ${dogCount}
+Deod:        ${hasDeod ? 'Yes' : 'No'}
+First clean: ${firstCleanLabel || 'Not specified'}
 
-This client has been automatically added to your Customers tab in the admin dashboard.
-Log in at https://scoopngoarizona.com/admin to schedule their first service.
+${isOneTime ? 'They already paid. Text them to confirm the cleanup day!' : 'This client has been automatically added to your Customers tab in the admin dashboard.'}
+Log in at https://scoopngoarizona.com/admin to schedule their ${isOneTime ? 'cleanup' : 'first service'}.
 
 Stripe Customer ID: ${stripeCustomerId || 'N/A'}
           `.trim(),
