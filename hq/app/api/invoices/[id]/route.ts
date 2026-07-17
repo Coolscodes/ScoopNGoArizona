@@ -16,7 +16,7 @@ import type { Customer, Invoice, PayMethod } from '@/lib/types';
 
 export const dynamic = 'force-dynamic';
 
-const METHODS: PayMethod[] = ['cash', 'venmo', 'zelle', 'check', 'card'];
+const METHODS: PayMethod[] = ['cash', 'venmo', 'zelle', 'check', 'card', 'applepay'];
 
 export async function PATCH(request: Request, { params }: { params: { id: string } }) {
   // Defense in depth (middleware also gates this), return clean 401 JSON.

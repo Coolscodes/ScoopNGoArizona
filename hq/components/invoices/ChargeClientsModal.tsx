@@ -9,6 +9,12 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Button, useToast } from '@/components/ui';
 import { money } from '@/lib/format';
 
+interface OpenWeek {
+  periodStart: string;
+  label: string;
+  amount: number;
+}
+
 interface EligibleClient {
   id: string;
   name: string;
@@ -20,6 +26,7 @@ interface EligibleClient {
   email: string | null;
   paidThisWeek: boolean;
   openThisWeek: number | null;
+  openWeeks: OpenWeek[];
   autoCharge: boolean;
 }
 
@@ -33,6 +40,7 @@ interface ChargeRunResult {
     name: string;
     status: 'charged' | 'failed' | 'skipped';
     amount?: number;
+    week?: string;
     reason?: string;
   }[];
 }
@@ -40,6 +48,8 @@ interface ChargeRunResult {
 interface RowState {
   checked: boolean;
   amount: string;
+  // 'current' = this week; otherwise the period_start of an unpaid past week.
+  week: string;
 }
 
 const DAYS = [
@@ -70,6 +80,7 @@ export function ChargeClientsModal({
   const [error, setError] = useState<string | null>(null);
   const [clients, setClients] = useState<EligibleClient[]>([]);
   const [weekLabel, setWeekLabel] = useState('');
+  const [weekStart, setWeekStart] = useState('');
   const [rows, setRows] = useState<Record<string, RowState>>({});
   const [dayFilter, setDayFilter] = useState('today');
   const [search, setSearch] = useState('');
@@ -94,21 +105,25 @@ export function ChargeClientsModal({
       .then(async (r) => {
         const d = (await r.json()) as {
           error?: string;
-          week?: { label: string };
+          week?: { label: string; periodStart: string };
           clients?: EligibleClient[];
         };
         if (!r.ok) throw new Error(d.error || 'Could not load clients');
         const list = d.clients ?? [];
         setClients(list);
         setWeekLabel(d.week?.label ?? '');
+        setWeekStart(d.week?.periodStart ?? '');
         const init: Record<string, RowState> = {};
         for (const c of list) {
-          // Pre-fill from the week's open invoice when there is one; otherwise
-          // the standing price. Chargeable rows start checked.
-          const amount = c.openThisWeek ?? c.price;
+          // Default to the oldest unpaid week (and its owed amount) when the
+          // client is behind; otherwise this week at the standing price.
+          // Chargeable rows start checked.
+          const oldest = c.openWeeks?.[0];
+          const amount = oldest?.amount ?? c.openThisWeek ?? c.price;
           init[c.id] = {
             checked: c.hasCard && !c.paidThisWeek && amount != null,
             amount: amount != null ? String(amount) : '',
+            week: oldest?.periodStart ?? 'current',
           };
         }
         setRows(init);
@@ -147,14 +162,19 @@ export function ChargeClientsModal({
 
   // Current selection over the *visible* rows: valid picks + invalid count.
   const selection = useMemo(() => {
-    const picks: { id: string; amount: number }[] = [];
+    const picks: { id: string; amount: number; week: string }[] = [];
     let invalid = 0;
     for (const c of visible) {
       const r = rows[c.id];
       if (!r?.checked || !c.hasCard) continue;
       const n = parseFloat(r.amount);
       if (Number.isNaN(n) || n < 1) invalid += 1;
-      else picks.push({ id: c.id, amount: Math.round(n * 100) / 100 });
+      else
+        picks.push({
+          id: c.id,
+          amount: Math.round(n * 100) / 100,
+          week: r.week ?? 'current',
+        });
     }
     return { picks, invalid, total: picks.reduce((s, p) => s + p.amount, 0) };
   }, [visible, rows]);
@@ -221,14 +241,22 @@ export function ChargeClientsModal({
     disarm();
     setSubmitting(true);
     try {
+      // Every pick sends an explicit week so the server charges exactly what
+      // is shown here, "This week" included.
       const amounts: Record<string, number> = {};
-      for (const p of selection.picks) amounts[p.id] = p.amount;
+      const weeks: Record<string, string> = {};
+      for (const p of selection.picks) {
+        amounts[p.id] = p.amount;
+        const start = p.week === 'current' ? weekStart : p.week;
+        if (start) weeks[p.id] = start;
+      }
       const res = await fetch('/api/charge', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           customer_ids: selection.picks.map((p) => p.id),
           amounts,
+          weeks,
         }),
       });
       const data = (await res.json()) as ChargeRunResult & { error?: string };
@@ -332,7 +360,9 @@ export function ChargeClientsModal({
                 ) : (
                   <ul className="space-y-2">
                     {visible.map((c) => {
-                      const r = rows[c.id] ?? { checked: false, amount: '' };
+                      const r =
+                        rows[c.id] ?? { checked: false, amount: '', week: 'current' };
+                      const totalOwed = c.openWeeks.reduce((s, w) => s + w.amount, 0);
                       const amountNum = parseFloat(r.amount);
                       const amountBad =
                         r.checked && c.hasCard && (Number.isNaN(amountNum) || amountNum < 1);
@@ -378,9 +408,12 @@ export function ChargeClientsModal({
                               ✓ Paid this week
                             </span>
                           )}
-                          {c.openThisWeek != null && !c.paidThisWeek && (
+                          {totalOwed > 0 && (
                             <span className="text-[0.7rem] font-bold rounded-full px-2 py-0.5 bg-info/10 text-info whitespace-nowrap">
-                              Owes {money(c.openThisWeek)}
+                              Owes {money(totalOwed)}
+                              {c.openWeeks.length > 1
+                                ? ` (${c.openWeeks.length} wks)`
+                                : ''}
                             </span>
                           )}
                           {!c.hasCard && (
@@ -396,6 +429,38 @@ export function ChargeClientsModal({
                                 {linkBusy === c.id ? '…' : '💳 Card link'}
                               </Button>
                             </>
+                          )}
+                          {c.openWeeks.length > 0 && (
+                            <select
+                              value={r.week}
+                              disabled={!c.hasCard}
+                              onChange={(e) => {
+                                const w = e.target.value;
+                                const wk = c.openWeeks.find(
+                                  (o) => o.periodStart === w
+                                );
+                                // Re-prefill the amount for the chosen week.
+                                const amount = wk?.amount ?? c.price;
+                                setRow(c.id, {
+                                  week: w,
+                                  amount: amount != null ? String(amount) : '',
+                                });
+                              }}
+                              aria-label={`Week to charge for ${c.name}`}
+                              className="border-2 border-line rounded-[7px] px-2 py-1 text-xs bg-white text-ink max-w-[150px]"
+                            >
+                              {c.openWeeks.map((w) => (
+                                <option key={w.periodStart} value={w.periodStart}>
+                                  Owed: {w.label}
+                                </option>
+                              ))}
+                              {!c.paidThisWeek &&
+                                !c.openWeeks.some(
+                                  (w) => w.periodStart === weekStart
+                                ) && (
+                                  <option value="current">This week</option>
+                                )}
+                            </select>
                           )}
                           <span className="flex items-center gap-1">
                             <span className="font-heading font-bold text-brand text-sm">$</span>
@@ -503,6 +568,7 @@ function ResultsView({ run }: { run: ChargeRunResult }) {
         >
           <span>{RESULT_ICON[x.status] ?? '•'}</span>
           <strong className="flex-1 font-heading">{x.name}</strong>
+          {x.week && <span className="text-xs text-muted">Week of {x.week}</span>}
           {x.amount != null && (
             <span className="font-heading font-bold text-brand">
               {money(x.amount)}

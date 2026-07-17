@@ -27,7 +27,7 @@ export interface ActionProposal {
   payload: Record<string, string>; // exact params /api/assistant/execute needs
 }
 
-const PAY_METHODS: PayMethod[] = ['cash', 'venmo', 'zelle', 'check', 'card'];
+const PAY_METHODS: PayMethod[] = ['cash', 'venmo', 'zelle', 'check', 'card', 'applepay'];
 const APPT_STATUSES = ['completed', 'scheduled', 'skipped'] as const;
 
 function proposalJson(p: ActionProposal): string {

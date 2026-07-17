@@ -7,7 +7,7 @@ export type ApptStatus = 'scheduled' | 'completed' | 'skipped' | 'cancelled';
 export type InvoiceStatus = 'draft' | 'sent' | 'paid' | 'overdue';
 export type QuoteStatus = 'draft' | 'sent' | 'approved' | 'declined';
 export type TechRole = 'owner' | 'tech';
-export type PayMethod = 'cash' | 'venmo' | 'zelle' | 'card' | 'check';
+export type PayMethod = 'cash' | 'venmo' | 'zelle' | 'card' | 'check' | 'applepay';
 
 export interface Lead {
   id: string;

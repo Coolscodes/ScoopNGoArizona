@@ -37,6 +37,10 @@ export function currentWeek(now: Date = new Date()): WeekInfo {
   const diffToMon = day === 0 ? -6 : 1 - day;
   const monday = new Date(now);
   monday.setDate(now.getDate() + diffToMon);
+  return weekFromMonday(monday);
+}
+
+function weekFromMonday(monday: Date): WeekInfo {
   const sunday = new Date(monday);
   sunday.setDate(monday.getDate() + 6);
   const fmt = (d: Date) => d.toISOString().split('T')[0];
@@ -49,6 +53,31 @@ export function currentWeek(now: Date = new Date()): WeekInfo {
     monday,
     sunday,
   };
+}
+
+// WeekInfo for a stored invoice period_start (YYYY-MM-DD). Parsed as a local
+// date so the label never shifts a day across timezones. Works for any start
+// date, not just Mondays, since some hand-made invoices have odd bounds.
+export function weekFromPeriodStart(periodStart: string): WeekInfo {
+  const [y, m, d] = periodStart.split('-').map(Number);
+  return weekFromMonday(new Date(y, m - 1, d));
+}
+
+// The customer's oldest unpaid ('sent' or 'overdue') invoice, by period. This
+// is the week a new payment should apply to, so money always knocks out the
+// oldest debt first instead of stamping the current week.
+export async function oldestOpenInvoice(
+  sb: Supa,
+  customerId: string
+): Promise<Invoice | null> {
+  const { data } = await sb
+    .from('invoices')
+    .select('*')
+    .eq('customer_id', customerId)
+    .in('status', ['sent', 'overdue'])
+    .order('period_start', { ascending: true, nullsFirst: false })
+    .limit(1);
+  return ((data ?? []) as Invoice[])[0] ?? null;
 }
 
 // Due date = the customer's service day this week, or Friday if none set,
@@ -188,7 +217,7 @@ async function recordFailedChargeInvoice(
 // --- core charge --------------------------------------------------------------
 
 export type ChargeResult =
-  | { name: string; status: 'charged'; amount: number }
+  | { name: string; status: 'charged'; amount: number; week?: string }
   | { name: string; status: 'skipped'; reason: string }
   | { name: string; status: 'failed'; reason: string };
 
@@ -251,14 +280,14 @@ export async function chargeCustomerForWeek(
     if (pi.status === 'succeeded') {
       const dueDateStr = dueDateFor(c, week);
 
-      // Update an existing 'sent' invoice for this week to 'paid' instead of
+      // Update an existing open invoice for this week to 'paid' instead of
       // creating a duplicate; otherwise insert a fresh paid invoice.
       const { data: sentData } = await sb
         .from('invoices')
         .select('*')
         .eq('customer_id', c.id)
         .eq('period_start', week.periodStart)
-        .eq('status', 'sent')
+        .in('status', ['sent', 'overdue'])
         .limit(1);
       const existingInv = ((sentData ?? []) as Invoice[])[0];
 
@@ -307,7 +336,7 @@ export async function chargeCustomerForWeek(
 
       await sendReceiptEmail(c, week.weekLabel, amount);
 
-      return { name, status: 'charged', amount };
+      return { name, status: 'charged', amount, week: week.weekLabel };
     }
 
     const reason =
@@ -366,8 +395,36 @@ export async function autoChargeOnCompletion(
       return { attempted: false, reason: 'Already paid this week' };
     }
 
+    // A visit just happened, so this week is owed. Put it on the books as a
+    // 'sent' invoice (if not already invoiced) BEFORE charging, so that when
+    // the payment applies to an older owed week the current week's debt stays
+    // visible instead of silently disappearing.
+    const { data: existing } = await sb
+      .from('invoices')
+      .select('id')
+      .eq('customer_id', c.id)
+      .eq('period_start', week.periodStart)
+      .limit(1);
+    if ((existing ?? []).length === 0) {
+      await sb.from('invoices').insert({
+        customer_id: c.id,
+        amount: c.price_per_visit,
+        status: 'sent',
+        due_date: dueDateFor(c, week),
+        period_start: week.periodStart,
+        period_end: week.periodEnd,
+        notes: `Week of ${week.weekLabel} - ${c.service_type || 'Visit'}`,
+      });
+    }
+
+    // Pay the oldest owed week first (which is the current week when the
+    // client is caught up).
+    const open = await oldestOpenInvoice(sb, c.id);
+    const targetWeek = open?.period_start ? weekFromPeriodStart(open.period_start) : week;
+    const amount = open?.amount ? Number(open.amount) : c.price_per_visit;
+
     const sk = stripe();
-    const result = await chargeCustomerForWeek(sb, sk, c, week, c.price_per_visit);
+    const result = await chargeCustomerForWeek(sb, sk, c, targetWeek, amount);
     return { attempted: true, result };
   } catch (err) {
     const reason = err instanceof Error ? err.message : 'Auto-charge failed';
