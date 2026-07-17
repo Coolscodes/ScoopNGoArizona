@@ -10,6 +10,7 @@ const METHODS: { key: PayMethod; label: string }[] = [
   { key: 'cash', label: 'Cash' },
   { key: 'venmo', label: 'Venmo' },
   { key: 'zelle', label: 'Zelle' },
+  { key: 'applepay', label: 'Apple Pay' },
   { key: 'check', label: 'Check' },
   { key: 'card', label: 'Card' },
 ];

@@ -176,7 +176,7 @@ const TOOLS: Anthropic.Tool[] = [
         invoice_id: { type: 'string', description: 'The invoice id to mark paid.' },
         method: {
           type: 'string',
-          enum: ['cash', 'venmo', 'zelle', 'check', 'card'],
+          enum: ['cash', 'venmo', 'zelle', 'check', 'card', 'applepay'],
           description: 'How the money was collected. Defaults to cash.',
         },
       },
