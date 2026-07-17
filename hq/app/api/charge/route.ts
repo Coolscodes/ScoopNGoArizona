@@ -13,6 +13,8 @@ import { supabaseServer } from '@/lib/supabase';
 import { getCurrentUser } from '@/lib/auth';
 import {
   currentWeek,
+  weekFromPeriodStart,
+  oldestOpenInvoice,
   chargeCustomerForWeek,
   type ChargeResult,
 } from '@/lib/charge-core';
@@ -47,9 +49,13 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  let body: { customer_ids?: unknown; amounts?: unknown } = {};
+  let body: { customer_ids?: unknown; amounts?: unknown; weeks?: unknown } = {};
   try {
-    body = (await request.json()) as { customer_ids?: unknown; amounts?: unknown };
+    body = (await request.json()) as {
+      customer_ids?: unknown;
+      amounts?: unknown;
+      weeks?: unknown;
+    };
   } catch {
     // Empty body is allowed below; treated as no selection.
   }
@@ -65,6 +71,16 @@ export async function POST(request: Request) {
     for (const [id, v] of Object.entries(body.amounts as Record<string, unknown>)) {
       const n = typeof v === 'number' ? v : parseFloat(String(v));
       if (!Number.isNaN(n) && n >= 1) overrides.set(id, Math.round(n * 100) / 100);
+    }
+  }
+
+  // Optional per-client week picks (period_start YYYY-MM-DD) from the modal.
+  // Without a pick, the charge applies to the client's oldest unpaid week, or
+  // the current week when they are caught up.
+  const weekPicks = new Map<string, string>();
+  if (body.weeks && typeof body.weeks === 'object' && !Array.isArray(body.weeks)) {
+    for (const [id, v] of Object.entries(body.weeks as Record<string, unknown>)) {
+      if (typeof v === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(v)) weekPicks.set(id, v);
     }
   }
 
@@ -108,11 +124,6 @@ export async function POST(request: Request) {
   for (const c of customers) {
     const name = `${c.first_name} ${c.last_name}`.trim();
 
-    if (alreadyPaid.has(c.id)) {
-      results.push({ name, status: 'skipped', reason: 'Already charged this week' });
-      continue;
-    }
-
     const chargeAmount = overrides.get(c.id) ?? c.price_per_visit ?? 0;
     if (!chargeAmount) {
       results.push({ name, status: 'skipped', reason: 'No price set' });
@@ -123,7 +134,38 @@ export async function POST(request: Request) {
       continue;
     }
 
-    results.push(await chargeCustomerForWeek(sb, sk, c, week, chargeAmount));
+    // Which week does this money apply to? Explicit pick from the modal wins,
+    // then the oldest unpaid week, then the current week.
+    const picked = weekPicks.get(c.id);
+    let targetWeek = week;
+    if (picked) {
+      targetWeek = weekFromPeriodStart(picked);
+      const { data: pickedPaid } = await sb
+        .from('invoices')
+        .select('id')
+        .eq('customer_id', c.id)
+        .eq('period_start', picked)
+        .eq('status', 'paid')
+        .limit(1);
+      if ((pickedPaid ?? []).length > 0) {
+        results.push({
+          name,
+          status: 'skipped',
+          reason: `Week of ${targetWeek.weekLabel} already paid`,
+        });
+        continue;
+      }
+    } else {
+      const open = await oldestOpenInvoice(sb, c.id);
+      if (open?.period_start) {
+        targetWeek = weekFromPeriodStart(open.period_start);
+      } else if (alreadyPaid.has(c.id)) {
+        results.push({ name, status: 'skipped', reason: 'Already charged this week' });
+        continue;
+      }
+    }
+
+    results.push(await chargeCustomerForWeek(sb, sk, c, targetWeek, chargeAmount));
   }
 
   const charged = results.filter((r) => r.status === 'charged').length;
@@ -164,24 +206,43 @@ export async function GET(request: Request) {
 
   const { data: invData } = await sb
     .from('invoices')
-    .select('customer_id, amount, status')
-    .eq('period_start', week.periodStart);
-  const weekInvoices = (invData ?? []) as {
+    .select('customer_id, amount, status, period_start')
+    .or(`period_start.eq.${week.periodStart},status.in.(sent,overdue)`)
+    .order('period_start', { ascending: true });
+  const invoices = (invData ?? []) as {
     customer_id: string;
     amount: number;
     status: string;
+    period_start: string | null;
   }[];
 
   const paid = new Set(
-    weekInvoices.filter((i) => i.status === 'paid').map((i) => i.customer_id)
+    invoices
+      .filter((i) => i.status === 'paid' && i.period_start === week.periodStart)
+      .map((i) => i.customer_id)
   );
   const openAmount = new Map<string, number>();
-  for (const i of weekInvoices) {
-    if (i.status === 'sent' || i.status === 'overdue') {
+  // Every unpaid week per client, oldest first, for the modal's week picker.
+  const openWeeks = new Map<
+    string,
+    { periodStart: string; label: string; amount: number }[]
+  >();
+  for (const i of invoices) {
+    if (i.status !== 'sent' && i.status !== 'overdue') continue;
+    if (i.period_start === week.periodStart) {
       openAmount.set(
         i.customer_id,
         (openAmount.get(i.customer_id) ?? 0) + (Number(i.amount) || 0)
       );
+    }
+    if (i.period_start) {
+      const list = openWeeks.get(i.customer_id) ?? [];
+      list.push({
+        periodStart: i.period_start,
+        label: weekFromPeriodStart(i.period_start).weekLabel,
+        amount: Number(i.amount) || 0,
+      });
+      openWeeks.set(i.customer_id, list);
     }
   }
 
@@ -202,6 +263,7 @@ export async function GET(request: Request) {
       email: c.email ?? null,
       paidThisWeek: paid.has(c.id),
       openThisWeek: openAmount.get(c.id) ?? null,
+      openWeeks: openWeeks.get(c.id) ?? [],
       autoCharge: Boolean(c.auto_charge),
     })),
   });

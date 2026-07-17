@@ -6,8 +6,8 @@ import { ClientQuickActions } from '@/components/clients/ClientQuickActions';
 import { DogsEditor } from '@/components/clients/DogsEditor';
 import { FlagsEditor } from '@/components/clients/FlagsEditor';
 import { supabaseServer } from '@/lib/supabase';
-import { money, phone as fmtPhone, fullName, initials, shortDate } from '@/lib/format';
-import type { Customer, Dog, Appointment, Invoice, ServiceLog } from '@/lib/types';
+import { money, phone as fmtPhone, fullName, initials, shortDate, dayMonth } from '@/lib/format';
+import type { Customer, Dog, Appointment, Invoice, Payment, ServiceLog } from '@/lib/types';
 
 export const dynamic = 'force-dynamic';
 
@@ -18,14 +18,35 @@ async function getClient(id: string) {
       sb.from('customers').select('*').eq('id', id).maybeSingle(),
       sb.from('dogs').select('*').eq('customer_id', id).order('name'),
       sb.from('appointments').select('*').eq('customer_id', id).order('scheduled_at', { ascending: false }).limit(6),
-      sb.from('invoices').select('*').eq('customer_id', id).order('created_at', { ascending: false }).limit(6),
+      sb
+        .from('invoices')
+        .select('*')
+        .eq('customer_id', id)
+        .order('period_start', { ascending: false, nullsFirst: false })
+        .limit(12),
       sb.from('service_logs').select('*').eq('customer_id', id).order('completed_at', { ascending: false }).limit(6),
     ]);
+
+  // Payment method per invoice (card / cash / Venmo...), for the history list.
+  const invoiceRows = (invoices ?? []) as Invoice[];
+  const paymentByInvoice = new Map<string, Payment>();
+  if (invoiceRows.length > 0) {
+    const { data: pays } = await sb
+      .from('payments')
+      .select('*')
+      .in('invoice_id', invoiceRows.map((i) => i.id))
+      .order('paid_at', { ascending: false });
+    for (const p of (pays ?? []) as Payment[]) {
+      if (!paymentByInvoice.has(p.invoice_id)) paymentByInvoice.set(p.invoice_id, p);
+    }
+  }
+
   return {
     client: (client as Customer) ?? null,
     dogs: (dogs ?? []) as Dog[],
     appts: (appts ?? []) as Appointment[],
-    invoices: (invoices ?? []) as Invoice[],
+    invoices: invoiceRows,
+    paymentByInvoice,
     logs: (logs ?? []) as ServiceLog[],
   };
 }
@@ -40,7 +61,7 @@ function Row({ label, value }: { label: string; value?: string | null }) {
 }
 
 export default async function ClientDetailPage({ params }: { params: { id: string } }) {
-  const { client, dogs, appts, invoices, logs } = await getClient(params.id);
+  const { client, dogs, appts, invoices, paymentByInvoice, logs } = await getClient(params.id);
   if (!client) notFound();
 
   const balance = invoices
@@ -130,20 +151,45 @@ export default async function ClientDetailPage({ params }: { params: { id: strin
         </Card>
 
         <Card className="p-5">
-          <div className="font-heading font-bold mb-3">Recent invoices</div>
+          <div className="flex items-center justify-between mb-3">
+            <div className="font-heading font-bold">Payment history</div>
+            <Link
+              href={`/invoices?customer=${client.id}`}
+              className="text-xs text-muted hover:text-brand"
+            >
+              All invoices →
+            </Link>
+          </div>
           {invoices.length === 0 ? (
             <p className="text-sm text-muted">No invoices yet.</p>
           ) : (
             <div className="divide-y divide-line">
-              {invoices.map((i) => (
-                <div key={i.id} className="flex items-center justify-between py-2.5 text-sm">
-                  <span>{shortDate(i.created_at)}</span>
-                  <span className="flex items-center gap-2">
-                    <span className="font-heading font-bold">{money(i.amount)}</span>
-                    <StatusPill status={i.status} />
-                  </span>
-                </div>
-              ))}
+              {invoices.map((i) => {
+                const pay = paymentByInvoice.get(i.id);
+                const week = i.period_start
+                  ? `${dayMonth(i.period_start)} to ${dayMonth(i.period_end ?? i.period_start)}`
+                  : shortDate(i.created_at);
+                return (
+                  <div key={i.id} className="flex items-center justify-between gap-2 py-2.5 text-sm">
+                    <span>
+                      <span className="block">{week}</span>
+                      <span className="block text-xs text-muted">
+                        {i.status === 'paid'
+                          ? [pay?.method, pay?.paid_at ? shortDate(pay.paid_at) : null]
+                              .filter(Boolean)
+                              .join(' · ') || 'paid'
+                          : i.due_date
+                            ? `due ${shortDate(i.due_date)}`
+                            : ''}
+                      </span>
+                    </span>
+                    <span className="flex items-center gap-2 shrink-0">
+                      <span className="font-heading font-bold">{money(i.amount)}</span>
+                      <StatusPill status={i.status} />
+                    </span>
+                  </div>
+                );
+              })}
             </div>
           )}
         </Card>

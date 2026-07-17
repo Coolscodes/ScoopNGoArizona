@@ -5,8 +5,15 @@ import { InvoicesView } from '@/components/invoices/InvoicesView';
 // Live AR + invoice book, always read fresh.
 export const dynamic = 'force-dynamic';
 
-export default async function InvoicesPage() {
-  const { rows, summary, balances } = await getInvoicesData();
+export default async function InvoicesPage({
+  searchParams,
+}: {
+  searchParams?: { customer?: string };
+}) {
+  const customerId = searchParams?.customer;
+  const { rows, summary, balances } = await getInvoicesData(
+    customerId ? { customerId } : undefined
+  );
 
   return (
     <div>
