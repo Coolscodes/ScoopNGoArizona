@@ -3,21 +3,25 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button, useToast } from '@/components/ui';
+import { RecordPaymentButton } from './RecordPaymentButton';
 
-// Charge the card on file (this week's visit price) or send a card-setup link.
-// Mirrors the invoices page actions so behavior is consistent across the app.
+// Charge the card on file (this week's visit price), record an outside payment,
+// or send a card-setup link. Mirrors the invoices page actions so behavior is
+// consistent across the app.
 export function ClientQuickActions({
   customerId,
   customerName,
   email,
   stripeCustomerId,
   hasCard,
+  price,
 }: {
   customerId: string;
   customerName: string;
   email?: string;
   stripeCustomerId?: string;
   hasCard: boolean;
+  price?: number;
 }) {
   const router = useRouter();
   const toast = useToast();
@@ -90,10 +94,15 @@ export function ClientQuickActions({
   }
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-2 flex-wrap">
       <Button variant="primary" size="sm" disabled={busy || !hasCard} onClick={chargeNow}>
         {busy ? 'Working…' : 'Charge now'}
       </Button>
+      <RecordPaymentButton
+        customerId={customerId}
+        customerName={customerName}
+        price={price}
+      />
       <Button variant="outline" size="sm" disabled={busy} onClick={setupLink}>
         {hasCard ? 'New card link' : 'Card setup link'}
       </Button>

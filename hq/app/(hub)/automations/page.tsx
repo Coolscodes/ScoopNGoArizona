@@ -17,7 +17,8 @@ async function loadAutomations(): Promise<Automation[]> {
       .select('*')
       .order('key', { ascending: true });
     if (error) throw error;
-    return (data ?? []) as Automation[];
+    // The cron heartbeat is a system record, not a user-facing toggle.
+    return ((data ?? []) as Automation[]).filter((a) => a.key !== 'cron_heartbeat');
   } catch {
     // Env keys may be placeholders / table may be empty, never crash the page.
     return [];

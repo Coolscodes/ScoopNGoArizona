@@ -87,6 +87,7 @@ export default async function ClientDetailPage({ params }: { params: { id: strin
                 email={client.email}
                 stripeCustomerId={client.stripe_customer_id}
                 hasCard={Boolean(client.stripe_payment_method_id)}
+                price={client.price_per_visit ?? undefined}
               />
               <ClientForm client={client} />
             </div>

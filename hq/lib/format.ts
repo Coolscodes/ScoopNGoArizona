@@ -1,6 +1,11 @@
 // Formatting helpers. Owned by Workstream 0.
 
-import { format, parseISO, startOfWeek, endOfWeek, isToday as dfIsToday } from 'date-fns';
+import { format, parseISO, isToday as dfIsToday } from 'date-fns';
+
+// The business runs in Arizona; the servers run in UTC. Every "what day is it"
+// question must be answered in Phoenix time or evening work (after 5pm MST =
+// midnight UTC) lands on the wrong day/week.
+export const BUSINESS_TZ = 'America/Phoenix';
 
 export function money(amount?: number | null): string {
   return new Intl.NumberFormat('en-US', {
@@ -46,18 +51,29 @@ export function initials(p?: { first_name?: string; last_name?: string } | null)
 
 export function isToday(date?: string | Date | null): boolean {
   if (!date) return false;
+  // Date-only strings compare against the Phoenix calendar day, not server-local.
+  if (typeof date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(date)) {
+    return date === todayISO();
+  }
   const d = typeof date === 'string' ? parseISO(date) : date;
   return dfIsToday(d);
 }
 
-// Monday-Sunday week bounds as YYYY-MM-DD strings (matches the existing charge flow).
-export function weekBounds(ref: Date = new Date()): { start: string; end: string } {
-  return {
-    start: format(startOfWeek(ref, { weekStartsOn: 1 }), 'yyyy-MM-dd'),
-    end: format(endOfWeek(ref, { weekStartsOn: 1 }), 'yyyy-MM-dd'),
-  };
+// Monday-Sunday week bounds as YYYY-MM-DD strings (matches the charge flow),
+// computed on the Phoenix calendar.
+export function weekBounds(ref?: Date): { start: string; end: string } {
+  const dayStr = ref
+    ? ref.toLocaleDateString('en-CA', { timeZone: BUSINESS_TZ })
+    : todayISO();
+  const d = new Date(dayStr + 'T00:00:00Z');
+  const day = d.getUTCDay();
+  d.setUTCDate(d.getUTCDate() + (day === 0 ? -6 : 1 - day));
+  const start = d.toISOString().slice(0, 10);
+  d.setUTCDate(d.getUTCDate() + 6);
+  return { start, end: d.toISOString().slice(0, 10) };
 }
 
+// Today's date in Phoenix, as YYYY-MM-DD (en-CA formats as ISO).
 export function todayISO(): string {
-  return format(new Date(), 'yyyy-MM-dd');
+  return new Date().toLocaleDateString('en-CA', { timeZone: BUSINESS_TZ });
 }
