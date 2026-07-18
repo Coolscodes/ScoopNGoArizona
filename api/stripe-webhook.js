@@ -103,9 +103,28 @@ export default async function handler(req, res) {
       }
     }
 
-    // 1. Mark invoice paid (admin-generated payment links)
+    // 1. Mark invoice paid (admin-generated payment links) AND record the
+    // payment itself so the books show how and when the money arrived.
     if (invoice_id) {
-      await supabase(`invoices?id=eq.${invoice_id}`, 'PATCH', { status: 'paid' });
+      const piId =
+        typeof session.payment_intent === 'string'
+          ? session.payment_intent
+          : session.payment_intent?.id || null;
+      await supabase(`invoices?id=eq.${invoice_id}`, 'PATCH', {
+        status: 'paid',
+        ...(piId ? { stripe_payment_intent_id: piId } : {}),
+      });
+      const amountPaid =
+        typeof session.amount_total === 'number' ? session.amount_total / 100 : null;
+      if (amountPaid) {
+        await supabase('payments', 'POST', {
+          invoice_id,
+          amount: amountPaid,
+          method: 'card',
+          paid_at: new Date().toISOString(),
+          notes: piId ? `Stripe payment link ${piId}` : 'Stripe payment link',
+        });
+      }
     }
 
     // 2. Auto-create customer when someone subscribes online

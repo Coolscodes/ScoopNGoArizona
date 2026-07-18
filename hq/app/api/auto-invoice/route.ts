@@ -1,6 +1,9 @@
 // Workstream 6, Weekly invoice generator (cron).
-// PORT of the repo-root /api/auto-invoice.js, preserving its tested behavior:
-//   - Monday to Sunday week; period_start = Monday, period_end = Sunday.
+//   - Monday to Sunday week (Phoenix calendar); period_start = Monday.
+//   - Only invoices clients who actually have a visit this week: an appointment
+//     inside the week in 'scheduled' or 'completed' status. This keeps bi-weekly
+//     and monthly clients (frequency_weeks > 1) from being billed on their off
+//     weeks, and skipped visits are never billed.
 //   - Idempotent: skip any customer who already has an invoice for this week's
 //     period_start (any status).
 //   - Skip customers with no price_per_visit.
@@ -8,16 +11,16 @@
 //     clamped to within the week.
 //   - Creates a 'sent' invoice noted "Week of <label> - <service_type|Visit>".
 //
-// Auth & scope (per WS6 conventions):
-//   - CRON_SECRET only (Bearer or x-cron-secret); fail closed if unset. The old
-//     ADMIN_PASSWORD path is dropped, staff trigger this from the authed app.
+// Auth & scope:
+//   - CRON_SECRET only (Bearer or x-cron-secret); fail closed if unset.
 //   - Default (cron) scope: only active customers whose preferred_day is today
-//     (matches the original cron behavior).
-//   - Pass ?scope=all to invoice ALL active customers (the original's manual
-//     "admin" behavior). GET and POST are both accepted; Vercel cron uses GET.
+//     (Phoenix). Pass ?scope=all to consider ALL active customers.
+//   GET and POST are both accepted; the daily cron orchestrator uses POST.
 
 import { NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase';
+import { currentWeek, dueDateFor } from '@/lib/charge-core';
+import { BUSINESS_TZ } from '@/lib/format';
 import type { Customer } from '@/lib/types';
 
 export const dynamic = 'force-dynamic';
@@ -45,30 +48,17 @@ async function generate(request: Request) {
   }
 
   const sb = supabaseServer();
-
-  // Monday of the current week as period_start (invoices are per-week).
-  const now = new Date();
-  const day = now.getDay(); // 0=Sun, 1=Mon...
-  const diffToMon = day === 0 ? -6 : 1 - day;
-  const monday = new Date(now);
-  monday.setDate(now.getDate() + diffToMon);
-  const sunday = new Date(monday);
-  sunday.setDate(monday.getDate() + 6);
-
-  const fmt = (d: Date) => d.toISOString().split('T')[0];
-  const periodStart = fmt(monday);
-  const periodEnd = fmt(sunday);
-
-  const fmtLabel = (d: Date) =>
-    d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-  const weekLabel = `${fmtLabel(monday)} to ${fmtLabel(sunday)}, ${monday.getFullYear()}`;
+  const week = currentWeek();
 
   const url = new URL(request.url);
   const scopeAll = url.searchParams.get('scope') === 'all';
-  const todayName = now.toLocaleDateString('en-US', { weekday: 'long' });
+  const todayName = new Date().toLocaleDateString('en-US', {
+    weekday: 'long',
+    timeZone: BUSINESS_TZ,
+  });
 
-  // Cron scope: only customers whose service day matches today.
-  // scope=all: every active customer (the original manual path).
+  // Cron scope: only customers whose service day matches today (Phoenix).
+  // scope=all: every active customer.
   let custQuery = sb
     .from('customers')
     .select('*')
@@ -80,21 +70,29 @@ async function generate(request: Request) {
   const customers = (custData ?? []) as Customer[];
 
   if (!customers.length) {
-    return NextResponse.json({ message: 'No active customers found', week: weekLabel });
+    return NextResponse.json({ message: 'No active customers found', week: week.weekLabel });
   }
 
   // Which customers already have an invoice for this week (idempotency).
   const { data: existing } = await sb
     .from('invoices')
     .select('customer_id')
-    .eq('period_start', periodStart);
+    .eq('period_start', week.periodStart);
   const existingIds = new Set(
     ((existing ?? []) as { customer_id: string }[]).map((i) => i.customer_id)
   );
 
-  const dayMap: Record<string, number> = {
-    Sunday: 0, Monday: 1, Tuesday: 2, Wednesday: 3, Thursday: 4, Friday: 5, Saturday: 6,
-  };
+  // Which customers have a real visit this week (scheduled or completed).
+  // No visit = no invoice; this is what respects frequency_weeks.
+  const { data: visitData } = await sb
+    .from('appointments')
+    .select('customer_id')
+    .gte('scheduled_at', week.periodStart)
+    .lte('scheduled_at', week.periodEnd)
+    .in('status', ['scheduled', 'completed']);
+  const visitingIds = new Set(
+    ((visitData ?? []) as { customer_id: string }[]).map((a) => a.customer_id)
+  );
 
   const results: GenResult[] = [];
 
@@ -105,25 +103,23 @@ async function generate(request: Request) {
       results.push({ name, status: 'skipped (already invoiced this week)' });
       continue;
     }
+    if (!visitingIds.has(c.id)) {
+      results.push({ name, status: 'skipped (no visit this week)' });
+      continue;
+    }
     if (!c.price_per_visit) {
       results.push({ name, status: 'skipped (no price set)' });
       continue;
     }
 
-    // Due date = their service day this week, or Friday if none set.
-    const serviceDayNum = (c.preferred_day ? dayMap[c.preferred_day] : undefined) ?? 5;
-    const dueDate = new Date(monday);
-    dueDate.setDate(monday.getDate() + ((serviceDayNum - 1 + 7) % 7));
-    const dueDateStr = fmt(dueDate <= sunday ? dueDate : sunday);
-
     const { error } = await sb.from('invoices').insert({
       customer_id: c.id,
       amount: c.price_per_visit,
       status: 'sent',
-      due_date: dueDateStr,
-      period_start: periodStart,
-      period_end: periodEnd,
-      notes: `Week of ${weekLabel} - ${c.service_type || 'Visit'}`,
+      due_date: dueDateFor(c, week),
+      period_start: week.periodStart,
+      period_end: week.periodEnd,
+      notes: `Week of ${week.weekLabel} - ${c.service_type || 'Visit'}`,
     });
 
     results.push({
@@ -136,7 +132,7 @@ async function generate(request: Request) {
   const created = results.filter((r) => r.status === 'created').length;
   const skipped = results.filter((r) => r.status.startsWith('skipped')).length;
 
-  return NextResponse.json({ week: weekLabel, created, skipped, results });
+  return NextResponse.json({ week: week.weekLabel, created, skipped, results });
 }
 
 export async function GET(request: Request) {

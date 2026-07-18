@@ -25,6 +25,14 @@ export interface AttentionItem {
   dueDate?: string;
 }
 
+// A past visit still sitting 'scheduled': needs to be closed out (done/skip).
+export interface UnclosedVisit {
+  appointmentId: string;
+  customerId: string;
+  customerName: string;
+  scheduledAt: string;
+}
+
 export interface DashboardData {
   metrics: {
     todaysStops: number;
@@ -33,6 +41,9 @@ export interface DashboardData {
     newRequests: number;
   };
   needsAttention: AttentionItem[];
+  unclosedVisits: UnclosedVisit[];
+  // When the daily cron last ran (heartbeat), null if it has never run.
+  cronLastRunAt: string | null;
   route: RouteStop[];
   // True when no data store is reachable (placeholder env / query error).
   // The UI still renders gracefully; this just lets callers know it's empty-by-default.
@@ -67,7 +78,7 @@ export async function getDashboardData(): Promise<DashboardData> {
   // scheduled_at may be a date or a timestamp; bound the whole day [today, today+1).
   const tomorrow = nextDayISO(today);
 
-  const [apptRes, paymentsRes, invoicesRes, leadsRes] = await Promise.all([
+  const [apptRes, paymentsRes, invoicesRes, leadsRes, unclosedRes, heartbeatRes] = await Promise.all([
     safeRows<Appointment>(() =>
       sb
         .from('appointments')
@@ -97,6 +108,20 @@ export async function getDashboardData(): Promise<DashboardData> {
     safeRows<{ id: string }>(() =>
       sb.from('leads').select('id').eq('status', 'new')
     ),
+    // Past visits still 'scheduled': should have been closed out (done/skip).
+    safeRows<Pick<Appointment, 'id' | 'customer_id' | 'scheduled_at'>>(() =>
+      sb
+        .from('appointments')
+        .select('id, customer_id, scheduled_at')
+        .eq('status', 'scheduled')
+        .lt('scheduled_at', today)
+        .order('scheduled_at', { ascending: false })
+        .limit(20)
+    ),
+    // Daily-cron heartbeat (written by /api/cron/daily).
+    safeRows<{ config: { last_run_at?: string } | null }>(() =>
+      sb.from('automations').select('config').eq('key', 'cron_heartbeat').limit(1)
+    ),
   ]);
 
   const degraded =
@@ -124,11 +149,13 @@ export async function getDashboardData(): Promise<DashboardData> {
   // Metric: new lead requests.
   const newRequests = leadsRes.rows.length;
 
-  // Gather customer ids we need (route stops + attention invoices) in one fetch.
+  // Gather customer ids we need (route stops + attention invoices + unclosed
+  // visits) in one fetch.
   const customerIds = Array.from(
     new Set([
       ...todaysAppointments.map((a) => a.customer_id),
       ...invoicesRes.rows.map((i) => i.customer_id),
+      ...unclosedRes.rows.map((a) => a.customer_id),
     ])
   ).filter(Boolean);
 
@@ -185,6 +212,15 @@ export async function getDashboardData(): Promise<DashboardData> {
       dogCount: dogCountByCustomer.get(a.customer_id) ?? 0,
     }));
 
+  const unclosedVisits: UnclosedVisit[] = unclosedRes.rows.map((a) => ({
+    appointmentId: a.id,
+    customerId: a.customer_id,
+    customerName: fullName(customersById.get(a.customer_id)),
+    scheduledAt: a.scheduled_at,
+  }));
+
+  const cronLastRunAt = heartbeatRes.rows[0]?.config?.last_run_at ?? null;
+
   return {
     metrics: {
       todaysStops,
@@ -193,6 +229,8 @@ export async function getDashboardData(): Promise<DashboardData> {
       newRequests,
     },
     needsAttention,
+    unclosedVisits,
+    cronLastRunAt,
     route,
     degraded,
   };

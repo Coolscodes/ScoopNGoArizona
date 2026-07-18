@@ -18,7 +18,8 @@ import { supabaseServer } from './supabase';
 import type { Customer, Invoice } from './types';
 
 const OWNER_EMAIL = 'scoopngoarizona@gmail.com';
-const FROM = 'Scoop N Go Arizona <onboarding@resend.dev>';
+// Domain verified in Resend (scoopngoarizona.com); requires RESEND_API_KEY in env.
+const FROM = 'Scoop N Go Arizona <hello@scoopngoarizona.com>';
 
 type Supa = ReturnType<typeof supabaseServer>;
 
@@ -32,35 +33,49 @@ export interface WeekInfo {
   sunday: Date;
 }
 
-export function currentWeek(now: Date = new Date()): WeekInfo {
-  const day = now.getDay(); // 0=Sun, 1=Mon...
-  const diffToMon = day === 0 ? -6 : 1 - day;
-  const monday = new Date(now);
-  monday.setDate(now.getDate() + diffToMon);
-  return weekFromMonday(monday);
+// All week math is done on YYYY-MM-DD strings pinned to UTC noon-less midnights,
+// so it gives identical answers on a UTC server and a laptop in Arizona. "Today"
+// is always the Phoenix calendar day.
+function isoToUTC(iso: string): Date {
+  return new Date(iso + 'T00:00:00Z');
 }
 
-function weekFromMonday(monday: Date): WeekInfo {
-  const sunday = new Date(monday);
-  sunday.setDate(monday.getDate() + 6);
-  const fmt = (d: Date) => d.toISOString().split('T')[0];
-  const fmtLabel = (d: Date) =>
-    d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+export function addDaysISO(iso: string, days: number): string {
+  const d = isoToUTC(iso);
+  d.setUTCDate(d.getUTCDate() + days);
+  return d.toISOString().slice(0, 10);
+}
+
+function labelFor(iso: string): string {
+  return isoToUTC(iso).toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    timeZone: 'UTC',
+  });
+}
+
+function weekFromMondayISO(mondayISO: string): WeekInfo {
+  const periodEnd = addDaysISO(mondayISO, 6);
   return {
-    periodStart: fmt(monday),
-    periodEnd: fmt(sunday),
-    weekLabel: `${fmtLabel(monday)} to ${fmtLabel(sunday)}, ${monday.getFullYear()}`,
-    monday,
-    sunday,
+    periodStart: mondayISO,
+    periodEnd,
+    weekLabel: `${labelFor(mondayISO)} to ${labelFor(periodEnd)}, ${mondayISO.slice(0, 4)}`,
+    monday: isoToUTC(mondayISO),
+    sunday: isoToUTC(periodEnd),
   };
 }
 
-// WeekInfo for a stored invoice period_start (YYYY-MM-DD). Parsed as a local
-// date so the label never shifts a day across timezones. Works for any start
+export function currentWeek(now: Date = new Date()): WeekInfo {
+  const todayStr = now.toLocaleDateString('en-CA', { timeZone: 'America/Phoenix' });
+  const day = isoToUTC(todayStr).getUTCDay(); // 0=Sun, 1=Mon...
+  const diffToMon = day === 0 ? -6 : 1 - day;
+  return weekFromMondayISO(addDaysISO(todayStr, diffToMon));
+}
+
+// WeekInfo for a stored invoice period_start (YYYY-MM-DD). Works for any start
 // date, not just Mondays, since some hand-made invoices have odd bounds.
 export function weekFromPeriodStart(periodStart: string): WeekInfo {
-  const [y, m, d] = periodStart.split('-').map(Number);
-  return weekFromMonday(new Date(y, m - 1, d));
+  return weekFromMondayISO(periodStart);
 }
 
 // The customer's oldest unpaid ('sent' or 'overdue') invoice, by period. This
@@ -87,10 +102,8 @@ export function dueDateFor(c: Customer, week: WeekInfo): string {
     Sunday: 0, Monday: 1, Tuesday: 2, Wednesday: 3, Thursday: 4, Friday: 5, Saturday: 6,
   };
   const serviceDayNum = (c.preferred_day ? dayMap[c.preferred_day] : undefined) ?? 5;
-  const dueDate = new Date(week.monday);
-  dueDate.setDate(week.monday.getDate() + ((serviceDayNum - 1 + 7) % 7));
-  const fmt = (d: Date) => d.toISOString().split('T')[0];
-  return fmt(dueDate <= week.sunday ? dueDate : week.sunday);
+  const due = addDaysISO(week.periodStart, (serviceDayNum - 1 + 7) % 7);
+  return due <= week.periodEnd ? due : week.periodEnd;
 }
 
 // --- emails -------------------------------------------------------------------
@@ -143,7 +156,7 @@ async function sendReceiptEmail(
   amount: number
 ): Promise<void> {
   const resendKey = process.env.RESEND_API_KEY;
-  if (!resendKey || !c.email) return;
+  if (!resendKey) return;
   try {
     await fetch('https://api.resend.com/emails', {
       method: 'POST',
@@ -153,9 +166,10 @@ async function sendReceiptEmail(
       },
       body: JSON.stringify({
         from: FROM,
-        // Resend restriction: can only send to the verified email in test mode.
-        to: OWNER_EMAIL,
-        reply_to: c.email,
+        // Send to the client when we have their email; otherwise the owner
+        // still gets a copy so every charge leaves a paper trail.
+        to: c.email || OWNER_EMAIL,
+        reply_to: 'scoopngoarizona@gmail.com',
         subject: `Receipt: Scoop N Go Arizona: Week of ${weekLabel}`,
         html: `
           <div style="font-family:Arial,sans-serif;max-width:500px;margin:0 auto;padding:20px;">

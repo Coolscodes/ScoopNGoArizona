@@ -22,7 +22,7 @@
 
 import { NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase';
-import { autoChargeOnCompletion, type AutoChargeOutcome } from '@/lib/charge-core';
+import { autoChargeOnCompletion, currentWeek, type AutoChargeOutcome } from '@/lib/charge-core';
 import { todayISO } from '@/lib/format';
 import type { Appointment, ApptStatus, Customer } from '@/lib/types';
 
@@ -245,7 +245,33 @@ export async function PATCH(request: Request) {
         // Log sync is best-effort; the status change itself already succeeded.
       }
 
-      return NextResponse.json({ ok: true, id, status, charge: chargeOutcome });
+      // Undoing a completion cannot un-charge a card. If this client's current
+      // week is already paid, tell the UI so it can warn the operator.
+      let paidThisWeek = false;
+      if (status !== 'completed') {
+        try {
+          const { data: appt } = await sb
+            .from('appointments')
+            .select('customer_id')
+            .eq('id', id)
+            .single();
+          if (appt) {
+            const week = currentWeek();
+            const { data: paid } = await sb
+              .from('invoices')
+              .select('id')
+              .eq('customer_id', (appt as { customer_id: string }).customer_id)
+              .eq('period_start', week.periodStart)
+              .eq('status', 'paid')
+              .limit(1);
+            paidThisWeek = (paid ?? []).length > 0;
+          }
+        } catch {
+          // Advisory only.
+        }
+      }
+
+      return NextResponse.json({ ok: true, id, status, charge: chargeOutcome, paidThisWeek });
     }
 
     return NextResponse.json(

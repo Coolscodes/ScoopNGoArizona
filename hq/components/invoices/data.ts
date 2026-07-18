@@ -5,7 +5,7 @@
 // client). Only imported by server components and route handlers.
 
 import { supabaseServer } from '@/lib/supabase';
-import { todayISO } from '@/lib/format';
+import { todayISO, weekBounds } from '@/lib/format';
 import type { Customer, Invoice, InvoiceStatus } from '@/lib/types';
 
 // An invoice enriched with the client it belongs to (name + card-on-file status).
@@ -73,21 +73,12 @@ function round2(n: number): number {
   return Math.round(n * 100) / 100;
 }
 
-// Monday-Sunday week bounds (matches the existing charge flow).
-function weekStartISO(ref: Date = new Date()): string {
-  const day = ref.getDay(); // 0=Sun
-  const diffToMon = day === 0 ? -6 : 1 - day;
-  const monday = new Date(ref);
-  monday.setDate(ref.getDate() + diffToMon);
-  return monday.toISOString().split('T')[0];
-}
-
 export async function getInvoicesData(opts?: {
   status?: InvoiceStatus;
   customerId?: string;
 }): Promise<InvoicesData> {
   const today = todayISO();
-  const weekStart = weekStartISO();
+  const weekStart = weekBounds().start;
   const sb = supabaseServer();
 
   // Pull every invoice once; filtering for the visible list happens after we

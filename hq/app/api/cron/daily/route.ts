@@ -12,6 +12,7 @@
 // Vercel cron job (within Hobby-plan limits) and guarantees ordering.
 
 import { NextResponse } from 'next/server';
+import { supabaseServer } from '@/lib/supabase';
 
 export const dynamic = 'force-dynamic';
 
@@ -45,6 +46,34 @@ export async function GET(request: Request) {
     } catch (err) {
       results[path] = { error: err instanceof Error ? err.message : String(err) };
     }
+  }
+
+  // Heartbeat: record that the daily run happened, so the dashboard can warn
+  // when the scheduler silently stops (it once sat dead for three weeks).
+  // Stored as a hidden automations row; the Automations UI filters it out.
+  try {
+    const sb = supabaseServer();
+    const now = new Date().toISOString();
+    const { data: hb } = await sb
+      .from('automations')
+      .select('id')
+      .eq('key', 'cron_heartbeat')
+      .limit(1);
+    if (hb && hb.length > 0) {
+      await sb
+        .from('automations')
+        .update({ config: { last_run_at: now } })
+        .eq('key', 'cron_heartbeat');
+    } else {
+      await sb.from('automations').insert({
+        key: 'cron_heartbeat',
+        label: 'Daily cron heartbeat (system)',
+        enabled: true,
+        config: { last_run_at: now },
+      });
+    }
+  } catch {
+    // The heartbeat must never fail the run itself.
   }
 
   return NextResponse.json({ ran: true, at: new Date().toISOString(), results });

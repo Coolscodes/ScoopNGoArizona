@@ -142,8 +142,15 @@ export function RouteList({
         body: JSON.stringify({ action: 'status', id: stop.id, status: next, no_charge: noCharge }),
       });
       if (!res.ok) throw new Error('status failed');
-      const data = (await res.json().catch(() => ({}))) as { charge?: ChargeOutcome | null };
+      const data = (await res.json().catch(() => ({}))) as {
+        charge?: ChargeOutcome | null;
+        paidThisWeek?: boolean;
+      };
       toast(doneMessage(next, noCharge, data.charge ?? null), chargeFailed(data.charge ?? null) ? 'error' : undefined);
+      // Undo cannot un-charge: if their week is already paid, say so.
+      if (next !== 'completed' && data.paidThisWeek) {
+        toast('Heads up: this week was already charged. Undo does not refund, handle any refund in Stripe.', 'info');
+      }
     } catch {
       setStops((prev) => prev.map((s) => (s.id === stop.id ? { ...s, status: prevStatus } : s)));
       toast('Could not update the stop', 'error');
