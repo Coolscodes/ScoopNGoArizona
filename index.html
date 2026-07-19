@@ -347,6 +347,14 @@
     .form-submit:hover:not(:disabled) { background: var(--orange-deep); transform: translateY(-2px); }
     .form-submit:disabled { opacity: .7; cursor: not-allowed; }
     .form-note { font-size: .78rem; color: var(--mid); text-align: center; margin-top: .9rem; }
+    .form-more { margin-bottom: .3rem; }
+    .form-more > summary { cursor: pointer; list-style: none; display: flex; align-items: center; gap: .5rem; padding: .6rem 0; font-size: .88rem; font-weight: 700; color: var(--pine); }
+    .form-more > summary::-webkit-details-marker { display: none; }
+    .form-more > summary::before { content: '+'; flex-shrink: 0; width: 20px; height: 20px; border-radius: 50%; background: var(--orange-soft); color: var(--orange-deep); font-weight: 800; font-size: .85rem; display: flex; align-items: center; justify-content: center; line-height: 1; }
+    .form-more[open] > summary::before { content: '\2212'; }
+    .form-more > summary span { font-weight: 500; color: var(--mid); }
+    .form-more > summary:hover { color: var(--orange-deep); }
+    .form-more > .form-row:first-of-type { margin-top: .4rem; }
     .form-success { display: none; text-align: center; padding: 1.5rem 0; }
     .form-success.show { display: block; }
     .form-success-icon { font-size: 3.5rem; margin-bottom: .8rem; }
@@ -726,15 +734,8 @@
       <!-- Form -->
       <div id="quoteForm">
         <div class="form-row">
-          <div class="form-group"><label for="firstName">First Name *</label><input type="text" id="firstName" placeholder="Jane" autocomplete="given-name"/></div>
-          <div class="form-group"><label for="lastName">Last Name *</label><input type="text" id="lastName" placeholder="Smith" autocomplete="family-name"/></div>
-        </div>
-        <div class="form-row">
+          <div class="form-group"><label for="fullName">Name *</label><input type="text" id="fullName" placeholder="Jane Smith" autocomplete="name"/></div>
           <div class="form-group"><label for="phone">Phone Number *</label><input type="tel" id="phone" placeholder="(602) 555-0000" autocomplete="tel"/></div>
-          <div class="form-group"><label for="email">Email Address *</label><input type="email" id="email" placeholder="jane@email.com" autocomplete="email"/></div>
-        </div>
-        <div class="form-row">
-          <div class="form-group full"><label for="address">Service Address *</label><input type="text" id="address" placeholder="123 N Example St, Gilbert" autocomplete="street-address"/></div>
         </div>
         <!-- Honeypot: hidden from humans, bots tend to fill it. If filled, we drop the submission. -->
         <div aria-hidden="true" style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;"><label for="company">Company</label><input type="text" id="company" name="company" tabindex="-1" autocomplete="off"/></div>
@@ -749,9 +750,16 @@
             <select id="frequency"><option value="">Select...</option><option>Weekly</option><option>Bi-Weekly</option><option>Monthly</option><option>One-Time Cleanup</option></select>
           </div>
         </div>
-        <div class="form-row">
-          <div class="form-group full"><label for="details">Any additional details?</label><textarea id="details" placeholder="Gate code, access info, specific needs..."></textarea></div>
-        </div>
+        <details class="form-more">
+          <summary>Add email, address or notes <span>(optional)</span></summary>
+          <div class="form-row">
+            <div class="form-group"><label for="email">Email Address</label><input type="email" id="email" placeholder="jane@email.com" autocomplete="email"/></div>
+            <div class="form-group"><label for="address">Service Address</label><input type="text" id="address" placeholder="123 N Example St, Gilbert" autocomplete="street-address"/></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group full"><label for="details">Any additional details?</label><textarea id="details" placeholder="Gate code, access info, specific needs..."></textarea></div>
+          </div>
+        </details>
         <button class="form-submit" id="submitBtn" onclick="handleSubmit()">🐾 Submit My Quote Request</button>
         <div class="form-error" id="formError"></div>
         <p class="form-note">We typically respond within 2 hours. No spam, ever.</p>
@@ -1034,8 +1042,7 @@
       return;
     }
 
-    var firstName = document.getElementById('firstName').value.trim();
-    var lastName  = document.getElementById('lastName').value.trim();
+    var fullName  = document.getElementById('fullName').value.trim();
     var phone     = document.getElementById('phone').value.trim();
     var email     = document.getElementById('email').value.trim();
     var address   = document.getElementById('address').value.trim();
@@ -1045,17 +1052,24 @@
     var details   = document.getElementById('details').value.trim();
     var errorEl   = document.getElementById('formError');
 
-    if (!firstName || !lastName || !phone || !email || !address || !zip || !dogs || !frequency) {
+    // Only name, phone, zip, dogs and frequency are required. Email and address are optional
+    // so the form stays short; the rest gets collected on the callback.
+    if (!fullName || !phone || !zip || !dogs || !frequency) {
       errorEl.textContent = 'Please fill out all required fields marked with *.';
       errorEl.classList.add('show');
       return;
     }
+
+    // Split the single name field so the leads table keeps its first/last columns.
+    var nameParts = fullName.split(/\s+/);
+    var firstName = nameParts.shift();
+    var lastName  = nameParts.join(' ');
     errorEl.classList.remove('show');
 
     var source = getLeadSource();
 
     // Fold service address + lead source into notes (leads table has no dedicated columns yet).
-    var meta = ['Service address: ' + address + (zip ? ', ' + zip : ''), 'Lead source: ' + source];
+    var meta = ['Service address: ' + (address ? address + ', ' : '') + zip, 'Lead source: ' + source];
     var fullNotes = details ? (details + '\n\n' + meta.join('\n')) : meta.join('\n');
 
     var btn = document.getElementById('submitBtn');
