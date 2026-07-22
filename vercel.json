@@ -2,7 +2,8 @@
   "rewrites": [
     { "source": "/admin", "destination": "/admin.html" },
     { "source": "/payment-success", "destination": "/payment-success.html" },
-    { "source": "/tip", "destination": "/tip.html" }
+    { "source": "/tip", "destination": "/tip.html" },
+    { "source": "/privacy", "destination": "/privacy.html" }
   ],
   "crons": [
     {
