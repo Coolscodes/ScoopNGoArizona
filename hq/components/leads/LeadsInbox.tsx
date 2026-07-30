@@ -14,6 +14,7 @@ import {
   Avatar,
 } from '@/components/ui';
 import { phone as fmtPhone, fullName, initials, shortDate } from '@/lib/format';
+import { leadReplyText, smsLink } from '@/lib/lead-reply';
 import type { Lead, LeadStatus } from '@/lib/types';
 
 const STATUS_OPTIONS: LeadStatus[] = ['new', 'contacted', 'converted', 'lost'];
@@ -24,6 +25,36 @@ const FILTERS: Array<{ key: LeadStatus | 'all'; label: string }> = [
   { key: 'converted', label: 'Converted' },
   { key: 'lost', label: 'Lost' },
 ];
+
+// The leads table has no city column, so the Meta poller stashes the answer in
+// notes as "City answer: Chandler | meta:123". Pull it back out so the reply can
+// name their city; leadReplyText falls back to the zip when it is missing.
+function cityFromNotes(notes?: string): string {
+  const m = (notes ?? '').match(/City answer:\s*([^|]+)/i);
+  return m ? m[1].trim() : '';
+}
+
+// Opens Messages with the confirmation text already written, so it goes out from
+// Jett's own number rather than some unfamiliar business line.
+function textLink(l: Lead): string {
+  return smsLink(
+    l.phone,
+    leadReplyText({
+      firstName: l.first_name,
+      city: cityFromNotes(l.notes),
+      zip: l.zip,
+      dogs: l.dogs,
+      frequency: l.service_type,
+      createdAt: l.created_at,
+    })
+  );
+}
+
+const TEXT_LINK_CLASS =
+  'inline-flex items-center justify-center gap-1.5 rounded-[7px] font-heading font-bold ' +
+  'transition-colors touch-manipulation bg-transparent text-muted border-2 border-line ' +
+  'hover:border-brand hover:text-brand px-3 py-1.5 text-[0.78rem] ' +
+  'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-dark';
 
 export function LeadsInbox({ leads }: { leads: Lead[] }) {
   const router = useRouter();
@@ -168,18 +199,25 @@ export function LeadsInbox({ leads }: { leads: Lead[] }) {
                   </Select>
                 </Td>
                 <Td className="text-right whitespace-nowrap">
-                  {l.status === 'converted' ? (
-                    <StatusPill status="converted" />
-                  ) : (
-                    <Button
-                      variant="primary"
-                      size="sm"
-                      onClick={() => convert(l.id)}
-                      disabled={busyId === l.id}
-                    >
-                      {busyId === l.id ? '…' : 'Convert to client'}
-                    </Button>
-                  )}
+                  <div className="inline-flex items-center gap-2">
+                    {textLink(l) && (
+                      <a href={textLink(l)} className={TEXT_LINK_CLASS}>
+                        Text
+                      </a>
+                    )}
+                    {l.status === 'converted' ? (
+                      <StatusPill status="converted" />
+                    ) : (
+                      <Button
+                        variant="primary"
+                        size="sm"
+                        onClick={() => convert(l.id)}
+                        disabled={busyId === l.id}
+                      >
+                        {busyId === l.id ? '…' : 'Convert to client'}
+                      </Button>
+                    )}
+                  </div>
                 </Td>
               </tr>
             ))}
