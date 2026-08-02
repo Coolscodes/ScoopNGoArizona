@@ -184,10 +184,11 @@
     .hero-visual .blob { position: absolute; inset: -8% -6%; background: radial-gradient(circle at 50% 45%, var(--sand) 0%, var(--sand) 58%, transparent 60%); z-index: 0; }
     .hero-visual img { position: relative; z-index: 1; width: min(400px, 88%); border-radius: 50%; box-shadow: var(--shadow-lg); animation: float 7s ease-in-out infinite; }
     @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
-    .hero-chip { position: absolute; z-index: 2; background: var(--white); border: 1px solid var(--line); border-radius: 14px; box-shadow: var(--shadow-md); padding: .6rem .95rem; font-size: .8rem; font-weight: 700; color: var(--pine-deep); display: flex; align-items: center; gap: .5rem; }
+    @keyframes floatChip { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-7px); } }
+    .hero-chip { position: absolute; z-index: 2; background: var(--white); border: 1px solid var(--line); border-radius: 14px; box-shadow: var(--shadow-md); padding: .6rem .95rem; font-size: .8rem; font-weight: 700; color: var(--pine-deep); display: flex; align-items: center; gap: .5rem; white-space: nowrap; }
     .hero-chip .big { font-family: var(--font-display); font-size: 1.05rem; color: var(--orange-deep); }
-    .chip-1 { top: 6%; left: 0; animation: float 6s ease-in-out infinite .5s; }
-    .chip-2 { bottom: 10%; right: 0; animation: float 6.5s ease-in-out infinite 1s; }
+    .chip-1 { top: -54px; left: 0; animation: floatChip 6s ease-in-out infinite .5s; }
+    .chip-2 { bottom: -58px; right: 0; animation: floatChip 6.5s ease-in-out infinite 1s; }
     .hero-wave { display: block; width: 100%; margin-bottom: -1px; }
 
     /* ---------- Section scaffolding ---------- */
@@ -399,9 +400,11 @@
       .hero-inner { grid-template-columns: 1fr; text-align: center; gap: 2.5rem; padding-bottom: 60px; }
       .hero p.lede { margin-left: auto; margin-right: auto; }
       .hero-btns, .hero-checks { justify-content: center; }
-      .hero-visual { order: -1; }
-      .hero-visual img { width: min(300px, 72%); }
-      .chip-1 { left: 4%; } .chip-2 { right: 4%; }
+      .hero-visual { order: -1; flex-direction: column; align-items: center; gap: .5rem; }
+      .hero-visual img { width: min(280px, 68%); }
+      .hero-chip { position: static; animation: none; font-size: .76rem; padding: .5rem .85rem; }
+      .chip-1 { top: auto; right: auto; bottom: auto; left: auto; }
+      .chip-2 { display: none; } /* duplicates the "Gate Photo Every Visit" check below */
       .how-grid, .service-grid, .why-grid, .reviews-grid { grid-template-columns: 1fr; }
       .ba-grid { grid-template-columns: 1fr; max-width: 560px; gap: 2.5rem; }
       .how-card { margin-top: 14px; }
