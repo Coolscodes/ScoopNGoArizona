@@ -525,7 +525,7 @@
       <p class="section-sub">From messy yard to spotless in three easy steps. No contracts, no hassle, no gross Saturday chores.</p>
     </div>
     <div class="how-grid">
-      <div class="how-card reveal"><div class="how-num">1</div><div class="how-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 21v-5"/><path d="M4 12V3"/><path d="M12 21v-9"/><path d="M12 8V3"/><path d="M20 21v-7"/><path d="M20 10V3"/><circle cx="4" cy="14" r="2"/><circle cx="12" cy="10" r="2"/><circle cx="20" cy="12" r="2"/></svg></div><h3>Pick Your Plan</h3><p>Use the price builder below to choose weekly, bi-weekly, monthly, or one-time service. See your exact price instantly and subscribe online in under a minute.</p></div>
+      <div class="how-card reveal"><div class="how-num">1</div><div class="how-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 21v-5"/><path d="M4 12V3"/><path d="M12 21v-9"/><path d="M12 8V3"/><path d="M20 21v-7"/><path d="M20 10V3"/><circle cx="4" cy="14" r="2"/><circle cx="12" cy="10" r="2"/><circle cx="20" cy="12" r="2"/></svg></div><h3>Pick Your Plan</h3><p>Use the price builder below to choose weekly, bi-weekly, monthly, or one-time service. See your exact price instantly and start service online in under a minute.</p></div>
       <div class="how-card reveal reveal-d1"><div class="how-num">2</div><div class="how-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5l1.7 4.8 4.8 1.7-4.8 1.7L12 16.5l-1.7-4.8-4.8-1.7 4.8-1.7L12 3.5z"/><path d="M19 15.5v3"/><path d="M17.5 17h3"/><path d="M5 17.5v3"/><path d="M3.5 19h3"/></svg></div><h3>We Scoop &amp; Sanitize</h3><p>Your tech texts you on the way, does a full-yard sweep, and double-bags everything into your outdoor trash bin, or adds haul-away and we take it with us. Equipment is sanitized between every yard.</p></div>
       <div class="how-card reveal reveal-d2"><div class="how-num">3</div><div class="how-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8a2 2 0 0 1 2-2h2l1.2-1.6A1 1 0 0 1 9 4h6a1 1 0 0 1 .8.4L17 6h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8Z"/><circle cx="12" cy="12.5" r="3.2"/></svg></div><h3>Gate Photo &amp; Done</h3><p>You get a "job complete" text with a photo of your securely closed gate. Let the dogs out, the yard is clean and your weekend is yours.</p></div>
     </div>
@@ -868,7 +868,7 @@
     if (_plan === 'onetime') {
       document.getElementById('priceMonthly').textContent = 'One-time visit · book & pay online';
     } else if (_plan === 'monthly') {
-      document.getElementById('priceMonthly').textContent = '$' + price + ' billed monthly';
+      document.getElementById('priceMonthly').textContent = '$' + price + ' today, then $' + price + ' per month';
     } else {
       document.getElementById('priceMonthly').textContent = '$' + (price * prepaidVisits) + ' today, then $' + price + '/visit';
     }
@@ -889,15 +889,15 @@
     if (_plan === 'onetime') {
       cta.textContent = 'Book My Cleanup →';
     } else if (hasOffer) {
-      cta.textContent = 'Subscribe · First Cleanup FREE →';
+      cta.textContent = 'Start Service · First Cleanup FREE →';
     } else {
-      cta.textContent = 'Subscribe Online →';
+      cta.textContent = 'Start My Service →';
     }
     cta.onclick = doSubscribe;
 
     // Fineprint offer note (weekly & bi-weekly only)
     var fineOffer = document.getElementById('fineOffer');
-    if (fineOffer) fineOffer.textContent = hasOffer ? 'First cleanup free + intro visits prepaid at signup, then pay per visit · ' : '';
+    if (fineOffer) fineOffer.textContent = hasOffer ? 'First cleanup free + intro visits paid at signup, then we text you to set your service day and start per-visit billing · ' : '';
 
     // Dog plural
     document.getElementById('dogPlural').textContent = _dogs > 1 ? 's' : '';

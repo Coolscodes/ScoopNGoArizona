@@ -1,33 +1,32 @@
-// Creates a Stripe checkout session: recurring subscription plans or a one-time cleanup payment
+// Creates a Stripe checkout session. Every plan is sold as a ONE-TIME charge for an intro
+// block of visits, never a subscription, so Stripe shows a plain "pay today" page with no
+// trial banner. The card is saved to the customer, so ongoing per-visit billing gets set up
+// by hand in Stripe once the service day and start date are confirmed with the client.
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end();
 
   const { plan, dogs, deodorizer, haul_away, amount_cents, label } = req.body;
   const origin = 'https://scoopngoarizona.com';
 
-  // Recurring cadence per plan. One-time is a mode:payment checkout, not a subscription.
-  const plans = {
-    weekly:   { interval: 'week',  interval_count: 1, cadence: 'every week' },
-    biweekly: { interval: 'week',  interval_count: 2, cadence: 'every 2 weeks' },
-    monthly:  { interval: 'month', interval_count: 1, cadence: 'every month' },
+  // Intro block bought up front, plus the cadence the ongoing service will run on later.
+  // freeFirst is the new-client special: first cleanup free no matter the size of the job.
+  //   weekly:   FREE first + 4 paid weekly visits  = 5 visits
+  //   biweekly: FREE first + 3 paid bi-weekly visits = 4 visits
+  //   monthly:  1 paid visit, no free cleanup
+  //   onetime:  single cleanup, no ongoing service
+  const intros = {
+    weekly:   { paidVisits: 4, freeFirst: true,  cadence: 'every week' },
+    biweekly: { paidVisits: 3, freeFirst: true,  cadence: 'every 2 weeks' },
+    monthly:  { paidVisits: 1, freeFirst: false, cadence: 'every month' },
     onetime:  null,
   };
 
-  // New-client special (WEEKLY & BI-WEEKLY only): FREE first cleanup, then prepay a set number
-  // of paid visits up front, then regular per-visit billing resumes. The trial period covers the
-  // free + prepaid service window so Stripe does not double-charge during it.
-  //   weekly:   free wk1 + 4 paid weeks = 5 weeks of service, per-visit billing resumes wk6 (day 35)
-  //   biweekly: free + 3 paid bi-weekly visits = 4 visits, per-visit billing resumes visit 5 (day 56)
-  const offers = {
-    weekly:   { prepaidVisits: 4, trialDays: 35 },
-    biweekly: { prepaidVisits: 3, trialDays: 56 },
-  };
+  if (!(plan in intros) || !amount_cents) return res.status(400).json({ error: 'Invalid plan or amount' });
 
-  if (!(plan in plans) || !amount_cents) return res.status(400).json({ error: 'Invalid plan or amount' });
-
-  const selected = plans[plan];
-  const offer = offers[plan] || null;
+  const intro = intros[plan];
   const isOneTime = plan === 'onetime';
+  const paidVisits = intro ? intro.paidVisits : 1;
+  const totalVisits = paidVisits + (intro && intro.freeFirst ? 1 : 0);
 
   const planLabel   = { weekly: 'Weekly', biweekly: 'Bi-Weekly', monthly: 'Monthly', onetime: 'One-Time' }[plan];
   const productName = `Scoop N Go Arizona | ${planLabel} Dog Waste ${isOneTime ? 'Cleanup' : 'Removal'}`;
@@ -36,26 +35,32 @@ export default async function handler(req, res) {
   const deodLine = deodorizer ? ' + Deodorizer Treatment' : '';
   const haulLine = haul_away ? ' + Haul-Away' : '';
   const perVisit = `$${(amount_cents / 100).toFixed(0)}`;
+  const visitWord = paidVisits === 1 ? 'visit' : 'visits';
+  // On monthly the visit and the billing period are the same thing, so "$60/visit every month" reads badly.
+  const ongoingRate = plan === 'monthly' ? `${perVisit} every month` : `${perVisit}/visit ${intro ? intro.cadence : ''}`;
 
   let summaryLine;
   if (isOneTime) {
     summaryLine = `${dogLine}${deodLine}${haulLine} · ${perVisit} one-time full yard cleanup`;
-  } else if (offer) {
-    summaryLine = `${dogLine}${deodLine}${haulLine} · ${perVisit}/visit billed ${selected.cadence} after your prepaid intro`;
+  } else if (intro.freeFirst) {
+    summaryLine = `${dogLine}${deodLine}${haulLine} · ${totalVisits} visits: your FREE first cleanup, then ${paidVisits} ${visitWord} at ${perVisit} each`;
   } else {
-    summaryLine = `${dogLine}${deodLine}${haulLine} · ${perVisit} billed ${selected.cadence}`;
+    summaryLine = `${dogLine}${deodLine}${haulLine} · your first ${planLabel.toLowerCase()} visit at ${perVisit}`;
   }
 
   const description = [
     summaryLine,
-    ...(offer ? ['🎉 FIRST CLEANUP FREE, then prepay your intro visits up front'] : []),
+    ...(intro && intro.freeFirst ? ['🎉 FIRST CLEANUP FREE, no matter how big or small the job'] : []),
     '✓ Full yard scoop',
     haul_away ? '✓ Waste hauled off your property' : '✓ Waste double-bagged in your trash bin',
     '✓ Gate closed & secured after every visit',
     '✓ Service notification text when complete',
     '✓ Gate photo sent after each visit',
     deodorizer ? '✓ Pet-safe deodorizer applied to yard' : '✓ 100% satisfaction guarantee',
-    ...(isOneTime ? [] : ['✓ No contracts, cancel anytime']),
+    ...(isOneTime ? [] : [
+      `✓ We text you to lock in your service day, then billing continues at ${ongoingRate}`,
+      '✓ No contracts, cancel anytime',
+    ]),
   ].join('\n');
 
   const params = new URLSearchParams({
@@ -65,17 +70,24 @@ export default async function handler(req, res) {
     'line_items[0][price_data][product_data][description]': description,
     'line_items[0][price_data][product_data][images][0]': 'https://scoopngoarizona.com/Scoopngologo.png',
     'line_items[0][price_data][unit_amount]': String(amount_cents),
-    'line_items[0][quantity]': '1',
-    'mode': isOneTime ? 'payment' : 'subscription',
-    'success_url': `${origin}/payment-success?type=${isOneTime ? 'onetime' : 'subscription'}`,
+    'line_items[0][quantity]': String(paidVisits),
+    'mode': 'payment',
+    'success_url': `${origin}/payment-success?type=${isOneTime ? 'onetime' : 'intro'}`,
     'cancel_url': `${origin}/#pricing`,
     'metadata[plan]': plan,
     'metadata[per_visit_cents]': String(amount_cents),
     'metadata[dogs]': String(dogs),
     'metadata[deodorizer]': String(deodorizer),
     'metadata[haul_away]': String(haul_away || false),
+    'metadata[paid_visits]': String(paidVisits),
+    'metadata[intro_visits]': String(totalVisits),
+    'metadata[free_first_cleanup]': String(!!(intro && intro.freeFirst)),
+    'metadata[cadence]': intro ? intro.cadence : '',
     'phone_number_collection[enabled]': 'true',
     'billing_address_collection': 'required',
+    // Create the Stripe customer at checkout so the ongoing subscription can be attached to
+    // it later without re-entering anything.
+    'customer_creation': 'always',
   });
 
   // Ask every customer when they want their first cleanup; lands in the webhook + owner email.
@@ -93,28 +105,12 @@ export default async function handler(req, res) {
   params.set('custom_fields[0][dropdown][options][3][value]', 'flexible');
 
   if (isOneTime) {
-    // Create a Stripe customer record even in payment mode so the booking shows a
-    // reusable customer in Stripe and the webhook can link it.
-    params.set('customer_creation', 'always');
+    params.set('custom_text[submit][message]', "We'll text you to confirm your cleanup day. No subscription, this is a single visit.");
   } else {
-    params.set('line_items[0][price_data][recurring][interval]', selected.interval);
-    params.set('line_items[0][price_data][recurring][interval_count]', String(selected.interval_count));
-  }
-
-  // Attach the intro offer: one-time prepay line item + a trial so recurring per-visit billing
-  // pauses until the prepaid window ends.
-  if (offer) {
-    const prepayCents = amount_cents * offer.prepaidVisits;
-    const visitWord = offer.prepaidVisits === 1 ? 'visit' : 'visits';
-    params.set('line_items[1][price_data][currency]', 'usd');
-    params.set('line_items[1][price_data][product_data][name]', `Prepaid Intro · ${offer.prepaidVisits} ${visitWord} + FREE First Cleanup`);
-    params.set('line_items[1][price_data][product_data][description]', `One-time charge today for your first ${offer.prepaidVisits} paid ${visitWord}, plus a FREE first cleanup no matter how big or small the job. Regular per-visit billing starts after your prepaid visits are used.`);
-    params.set('line_items[1][price_data][unit_amount]', String(prepayCents));
-    params.set('line_items[1][quantity]', '1');
-    params.set('subscription_data[trial_period_days]', String(offer.trialDays));
-    params.set('metadata[prepay_cents]', String(prepayCents));
-    params.set('metadata[prepaid_visits]', String(offer.prepaidVisits));
-    params.set('metadata[free_first_cleanup]', 'true');
+    // Keep the card on file so ongoing per-visit billing can start once the day is set.
+    params.set('payment_intent_data[setup_future_usage]', 'off_session');
+    params.set('custom_text[submit][message]',
+      `Today's charge covers your intro ${visitWord}. We'll text you to confirm your service day, then keep this card on file for ongoing billing at ${ongoingRate}. No contracts, cancel anytime.`);
   }
 
   try {

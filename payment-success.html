@@ -45,6 +45,9 @@
   <div class="onetime-msg" id="onetime-msg" style="display:none;">
     <p>Your one-time cleanup is booked and paid! We got your preferred day and we'll text you shortly to confirm exactly when we're coming. 🐾</p>
   </div>
+  <div class="intro-msg" id="intro-msg" style="display:none;">
+    <p>Welcome to the Scoop N Go family! Your intro visits are paid for. We'll text you shortly to lock in your service day, and your regular per-visit billing starts after those visits are used. Get ready to enjoy a poop-free yard! 🏡</p>
+  </div>
 
   <a href="/" class="btn">← Back to Home</a>
   <div class="logo"><img src="Scoopngologo.png" alt="Scoop N Go Arizona logo"/><span>Scoop N Go Arizona</span></div>
@@ -62,6 +65,11 @@
     document.getElementById('title').textContent = 'You\'re Subscribed!';
     document.getElementById('msg').textContent = '';
     document.getElementById('sub-msg').style.display = 'block';
+  } else if (type === 'intro') {
+    document.getElementById('icon').textContent = '✅';
+    document.getElementById('title').textContent = 'You\'re All Set!';
+    document.getElementById('msg').textContent = '';
+    document.getElementById('intro-msg').style.display = 'block';
   } else if (type === 'onetime') {
     document.getElementById('icon').textContent = '🧹';
     document.getElementById('title').textContent = 'Cleanup Booked!';

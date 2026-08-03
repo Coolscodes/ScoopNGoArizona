@@ -79,7 +79,10 @@ export default async function handler(req, res) {
 
   if (event.type === 'checkout.session.completed') {
     const session = event.data.object;
-    const { invoice_id, plan, dogs, deodorizer, customer_name, customer_id } = session.metadata || {};
+    const {
+      invoice_id, plan, dogs, deodorizer, customer_name, customer_id,
+      paid_visits, intro_visits, free_first_cleanup, cadence, per_visit_cents,
+    } = session.metadata || {};
 
     // Fallback: also handle setup via checkout session in case setup_intent.succeeded isn't subscribed
     if (session.mode === 'setup' && customer_id && session.setup_intent) {
@@ -154,6 +157,43 @@ export default async function handler(req, res) {
       const dogCount = parseInt(dogs) || 1;
       const hasDeod = deodorizer === 'true';
 
+      // Intro blocks are sold as a one-time charge, so recurring billing still has to be set
+      // up by hand once the service day is confirmed. Everything below spells that out.
+      const paidVisits  = parseInt(paid_visits) || 0;
+      const introVisits = parseInt(intro_visits) || paidVisits;
+      const freeFirst   = free_first_cleanup === 'true';
+      const perVisit    = per_visit_cents ? `$${(parseInt(per_visit_cents) / 100).toFixed(0)}` : '';
+      const amountPaidLabel = typeof session.amount_total === 'number' ? `$${(session.amount_total / 100).toFixed(2)}` : 'see Stripe';
+      const introLine = isOneTime
+        ? 'Booked one-time cleanup online via Stripe (paid).'
+        : `Paid intro block online via Stripe: ${introVisits} visit${introVisits > 1 ? 's' : ''}${freeFirst ? ` (first cleanup FREE + ${paidVisits} prepaid)` : ''}. RECURRING BILLING NOT SET UP YET, start it in Stripe once the service day is confirmed.`;
+
+      // Keep the card that just paid as the customer's default so the ongoing subscription
+      // can be created later without asking for it again.
+      let savedPmId = null;
+      if (!isOneTime && stripeCustomerId && session.payment_intent) {
+        const piId = typeof session.payment_intent === 'string' ? session.payment_intent : session.payment_intent?.id;
+        try {
+          const piRes = await fetch(`https://api.stripe.com/v1/payment_intents/${piId}`, {
+            headers: { 'Authorization': `Bearer ${process.env.STRIPE_SECRET_KEY}` },
+          });
+          const pi = await piRes.json();
+          savedPmId = pi.payment_method || null;
+          if (savedPmId) {
+            await fetch(`https://api.stripe.com/v1/customers/${stripeCustomerId}`, {
+              method: 'POST',
+              headers: {
+                'Authorization': `Bearer ${process.env.STRIPE_SECRET_KEY}`,
+                'Content-Type': 'application/x-www-form-urlencoded',
+              },
+              body: `invoice_settings[default_payment_method]=${savedPmId}`,
+            });
+          }
+        } catch {
+          savedPmId = null; // card still charged, it just has to be picked manually later
+        }
+      }
+
       // Create customer record
       const custRes = await supabase('customers', 'POST', {
         first_name: firstName || 'Online',
@@ -166,7 +206,8 @@ export default async function handler(req, res) {
         service_type: planLabel,
         status: 'active',
         stripe_customer_id: stripeCustomerId || '',
-        notes: `${isOneTime ? 'Booked one-time cleanup online via Stripe (paid).' : 'Subscribed online via Stripe.'} ${dogCount} dog${dogCount > 1 ? 's' : ''}${hasDeod ? ' + deodorizer' : ''}.${firstCleanLabel ? ` First cleanup: ${firstCleanLabel}.` : ''}`,
+        ...(savedPmId ? { stripe_payment_method_id: savedPmId } : {}),
+        notes: `${introLine} ${dogCount} dog${dogCount > 1 ? 's' : ''}${hasDeod ? ' + deodorizer' : ''}.${firstCleanLabel ? ` First cleanup: ${firstCleanLabel}.` : ''}`,
       });
 
       const custData = await custRes.json();
@@ -197,9 +238,9 @@ export default async function handler(req, res) {
           reply_to: email || 'noreply@stripe.com',
           subject: isOneTime
             ? `💰 One-Time Cleanup Booked & Paid: ${name || 'New Client'}`
-            : `💳 New Online Subscriber: ${name || 'New Client'} (${planLabel})`,
+            : `💳 Intro Paid, Set Up Billing: ${name || 'New Client'} (${planLabel})`,
           text: `
-${isOneTime ? 'One-time cleanup booked and PAID online!' : 'New subscription payment received!'}
+${isOneTime ? 'One-time cleanup booked and PAID online!' : `${planLabel} intro block PAID online. Recurring billing still needs to be set up.`}
 
 Name:        ${name || 'Unknown'}
 Email:       ${email || 'Not provided'}
@@ -209,8 +250,14 @@ Plan:        ${planLabel}
 Dogs:        ${dogCount}
 Deod:        ${hasDeod ? 'Yes' : 'No'}
 First clean: ${firstCleanLabel || 'Not specified'}
-
-${isOneTime ? 'They already paid. Text them to confirm the cleanup day!' : 'This client has been automatically added to your Customers tab in the admin dashboard.'}
+Paid today:  ${amountPaidLabel}${isOneTime ? '' : ` (${introVisits} visit${introVisits > 1 ? 's' : ''}${freeFirst ? `, first cleanup free + ${paidVisits} prepaid` : ''})`}
+${isOneTime ? '' : `
+NEXT STEPS
+1. Text them to confirm the service day and start date.
+2. Their intro covers ${introVisits} visit${introVisits > 1 ? 's' : ''}. When those run out, bill them at ${perVisit || 'their per-visit rate'}/visit ${cadence || planLabel.toLowerCase()}, either from HQ auto-charge or a Stripe subscription.
+3. Card on file: ${savedPmId ? 'saved and set as their default, so HQ can auto-charge it.' : 'NOT saved automatically, ask for it before the intro runs out.'}
+`}
+They are already in your Customers tab in the admin dashboard.
 Log in at https://scoopngoarizona.com/admin to schedule their ${isOneTime ? 'cleanup' : 'first service'}.
 
 Stripe Customer ID: ${stripeCustomerId || 'N/A'}
