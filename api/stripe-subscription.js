@@ -39,28 +39,26 @@ export default async function handler(req, res) {
   // On monthly the visit and the billing period are the same thing, so "$60/visit every month" reads badly.
   const ongoingRate = plan === 'monthly' ? `${perVisit} every month` : `${perVisit}/visit ${intro ? intro.cadence : ''}`;
 
+  // Stripe collapses the line breaks in this description into one paragraph, so it is written
+  // as three plain sentences: what you bought, what every visit includes, what happens next.
   let summaryLine;
   if (isOneTime) {
-    summaryLine = `${dogLine}${deodLine}${haulLine} · ${perVisit} one-time full yard cleanup`;
+    summaryLine = `${dogLine}${deodLine}${haulLine} · ${perVisit} one-time full yard cleanup.`;
   } else if (intro.freeFirst) {
-    summaryLine = `${dogLine}${deodLine}${haulLine} · ${totalVisits} visits: your FREE first cleanup, then ${paidVisits} ${visitWord} at ${perVisit} each`;
+    summaryLine = `${dogLine}${deodLine}${haulLine} · ${totalVisits} visits: your FREE first cleanup (no matter how big or small the job), then ${paidVisits} at ${perVisit} each.`;
   } else {
-    summaryLine = `${dogLine}${deodLine}${haulLine} · your first ${planLabel.toLowerCase()} visit at ${perVisit}`;
+    summaryLine = `${dogLine}${deodLine}${haulLine} · your first ${planLabel.toLowerCase()} visit at ${perVisit}.`;
   }
+
+  const wasteLine = haul_away ? 'waste hauled off your property' : 'waste double-bagged in your trash bin';
+  const deodBit   = deodorizer ? ', pet-safe deodorizer on the yard' : '';
 
   const description = [
     summaryLine,
-    ...(intro && intro.freeFirst ? ['🎉 FIRST CLEANUP FREE, no matter how big or small the job'] : []),
-    '✓ Full yard scoop',
-    haul_away ? '✓ Waste hauled off your property' : '✓ Waste double-bagged in your trash bin',
-    '✓ Gate closed & secured after every visit',
-    '✓ Service notification text when complete',
-    '✓ Gate photo sent after each visit',
-    deodorizer ? '✓ Pet-safe deodorizer applied to yard' : '✓ 100% satisfaction guarantee',
-    ...(isOneTime ? [] : [
-      `✓ We text you to lock in your service day, then billing continues at ${ongoingRate}`,
-      '✓ No contracts, cancel anytime',
-    ]),
+    `${isOneTime ? 'Your cleanup includes' : 'Every visit'}: full yard scoop, ${wasteLine}${deodBit}, gate closed and photographed, plus a text when we're done. 100% satisfaction guaranteed.`,
+    isOneTime
+      ? "We'll reach out to confirm your cleanup day. No subscription, this is a single visit."
+      : `We'll reach out to lock in your service day, then billing continues at ${ongoingRate}. No contracts, cancel anytime.`,
   ].join('\n');
 
   const params = new URLSearchParams({
