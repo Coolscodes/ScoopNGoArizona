@@ -8,17 +8,23 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        // Black + lime, matching the marketing site. The brand lime (#6faa22) is
+        // only 2.8:1 on white, so it lives on `accent` and never carries white
+        // text. `DEFAULT` is the deep lime that `text-white` is safe on (6.3:1),
+        // and `dark` is the near-black used for nav and toasts.
         brand: {
-          DEFAULT: '#2e7d32',
-          dark: '#1b5e20',
-          mid: '#388e3c',
-          light: '#e8f5e9',
+          DEFAULT: '#446b15',
+          dark: '#0d0d0d',
+          mid: '#1a1a1a',
+          accent: '#6faa22',
+          light: '#eaf3dc',
         },
-        tan: '#f9f6f1',
-        ink: '#1a1a1a',
-        muted: '#555555',
-        line: '#e0e0e0',
-        warn: '#f9a825',
+        tan: '#f6f7f3',
+        ink: '#171a15',
+        muted: '#5e645b',
+        line: '#e2e5db',
+        // was #f9a825, only 1.97:1 on white and used as `text-warn` on stat tiles
+        warn: '#b26a00',
         danger: '#c62828',
         info: '#1565c0',
       },

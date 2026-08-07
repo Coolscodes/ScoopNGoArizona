@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 :root {
-  --bg: #f0f4f0;
+  --bg: #f1f3ee;
 }
 
 html,
@@ -14,7 +14,7 @@ body {
 
 body {
   background: var(--bg);
-  color: #1a1a1a;
+  color: #171a15;
   font-family: var(--font-body), system-ui, sans-serif;
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;

@@ -5,45 +5,46 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Leave a Tip | Scoop N Go Arizona</title>
   <meta name="description" content="Leave a tip for your Scoop N Go Arizona technician. 100% goes directly to your tech."/>
-  <link rel="icon" href="Scoopngologo.png" type="image/png"/>
+  <link rel="icon" href="scoopngo-icon.png" type="image/png"/>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --pine: #1c4a26; --pine-deep: #123419; --orange: #e8842c; --orange-deep: #c96a15;
-      --orange-soft: #fdeedd; --cream: #faf6ee; --ink: #1d2b1a; --mid: #5b6656; --line: #e6dfd0;
+      --ink-800: #1a1a1a; --ink-900: #0d0d0d; --lime: #6faa22; --lime-deep: #5c8d1b;
+      --lime-text: #446b15; --lime-bright: #8ecb35; --lime-soft: #eaf3dc; --on-lime: #0d0d0d;
+      --paper: #f6f7f3; --ink: #171a15; --mid: #5e645b; --line: #e2e5db;
     }
-    body { font-family: 'Inter', sans-serif; background: linear-gradient(160deg, var(--pine) 0%, var(--pine-deep) 100%); min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; }
+    body { font-family: 'Inter', sans-serif; background: linear-gradient(160deg, var(--ink-800) 0%, var(--ink-900) 100%); min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; }
     body::before { content: ''; position: fixed; inset: 0; background: radial-gradient(700px 420px at 90% 10%, rgba(232,132,44,.15), transparent 65%); pointer-events: none; }
     .back-link { align-self: flex-start; color: rgba(255,255,255,.75); text-decoration: none; font-size: .85rem; font-weight: 600; margin-bottom: 1.5rem; display: flex; align-items: center; gap: .4rem; transition: color .2s; position: relative; }
     .back-link:hover { color: #fff; }
-    .card { position: relative; background: var(--cream); border-radius: 24px; padding: 2.8rem 2.5rem; max-width: 460px; width: 100%; box-shadow: 0 24px 64px rgba(0,0,0,.3); }
+    .card { position: relative; background: var(--paper); border-radius: 24px; padding: 2.8rem 2.5rem; max-width: 460px; width: 100%; box-shadow: 0 24px 64px rgba(0,0,0,.3); }
     .logo { display: flex; align-items: center; gap: .6rem; margin-bottom: 1.8rem; }
-    .logo img { width: 42px; height: 42px; border-radius: 50%; }
-    .logo span { font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; color: var(--pine); font-size: 1.02rem; }
+    .logo img { width: 42px; height: auto; }
+    .logo span { font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; color: var(--ink-800); font-size: 1.02rem; }
     .icon { font-size: 3rem; margin-bottom: .6rem; }
-    h1 { font-family: 'Bricolage Grotesque', sans-serif; font-size: 1.7rem; font-weight: 800; color: var(--pine-deep); margin-bottom: .5rem; letter-spacing: -.01em; }
+    h1 { font-family: 'Bricolage Grotesque', sans-serif; font-size: 1.7rem; font-weight: 800; color: var(--ink-900); margin-bottom: .5rem; letter-spacing: -.01em; }
     .subtitle { color: var(--mid); font-size: .92rem; line-height: 1.6; margin-bottom: 2rem; }
-    label { display: block; font-size: .82rem; font-weight: 700; color: var(--pine-deep); margin-bottom: .45rem; }
+    label { display: block; font-size: .82rem; font-weight: 700; color: var(--ink-900); margin-bottom: .45rem; }
     input[type="text"], input[type="number"] {
       width: 100%; padding: .85rem 1rem; border: 2px solid var(--line); border-radius: 12px; background: #fff;
       font-family: 'Inter', sans-serif; font-size: .95rem; color: var(--ink);
       transition: border .2s, box-shadow .2s; margin-bottom: 1.2rem;
     }
-    input:focus { outline: none; border-color: var(--orange); box-shadow: 0 0 0 4px rgba(232,132,44,.12); }
+    input:focus { outline: none; border-color: var(--lime); box-shadow: 0 0 0 4px rgba(111,170,34,.16); }
     .tip-amounts { display: grid; grid-template-columns: repeat(4,1fr); gap: .5rem; margin-bottom: 1.2rem; }
     .tip-btn { padding: .7rem .5rem; border: 2px solid var(--line); border-radius: 12px; background: #fff; font-family: 'Bricolage Grotesque', sans-serif; font-size: .98rem; font-weight: 700; color: var(--mid); cursor: pointer; transition: all .2s; }
-    .tip-btn:hover { border-color: var(--orange); color: var(--orange-deep); }
-    .tip-btn.selected { border-color: var(--orange); background: var(--orange); color: #fff; box-shadow: 0 4px 14px rgba(232,132,44,.35); }
+    .tip-btn:hover { border-color: var(--lime); color: var(--lime-text); }
+    .tip-btn.selected { border-color: var(--lime-deep); background: var(--lime); color: var(--on-lime); box-shadow: 0 4px 14px rgba(111,170,34,.35); }
     .custom-row { display: flex; align-items: center; gap: .5rem; margin-bottom: 1.8rem; }
-    .custom-row span { font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-size: 1.15rem; color: var(--pine); flex-shrink: 0; }
+    .custom-row span { font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-size: 1.15rem; color: var(--ink-800); flex-shrink: 0; }
     .custom-row input { margin-bottom: 0; }
-    .submit-btn { width: 100%; padding: 1rem; background: var(--orange); color: #fff; border: none; border-radius: 999px; font-family: 'Bricolage Grotesque', sans-serif; font-size: 1.05rem; font-weight: 800; cursor: pointer; transition: background .2s, transform .15s; box-shadow: 0 8px 24px rgba(232,132,44,.35); }
-    .submit-btn:hover:not(:disabled) { background: var(--orange-deep); transform: translateY(-2px); }
+    .submit-btn { width: 100%; padding: 1rem; background: var(--lime); color: var(--on-lime); border: none; border-radius: 999px; font-family: 'Bricolage Grotesque', sans-serif; font-size: 1.05rem; font-weight: 800; cursor: pointer; transition: background .2s, transform .15s; box-shadow: 0 8px 24px rgba(111,170,34,.35); }
+    .submit-btn:hover:not(:disabled) { background: var(--lime-deep); transform: translateY(-2px); }
     .submit-btn:disabled { opacity: .65; cursor: not-allowed; }
-    .secure-note { text-align: center; font-size: .75rem; color: #a8a294; margin-top: 1rem; }
+    .secure-note { text-align: center; font-size: .75rem; color: var(--mid); margin-top: 1rem; }
     .divider { border: none; border-top: 1px solid var(--line); margin: 1.5rem 0; }
     .error { background: #fdecea; border: 1px solid #f3b6ae; border-radius: 12px; padding: .8rem 1rem; font-size: .85rem; color: #b3362a; margin-bottom: 1rem; display: none; }
     .error.show { display: block; }
@@ -54,7 +55,7 @@
 <a href="/" class="back-link">← Back to Scoop N Go Arizona</a>
 
 <div class="card">
-  <div class="logo"><img src="Scoopngologo.png" alt="Scoop N Go Arizona logo"/><span>Scoop N Go Arizona</span></div>
+  <div class="logo"><img src="scoopngo-icon.png" alt="Scoop N Go Arizona logo" width="512" height="512"/><span>Scoop N Go Arizona</span></div>
   <div class="icon">🙏</div>
   <h1>Leave Your Tech a Tip</h1>
   <p class="subtitle">100% of your tip goes directly to your technician. They work hard in the Arizona heat to keep your yard clean and your pups happy!</p>
