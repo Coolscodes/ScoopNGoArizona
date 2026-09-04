@@ -6,6 +6,7 @@
 import { NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase';
 import type { Customer, Dog } from '@/lib/types';
+import { describeDbError } from '@/lib/db-error';
 
 export const dynamic = 'force-dynamic';
 
@@ -56,7 +57,7 @@ export async function PATCH(request: Request, { params }: { params: { id: string
     if (error) throw error;
     return NextResponse.json({ client: data as Customer });
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Failed to update client';
+    const message = describeDbError(err, 'Failed to update client');
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }

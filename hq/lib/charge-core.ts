@@ -16,6 +16,7 @@ import type Stripe from 'stripe';
 import { stripe, dollarsToCents } from './stripe';
 import { supabaseServer } from './supabase';
 import type { Customer, Invoice } from './types';
+import { fullName } from '@/lib/format';
 
 const OWNER_EMAIL = 'scoopngoarizona@gmail.com';
 // Domain verified in Resend (scoopngoarizona.com); requires RESEND_API_KEY in env.
@@ -246,7 +247,7 @@ export async function chargeCustomerForWeek(
   week: WeekInfo,
   amount: number
 ): Promise<ChargeResult> {
-  const name = `${c.first_name} ${c.last_name}`.trim();
+  const name = fullName(c);
 
   if (!c.stripe_customer_id) {
     return { name, status: 'skipped', reason: 'No card on file' };

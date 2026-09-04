@@ -20,7 +20,7 @@
 import { NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase';
 import { currentWeek, dueDateFor } from '@/lib/charge-core';
-import { BUSINESS_TZ } from '@/lib/format';
+import { fullName, BUSINESS_TZ } from '@/lib/format';
 import type { Customer } from '@/lib/types';
 
 export const dynamic = 'force-dynamic';
@@ -97,7 +97,7 @@ async function generate(request: Request) {
   const results: GenResult[] = [];
 
   for (const c of customers) {
-    const name = `${c.first_name} ${c.last_name}`.trim();
+    const name = fullName(c);
 
     if (existingIds.has(c.id)) {
       results.push({ name, status: 'skipped (already invoiced this week)' });

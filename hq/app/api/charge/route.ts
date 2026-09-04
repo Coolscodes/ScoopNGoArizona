@@ -19,6 +19,7 @@ import {
   type ChargeResult,
 } from '@/lib/charge-core';
 import type { Customer } from '@/lib/types';
+import { fullName } from '@/lib/format';
 
 export const dynamic = 'force-dynamic';
 
@@ -122,7 +123,7 @@ export async function POST(request: Request) {
   const results: ChargeResult[] = [];
 
   for (const c of customers) {
-    const name = `${c.first_name} ${c.last_name}`.trim();
+    const name = fullName(c);
 
     const chargeAmount = overrides.get(c.id) ?? c.price_per_visit ?? 0;
     if (!chargeAmount) {
@@ -254,7 +255,7 @@ export async function GET(request: Request) {
     },
     clients: customers.map((c) => ({
       id: c.id,
-      name: `${c.first_name} ${c.last_name}`.trim(),
+      name: fullName(c),
       serviceType: c.service_type ?? null,
       preferredDay: c.preferred_day ?? null,
       price: c.price_per_visit ?? null,

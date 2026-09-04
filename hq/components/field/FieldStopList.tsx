@@ -14,7 +14,7 @@ export interface FieldStop {
   customer: {
     id: string;
     first_name: string;
-    last_name: string;
+    last_name?: string;
     address?: string;
     city?: string;
     zip?: string;

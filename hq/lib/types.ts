@@ -28,9 +28,9 @@ export interface Customer {
   created_at: string;
   lead_id?: string;
   first_name: string;
-  last_name: string;
+  last_name?: string; // optional since migration 005
   phone: string;
-  email: string;
+  email?: string; // optional since migration 005
   address?: string;
   city?: string;
   zip?: string;

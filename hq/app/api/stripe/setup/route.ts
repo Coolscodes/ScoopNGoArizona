@@ -33,6 +33,7 @@ import { stripe } from '@/lib/stripe';
 import { supabaseServer } from '@/lib/supabase';
 import { getCurrentUser } from '@/lib/auth';
 import type { Customer } from '@/lib/types';
+import { fullName } from '@/lib/format';
 
 export const dynamic = 'force-dynamic';
 
@@ -90,7 +91,7 @@ async function createSetupSession(
   const sb = supabaseServer();
 
   const customerName =
-    nameOverride || `${customer.first_name} ${customer.last_name}`.trim() || 'Customer';
+    nameOverride || fullName(customer) || 'Customer';
   const customerEmail = emailOverride || customer.email || undefined;
 
   let stripeCustomerId = customer.stripe_customer_id;

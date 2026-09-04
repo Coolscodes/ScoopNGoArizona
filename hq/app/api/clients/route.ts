@@ -5,6 +5,7 @@
 import { NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase';
 import type { Customer } from '@/lib/types';
+import { describeDbError } from '@/lib/db-error';
 
 export const dynamic = 'force-dynamic';
 
@@ -66,7 +67,7 @@ export async function POST(request: Request) {
     if (error) throw error;
     return NextResponse.json({ client: data as Customer }, { status: 201 });
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Failed to create client';
+    const message = describeDbError(err, 'Failed to create client');
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }

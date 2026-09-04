@@ -8,6 +8,12 @@ import type { Customer } from '@/lib/types';
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 const SERVICE_TYPES = ['Weekly', 'Bi-Weekly', 'One-Time'];
 
+// Columns the customers table refuses to store as null (see migration 005).
+const REQUIRED: [keyof Customer, string][] = [
+  ['first_name', 'First name'],
+  ['phone', 'Phone'],
+];
+
 type Draft = Partial<Customer>;
 
 // Reusable create/edit form. Pass `client` to edit; omit to create.
@@ -31,22 +37,43 @@ export function ClientForm({
   }
 
   async function save() {
-    if (!draft.first_name?.trim()) {
-      toast('First name is required', 'error');
+    // These are NOT NULL on customers, so a blank one fails at the database
+    // rather than in the browser. Catch it here and name the field.
+    const missing = REQUIRED.filter(([key]) => !String(draft[key] ?? '').trim()).map(([, l]) => l);
+    if (missing.length) {
+      toast(`${missing.join(', ')} ${missing.length > 1 ? 'are' : 'is'} required`, 'error');
       return;
     }
+
     setSaving(true);
     const url = isEdit ? `/api/clients/${client!.id}` : '/api/clients';
-    const res = await fetch(url, {
-      method: isEdit ? 'PATCH' : 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(draft),
-    });
-    setSaving(false);
-    if (!res.ok) {
-      toast('Could not save client', 'error');
+    let res: Response;
+    try {
+      res = await fetch(url, {
+        method: isEdit ? 'PATCH' : 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(draft),
+      });
+    } catch {
+      setSaving(false);
+      toast('Could not reach the server. Check your connection and try again.', 'error');
       return;
     }
+    setSaving(false);
+
+    // A lapsed session redirects the write to the login page, which answers 200.
+    // Without this check the form would report a save that never happened.
+    if (res.redirected && new URL(res.url).pathname.startsWith('/login')) {
+      toast('Your session expired. Sign in again, then re-save.', 'error');
+      return;
+    }
+
+    const body = (await res.json().catch(() => null)) as { client?: Customer; error?: string } | null;
+    if (!res.ok || !body?.client) {
+      toast(body?.error ? `Could not save client. ${body.error}` : 'Could not save client', 'error');
+      return;
+    }
+
     toast(isEdit ? 'Client updated' : 'Client added');
     setOpen(false);
     if (!isEdit) setDraft({ active: true, frequency_weeks: 1 });
@@ -60,7 +87,7 @@ export function ClientForm({
       </Button>
       <Drawer open={open} onClose={() => setOpen(false)} title={isEdit ? 'Edit client' : 'New client'}>
         <div className="grid grid-cols-2 gap-x-3">
-          <FormField label="First name">
+          <FormField label="First name (required)">
             <Input value={draft.first_name ?? ''} onChange={(e) => set('first_name', e.target.value)} />
           </FormField>
           <FormField label="Last name">
@@ -68,7 +95,7 @@ export function ClientForm({
           </FormField>
         </div>
         <div className="grid grid-cols-2 gap-x-3">
-          <FormField label="Phone">
+          <FormField label="Phone (required)">
             <Input type="tel" inputMode="tel" value={draft.phone ?? ''} onChange={(e) => set('phone', e.target.value)} />
           </FormField>
           <FormField label="Email">
