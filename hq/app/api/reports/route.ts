@@ -27,7 +27,7 @@ export async function GET() {
           conversionRate: 0,
         },
         weeklyVisits: [],
-        topClients: [],
+        clientRevenue: [],
         degraded: true,
       },
       { status: 200 }

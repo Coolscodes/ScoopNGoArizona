@@ -1,19 +1,20 @@
 import { Card, CardBody, EmptyState, Table, Th, Td } from '@/components/ui';
 import { money } from '@/lib/format';
-import type { TopClient } from './data';
+import type { ClientRevenue } from './data';
 
-// Top 8 customers by all-time payments total.
-export function TopClientsTable({ data }: { data: TopClient[] }) {
+// Every client by all-time collected, highest first. Not a top slice: a cutoff
+// silently drops clients who are only tied with the ones above them.
+export function ClientRevenueTable({ data }: { data: ClientRevenue[] }) {
   return (
     <Card>
       <CardBody>
         <h2 className="font-heading text-[0.8rem] font-bold text-muted uppercase tracking-wider mb-4">
-          Top clients
+          Client revenue
         </h2>
         {data.length === 0 ? (
           <EmptyState
             title="No client revenue yet"
-            hint="Your highest lifetime-revenue clients will be ranked here."
+            hint="Every client will be listed here by lifetime revenue."
           />
         ) : (
           <Table>

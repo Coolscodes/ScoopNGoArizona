@@ -38,7 +38,7 @@ export interface WeeklyVisitPoint {
   issues: number;
 }
 
-export interface TopClient {
+export interface ClientRevenue {
   customerId: string;
   name: string;
   total: number;
@@ -50,7 +50,7 @@ export interface ReportsData {
   arAging: ArAgingBucket[];
   leadFunnel: LeadFunnelData;
   weeklyVisits: WeeklyVisitPoint[];
-  topClients: TopClient[];
+  clientRevenue: ClientRevenue[];
   // True when no data store is reachable (placeholder env / query error).
   // The UI still renders gracefully; this just lets callers know it's empty-by-default.
   degraded: boolean;
@@ -288,13 +288,20 @@ export async function getReportsData(): Promise<ReportsData> {
     issues: weekBuckets.get(w)?.issues ?? 0,
   }));
 
-  // ---- Top clients (lifetime collected = all-time PAID invoices) ----
+  // ---- Client revenue (lifetime collected = all-time PAID invoices) ----
+  // Every client appears, not a top slice. Ranking only the top few hid clients
+  // who were merely tied: Lindsay, Matthew and Paula all sat at $195 and two of
+  // them fell off an arbitrary cutoff.
   const totalsByCustomer = new Map<string, number>();
   for (const inv of paidInvoices) {
     totalsByCustomer.set(
       inv.customer_id,
       (totalsByCustomer.get(inv.customer_id) ?? 0) + (Number(inv.amount) || 0)
     );
+  }
+  // An active client who has never been invoiced still belongs on the list, at $0.
+  for (const c of customersRes.rows) {
+    if (!totalsByCustomer.has(c.id)) totalsByCustomer.set(c.id, 0);
   }
 
   const customerIds = Array.from(totalsByCustomer.keys());
@@ -308,14 +315,14 @@ export async function getReportsData(): Promise<ReportsData> {
     for (const c of custRes.rows) namesById.set(c.id, fullName(c));
   }
 
-  const topClients: TopClient[] = Array.from(totalsByCustomer.entries())
+  const clientRevenue: ClientRevenue[] = Array.from(totalsByCustomer.entries())
     .map(([customerId, total]) => ({
       customerId,
       name: namesById.get(customerId) ?? 'Unknown client',
       total: round2(total),
     }))
-    .sort((a, b) => b.total - a.total)
-    .slice(0, 8);
+    // Name breaks ties, so equal earners keep a stable order run to run.
+    .sort((a, b) => b.total - a.total || a.name.localeCompare(b.name));
 
   return {
     headline: {
@@ -332,7 +339,7 @@ export async function getReportsData(): Promise<ReportsData> {
       conversionRate,
     },
     weeklyVisits,
-    topClients,
+    clientRevenue,
     degraded,
   };
 }

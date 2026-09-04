@@ -5,13 +5,13 @@ import { MonthlyRevenueChart } from '@/components/reports/MonthlyRevenueChart';
 import { ArAgingChart } from '@/components/reports/ArAgingChart';
 import { LeadFunnelChart } from '@/components/reports/LeadFunnelChart';
 import { WeeklyVisitsChart } from '@/components/reports/WeeklyVisitsChart';
-import { TopClientsTable } from '@/components/reports/TopClientsTable';
+import { ClientRevenueTable } from '@/components/reports/ClientRevenueTable';
 
 // Always read fresh, reports reflect the live books.
 export const dynamic = 'force-dynamic';
 
 export default async function ReportsPage() {
-  const { headline, monthlyRevenue, arAging, leadFunnel, weeklyVisits, topClients } =
+  const { headline, monthlyRevenue, arAging, leadFunnel, weeklyVisits, clientRevenue } =
     await getReportsData();
 
   return (
@@ -41,7 +41,7 @@ export default async function ReportsPage() {
         <WeeklyVisitsChart data={weeklyVisits} />
       </div>
 
-      <TopClientsTable data={topClients} />
+      <ClientRevenueTable data={clientRevenue} />
     </div>
   );
 }
