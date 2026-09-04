@@ -11,32 +11,46 @@ export const dynamic = 'force-dynamic';
 // The daily cron should fire every ~24h; warn when it's been quiet this long.
 const CRON_STALE_MS = 36 * 60 * 60 * 1000;
 
-function CronHealth({ lastRunAt }: { lastRunAt: string | null }) {
+function CronHealth({
+  lastRunAt,
+  failedSteps,
+}: {
+  lastRunAt: string | null;
+  failedSteps: string[];
+}) {
   const stale = !lastRunAt || Date.now() - new Date(lastRunAt).getTime() > CRON_STALE_MS;
-  if (!stale) return null;
+  // A run that fired but failed is just as broken as one that never fired, and it
+  // is the failure mode that hid for seven weeks, so it gets the same red banner.
+  if (!stale && failedSteps.length === 0) return null;
   return (
     <div className="mb-6 rounded-card border border-[#ffcdd2] bg-[#ffebee] px-5 py-3 text-sm">
-      <span className="font-heading font-bold text-danger">⚠ Daily automations are not running.</span>{' '}
+      <span className="font-heading font-bold text-danger">
+        {stale ? '⚠ Daily automations are not running.' : '⚠ Daily automations ran but failed.'}
+      </span>{' '}
       <span className="text-danger/80">
-        {lastRunAt
-          ? `Last run ${shortDate(lastRunAt)}.`
-          : 'They have never run.'}{' '}
-        Visit generation, weekly invoices, and reminders are stalled, check the
-        Vercel cron for scoopngohq.
+        {stale ? (
+          <>
+            {lastRunAt ? `Last run ${shortDate(lastRunAt)}.` : 'They have never run.'}{' '}
+            Visit generation, weekly invoices, and reminders are stalled, check the
+            Vercel cron for scoopngohq.
+          </>
+        ) : (
+          <>Last run {shortDate(lastRunAt as string)} reported: {failedSteps.join('; ')}.</>
+        )}
       </span>
     </div>
   );
 }
 
 export default async function DashboardPage() {
-  const { metrics, needsAttention, unclosedVisits, cronLastRunAt, route } =
+  const { metrics, needsAttention, unclosedVisits, cronLastRunAt, cronFailedSteps, route } =
     await getDashboardData();
 
   return (
     <div>
       <PageHeader title="Dashboard" subtitle={dayMonth(todayISO())} />
 
-      <CronHealth lastRunAt={cronLastRunAt} />
+      <CronHealth lastRunAt={cronLastRunAt} failedSteps={cronFailedSteps} />
 
       <div className="grid gap-3 grid-cols-2 lg:grid-cols-4 mb-6">
         <StatCard label="Today's stops" value={metrics.todaysStops} />

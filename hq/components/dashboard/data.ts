@@ -44,6 +44,10 @@ export interface DashboardData {
   unclosedVisits: UnclosedVisit[];
   // When the daily cron last ran (heartbeat), null if it has never run.
   cronLastRunAt: string | null;
+  // Steps that failed on that run. A fresh heartbeat is not proof of a good run:
+  // the orchestrator writes it either way, which is how visit generation stayed
+  // dead for seven weeks behind a green dashboard.
+  cronFailedSteps: string[];
   route: RouteStop[];
   // True when no data store is reachable (placeholder env / query error).
   // The UI still renders gracefully; this just lets callers know it's empty-by-default.
@@ -119,7 +123,7 @@ export async function getDashboardData(): Promise<DashboardData> {
         .limit(20)
     ),
     // Daily-cron heartbeat (written by /api/cron/daily).
-    safeRows<{ config: { last_run_at?: string } | null }>(() =>
+    safeRows<{ config: { last_run_at?: string; failed_steps?: string[] } | null }>(() =>
       sb.from('automations').select('config').eq('key', 'cron_heartbeat').limit(1)
     ),
   ]);
@@ -220,6 +224,7 @@ export async function getDashboardData(): Promise<DashboardData> {
   }));
 
   const cronLastRunAt = heartbeatRes.rows[0]?.config?.last_run_at ?? null;
+  const cronFailedSteps = heartbeatRes.rows[0]?.config?.failed_steps ?? [];
 
   return {
     metrics: {
@@ -231,6 +236,7 @@ export async function getDashboardData(): Promise<DashboardData> {
     needsAttention,
     unclosedVisits,
     cronLastRunAt,
+    cronFailedSteps,
     route,
     degraded,
   };
