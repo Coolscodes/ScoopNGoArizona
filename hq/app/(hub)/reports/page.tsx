@@ -5,13 +5,14 @@ import { MonthlyRevenueChart } from '@/components/reports/MonthlyRevenueChart';
 import { ArAgingChart } from '@/components/reports/ArAgingChart';
 import { LeadFunnelChart } from '@/components/reports/LeadFunnelChart';
 import { WeeklyVisitsChart } from '@/components/reports/WeeklyVisitsChart';
+import { WeeklyRevenueChart } from '@/components/reports/WeeklyRevenueChart';
 import { ClientRevenueTable } from '@/components/reports/ClientRevenueTable';
 
 // Always read fresh, reports reflect the live books.
 export const dynamic = 'force-dynamic';
 
 export default async function ReportsPage() {
-  const { headline, monthlyRevenue, arAging, leadFunnel, weeklyVisits, clientRevenue } =
+  const { headline, monthlyRevenue, arAging, leadFunnel, weeklyVisits, weeklyRevenue, clientRevenue } =
     await getReportsData();
 
   return (
@@ -36,9 +37,15 @@ export default async function ReportsPage() {
         <ArAgingChart data={arAging} />
       </div>
 
+      {/* The two weekly charts share a row and an 8 week window, so a week's
+          visit count sits directly beside what that week earned. */}
+      <div className="grid gap-4 lg:grid-cols-2 mb-4 [&>*]:min-w-0">
+        <WeeklyVisitsChart data={weeklyVisits} />
+        <WeeklyRevenueChart data={weeklyRevenue} />
+      </div>
+
       <div className="grid gap-4 lg:grid-cols-2 mb-4 [&>*]:min-w-0">
         <LeadFunnelChart data={leadFunnel} />
-        <WeeklyVisitsChart data={weeklyVisits} />
       </div>
 
       <ClientRevenueTable data={clientRevenue} />

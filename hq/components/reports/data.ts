@@ -38,6 +38,12 @@ export interface WeeklyVisitPoint {
   issues: number;
 }
 
+export interface WeeklyRevenuePoint {
+  weekStart: string; // YYYY-MM-DD (Monday)
+  total: number;
+  visits: number;
+}
+
 export interface ClientRevenue {
   customerId: string;
   name: string;
@@ -50,6 +56,7 @@ export interface ReportsData {
   arAging: ArAgingBucket[];
   leadFunnel: LeadFunnelData;
   weeklyVisits: WeeklyVisitPoint[];
+  weeklyRevenue: WeeklyRevenuePoint[];
   clientRevenue: ClientRevenue[];
   // True when no data store is reachable (placeholder env / query error).
   // The UI still renders gracefully; this just lets callers know it's empty-by-default.
@@ -288,6 +295,24 @@ export async function getReportsData(): Promise<ReportsData> {
     issues: weekBuckets.get(w)?.issues ?? 0,
   }));
 
+  // ---- Weekly revenue (same 8 weeks, so the two charts read side by side) ----
+  // Credited to the week SERVICED (invoice period_start), not the day the money
+  // arrived. That is what makes it comparable to the visit count above it: nine
+  // visits and $187.50 are the same week's work. The monthly chart answers the
+  // other question, when cash landed, and uses the payment date instead.
+  const revenueByWeek = new Map<string, number>(weekStarts.map((w) => [w, 0]));
+  for (const inv of paidInvoices) {
+    if (!inv.period_start) continue;
+    const bucket = revenueByWeek.get(inv.period_start);
+    if (bucket === undefined) continue;
+    revenueByWeek.set(inv.period_start, bucket + (Number(inv.amount) || 0));
+  }
+  const weeklyRevenue: WeeklyRevenuePoint[] = weekStarts.map((w) => ({
+    weekStart: w,
+    total: round2(revenueByWeek.get(w) ?? 0),
+    visits: weekBuckets.get(w)?.count ?? 0,
+  }));
+
   // ---- Client revenue (lifetime collected = all-time PAID invoices) ----
   // Every client appears, not a top slice. Ranking only the top few hid clients
   // who were merely tied: Lindsay, Matthew and Paula all sat at $195 and two of
@@ -339,6 +364,7 @@ export async function getReportsData(): Promise<ReportsData> {
       conversionRate,
     },
     weeklyVisits,
+    weeklyRevenue,
     clientRevenue,
     degraded,
   };
