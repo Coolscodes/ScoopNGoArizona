@@ -8,6 +8,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Button, useToast } from '@/components/ui';
 import { money } from '@/lib/format';
+import { useCardSetupLink } from '@/components/clients/useCardSetupLink';
 
 interface OpenWeek {
   periodStart: string;
@@ -76,6 +77,7 @@ export function ChargeClientsModal({
   onClose: () => void;
 }) {
   const toast = useToast();
+  const cardLink = useCardSetupLink();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [clients, setClients] = useState<EligibleClient[]>([]);
@@ -203,27 +205,12 @@ export function ChargeClientsModal({
   async function sendCardLink(c: EligibleClient) {
     setLinkBusy(c.id);
     try {
-      const res = await fetch('/api/stripe/setup', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          customer_id: c.id,
-          customer_name: c.name,
-          customer_email: c.email ?? undefined,
-          stripe_customer_id: c.stripeCustomerId ?? undefined,
-        }),
+      await cardLink.request({
+        customer_id: c.id,
+        customer_name: c.name,
+        customer_email: c.email,
+        stripe_customer_id: c.stripeCustomerId,
       });
-      const data = (await res.json()) as { url?: string; error?: string };
-      if (!res.ok || !data.url) throw new Error(data.error || 'Setup link failed');
-      try {
-        await navigator.clipboard.writeText(data.url);
-        toast('Card setup link copied to clipboard');
-      } catch {
-        window.open(data.url, '_blank', 'noopener');
-        toast('Card setup link opened');
-      }
-    } catch (e) {
-      toast(e instanceof Error ? e.message : 'Setup link failed', 'error');
     } finally {
       setLinkBusy(null);
     }
@@ -540,6 +527,9 @@ export function ChargeClientsModal({
             </div>
           </div>
         </div>
+        {/* Inside the dialog (which stops propagation) so a tap on the link
+            modal's backdrop closes only that modal, not this one. */}
+        {cardLink.modal}
       </div>
     </div>
   );

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button, useToast } from '@/components/ui';
 import { RecordPaymentButton } from './RecordPaymentButton';
+import { useCardSetupLink } from './useCardSetupLink';
 
 // Charge the card on file (this week's visit price), record an outside payment,
 // or send a card-setup link. Mirrors the invoices page actions so behavior is
@@ -25,6 +26,7 @@ export function ClientQuickActions({
 }) {
   const router = useRouter();
   const toast = useToast();
+  const cardLink = useCardSetupLink();
   const [busy, setBusy] = useState(false);
 
   async function chargeNow() {
@@ -63,31 +65,13 @@ export function ClientQuickActions({
   async function setupLink() {
     setBusy(true);
     try {
-      const res = await fetch('/api/stripe/setup', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          customer_id: customerId,
-          customer_name: customerName,
-          customer_email: email,
-          stripe_customer_id: stripeCustomerId,
-        }),
+      const ok = await cardLink.request({
+        customer_id: customerId,
+        customer_name: customerName,
+        customer_email: email,
+        stripe_customer_id: stripeCustomerId,
       });
-      const data = (await res.json().catch(() => ({}))) as { url?: string; error?: string };
-      if (!res.ok || !data.url) {
-        toast(data.error || 'Could not create setup link', 'error');
-        return;
-      }
-      try {
-        await navigator.clipboard.writeText(data.url);
-        toast('Card setup link copied to clipboard');
-      } catch {
-        window.open(data.url, '_blank', 'noopener');
-        toast('Card setup link opened');
-      }
-      router.refresh();
-    } catch {
-      toast('Could not create setup link', 'error');
+      if (ok) router.refresh();
     } finally {
       setBusy(false);
     }
@@ -106,6 +90,7 @@ export function ClientQuickActions({
       <Button variant="outline" size="sm" disabled={busy} onClick={setupLink}>
         {hasCard ? 'New card link' : 'Card setup link'}
       </Button>
+      {cardLink.modal}
     </div>
   );
 }

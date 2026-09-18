@@ -16,6 +16,7 @@ import {
 import { money, shortDate } from '@/lib/format';
 import { InvoiceActions } from './InvoiceActions';
 import { ChargeClientsModal } from './ChargeClientsModal';
+import { useCardSetupLink } from '@/components/clients/useCardSetupLink';
 import type { InvoiceStatus } from '@/lib/types';
 import type { ArSummary, ClientBalance, InvoiceRow } from './data';
 
@@ -40,6 +41,7 @@ export function InvoicesView({
 }) {
   const router = useRouter();
   const toast = useToast();
+  const cardLink = useCardSetupLink();
   const [filter, setFilter] = useState<FilterKey>('all');
   const [chargeOpen, setChargeOpen] = useState(false);
   // customerId currently being charged / linked (disables that row's buttons).
@@ -89,36 +91,17 @@ export function InvoicesView({
     }
   }
 
+  // Copy the hosted Checkout link so it can be texted/emailed to the client.
   async function sendSetupLink(b: ClientBalance) {
     setBusy(b.customerId);
     try {
-      const res = await fetch('/api/stripe/setup', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          customer_id: b.customerId,
-          customer_name: b.customerName,
-          customer_email: b.email,
-          stripe_customer_id: b.stripeCustomerId,
-        }),
+      const ok = await cardLink.request({
+        customer_id: b.customerId,
+        customer_name: b.customerName,
+        customer_email: b.email,
+        stripe_customer_id: b.stripeCustomerId,
       });
-      const data = (await res.json()) as { url?: string; error?: string };
-      if (!res.ok || !data.url) {
-        toast(data.error || 'Could not create setup link', 'error');
-        return;
-      }
-      // Copy the hosted Checkout link so it can be texted/emailed to the client.
-      try {
-        await navigator.clipboard.writeText(data.url);
-        toast('Card setup link copied to clipboard');
-      } catch {
-        // Clipboard may be blocked, open it instead.
-        window.open(data.url, '_blank', 'noopener');
-        toast('Card setup link opened');
-      }
-      router.refresh();
-    } catch {
-      toast('Could not create setup link', 'error');
+      if (ok) router.refresh();
     } finally {
       setBusy(null);
     }
@@ -234,6 +217,7 @@ export function InvoicesView({
           router.refresh();
         }}
       />
+      {cardLink.modal}
     </div>
   );
 }
