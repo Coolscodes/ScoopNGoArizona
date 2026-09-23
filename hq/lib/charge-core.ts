@@ -229,6 +229,25 @@ async function recordFailedChargeInvoice(
   }
 }
 
+// --- payment methods ----------------------------------------------------------
+
+// The card to charge: the customer's saved default, falling back to the first
+// card on the Stripe customer. Shared by the weekly charge and the signup
+// collection so both pick the same card.
+export async function defaultPaymentMethodFor(
+  sk: Stripe,
+  stripeCustomerId: string
+): Promise<string | undefined> {
+  const stripeCust = await sk.customers.retrieve(stripeCustomerId);
+  if (!('deleted' in stripeCust)) {
+    const dpm = stripeCust.invoice_settings?.default_payment_method;
+    const id = typeof dpm === 'string' ? dpm : dpm?.id;
+    if (id) return id;
+  }
+  const pms = await sk.paymentMethods.list({ customer: stripeCustomerId, type: 'card' });
+  return pms.data[0]?.id;
+}
+
 // --- core charge --------------------------------------------------------------
 
 export type ChargeResult =
@@ -254,20 +273,7 @@ export async function chargeCustomerForWeek(
   }
 
   try {
-    // Saved default payment method; fall back to first card on the customer.
-    const stripeCust = await sk.customers.retrieve(c.stripe_customer_id);
-    let pmId: string | undefined;
-    if (!('deleted' in stripeCust)) {
-      const dpm = stripeCust.invoice_settings?.default_payment_method;
-      pmId = typeof dpm === 'string' ? dpm : dpm?.id;
-    }
-    if (!pmId) {
-      const pms = await sk.paymentMethods.list({
-        customer: c.stripe_customer_id,
-        type: 'card',
-      });
-      pmId = pms.data[0]?.id;
-    }
+    const pmId = await defaultPaymentMethodFor(sk, c.stripe_customer_id);
     if (!pmId) {
       return {
         name,

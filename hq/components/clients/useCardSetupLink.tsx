@@ -62,47 +62,69 @@ function queueClipboardWrite(text: Promise<string>): Promise<boolean> {
 interface PendingLink {
   url: string;
   name?: string;
+  what: string;
 }
 
-export function useCardSetupLink() {
+// The generic version: any link that has to be fetched and then copied under
+// the same tap. The signup payment link uses this too, so both links behave
+// identically on his phone.
+export function useCopyableLink() {
   const toast = useToast();
   const [pending, setPending] = useState<PendingLink | null>(null);
   const close = useCallback(() => setPending(null), []);
 
   // Call this synchronously from the click handler, with no await before it,
-  // so the clipboard write can still ride on the tap. Resolves true when a
-  // link was created (copied, or shown in the modal), false on failure.
+  // so the clipboard write can still ride on the tap. Resolves the link when
+  // one was created (copied, or shown in the modal), null on failure. Callers
+  // that want to keep the link on screen, like the signup flow, hold onto it.
   const request = useCallback(
-    async (input: CardSetupLinkInput): Promise<boolean> => {
-      const urlPromise = createSetupUrl(input);
+    async (
+      create: () => Promise<string>,
+      meta: { name?: string; what?: string } = {}
+    ): Promise<string | null> => {
+      const what = meta.what ?? 'Link';
+      const urlPromise = create();
       const queued = queueClipboardWrite(urlPromise);
 
       let url: string;
       try {
         url = await urlPromise;
       } catch (e) {
-        toast(e instanceof Error ? e.message : 'Could not create setup link', 'error');
-        return false;
+        toast(e instanceof Error ? e.message : `Could not create ${what.toLowerCase()}`, 'error');
+        return null;
       }
 
-      const who = input.customer_name ? ` for ${input.customer_name}` : '';
+      const who = meta.name ? ` for ${meta.name}` : '';
       if (await queued) {
-        toast(`Card setup link${who} copied to clipboard`);
-        return true;
+        toast(`${what}${who} copied to clipboard`);
+        return url;
       }
       try {
         await navigator.clipboard.writeText(url);
-        toast(`Card setup link${who} copied to clipboard`);
+        toast(`${what}${who} copied to clipboard`);
       } catch {
-        setPending({ url, name: input.customer_name });
+        setPending({ url, name: meta.name, what });
       }
-      return true;
+      return url;
     },
     [toast]
   );
 
   const modal = <CardSetupLinkModal pending={pending} onClose={close} />;
   return { request, modal };
+}
+
+export function useCardSetupLink() {
+  const link = useCopyableLink();
+  const request = useCallback(
+    (input: CardSetupLinkInput) =>
+      link.request(() => createSetupUrl(input), {
+        name: input.customer_name,
+        what: 'Card setup link',
+      }),
+    [link]
+  );
+  return { request, modal: link.modal };
 }
 
 function CardSetupLinkModal({
@@ -115,12 +137,12 @@ function CardSetupLinkModal({
   const toast = useToast();
   const canShare = typeof navigator !== 'undefined' && typeof navigator.share === 'function';
   if (!pending) return null;
-  const { url, name } = pending;
+  const { url, name, what } = pending;
 
   async function copy() {
     try {
       await navigator.clipboard.writeText(url);
-      toast('Card setup link copied to clipboard');
+      toast(`${what} copied to clipboard`);
       onClose();
     } catch {
       toast('Copy is blocked here, tap the link to select it', 'error');
@@ -130,8 +152,8 @@ function CardSetupLinkModal({
   async function share() {
     try {
       await navigator.share({
-        title: 'Card setup link',
-        text: `Save a card on file for Scoop N Go${name ? `, ${name}` : ''}`,
+        title: what,
+        text: `Scoop N Go${name ? `, ${name}` : ''}`,
         url,
       });
       onClose();
@@ -141,7 +163,7 @@ function CardSetupLinkModal({
   }
 
   return (
-    <Modal open onClose={onClose} title="Card setup link">
+    <Modal open onClose={onClose} title={what}>
       <p className="text-sm text-muted mb-3">
         {name ? `The link for ${name} is ready.` : 'The link is ready.'} Copy it, or send it
         straight to the client.
@@ -150,7 +172,7 @@ function CardSetupLinkModal({
         readOnly
         value={url}
         onFocus={(e) => e.currentTarget.select()}
-        aria-label="Card setup link"
+        aria-label={what}
       />
       <div className="flex items-center gap-2 mt-3 flex-wrap">
         <Button variant="primary" size="sm" onClick={copy}>

@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { PageHeader } from '@/components/ui';
 import { ClientsTable } from '@/components/clients/ClientsTable';
 import { supabaseServer } from '@/lib/supabase';
@@ -27,7 +28,18 @@ export default async function ClientsPage() {
   const activeCount = clients.filter((c) => c.active).length;
   return (
     <div>
-      <PageHeader title="Clients" subtitle={`${activeCount} active · ${clients.length} total`} />
+      <PageHeader
+        title="Clients"
+        subtitle={`${activeCount} active · ${clients.length} total`}
+        actions={
+          <Link
+            href="/signup"
+            className="inline-flex items-center rounded-[7px] bg-brand text-white px-4 py-2.5 text-[0.82rem] font-heading font-bold hover:bg-brand-dark"
+          >
+            New signup
+          </Link>
+        }
+      />
       <ClientsTable clients={clients} dogCounts={dogCounts} />
     </div>
   );
