@@ -5,6 +5,7 @@ import { ClientForm } from '@/components/clients/ClientForm';
 import { ClientQuickActions } from '@/components/clients/ClientQuickActions';
 import { DogsEditor } from '@/components/clients/DogsEditor';
 import { FlagsEditor } from '@/components/clients/FlagsEditor';
+import { UndoPaidButton } from '@/components/invoices/UndoPaidButton';
 import { supabaseServer } from '@/lib/supabase';
 import { money, phone as fmtPhone, fullName, initials, shortDate, dayMonth } from '@/lib/format';
 import type { Customer, Dog, Appointment, Invoice, Payment, ServiceLog } from '@/lib/types';
@@ -187,6 +188,14 @@ export default async function ClientDetailPage({ params }: { params: { id: strin
                     <span className="flex items-center gap-2 shrink-0">
                       <span className="font-heading font-bold">{money(i.amount)}</span>
                       <StatusPill status={i.status} />
+                      {i.status === 'paid' && (
+                        <UndoPaidButton
+                          invoiceId={i.id}
+                          amount={i.amount}
+                          customerName={fullName(client)}
+                          size="sm"
+                        />
+                      )}
                     </span>
                   </div>
                 );

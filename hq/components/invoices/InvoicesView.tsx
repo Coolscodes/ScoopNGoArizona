@@ -15,6 +15,7 @@ import {
 } from '@/components/ui';
 import { money, shortDate } from '@/lib/format';
 import { InvoiceActions } from './InvoiceActions';
+import { UndoPaidButton } from './UndoPaidButton';
 import { ChargeClientsModal } from './ChargeClientsModal';
 import { useCardSetupLink } from '@/components/clients/useCardSetupLink';
 import type { InvoiceStatus } from '@/lib/types';
@@ -188,7 +189,13 @@ export function InvoicesView({
                     <StatusPill status={r.pastDue ? 'overdue' : r.invoice.status} />
                   </Td>
                   <Td>
-                    {r.invoice.status !== 'paid' && (
+                    {r.invoice.status === 'paid' ? (
+                      <UndoPaidButton
+                        invoiceId={r.invoice.id}
+                        amount={r.invoice.amount}
+                        customerName={r.customerName}
+                      />
+                    ) : (
                       <InvoiceActions
                         invoiceId={r.invoice.id}
                         amount={r.invoice.amount}

@@ -7,11 +7,18 @@
 //     { action: 'charge' }
 //        -> charge the customer's card on file for the invoice amount via Stripe,
 //           then mark it paid and record a card payment.
+//     { action: 'unmark_paid' }
+//        -> undo a mark_paid: put the week back on the books as owed and delete
+//           the payment rows that said the money arrived. Refused when the
+//           invoice carries a Stripe payment intent, because that money really
+//           did move and hiding it would only make the books wrong the other
+//           way; that one has to be refunded in Stripe first.
 
 import { NextResponse } from 'next/server';
 import { stripe, dollarsToCents } from '@/lib/stripe';
 import { supabaseServer } from '@/lib/supabase';
 import { getCurrentUser } from '@/lib/auth';
+import { weekFromPeriodStart } from '@/lib/charge-core';
 import type { Customer, Invoice, PayMethod } from '@/lib/types';
 
 export const dynamic = 'force-dynamic';
@@ -45,6 +52,40 @@ export async function PATCH(request: Request, { params }: { params: { id: string
     return NextResponse.json({ error: 'Invoice not found' }, { status: 404 });
   }
   const invoice = invData as Invoice;
+
+  // ---- undo a payment that was recorded by mistake ----
+  if (body.action === 'unmark_paid') {
+    if (invoice.status !== 'paid') {
+      return NextResponse.json({ error: 'That week is not marked paid.' }, { status: 400 });
+    }
+    if (invoice.stripe_payment_intent_id) {
+      return NextResponse.json(
+        {
+          error:
+            'That week was charged to their card. Refund it in Stripe first, then it can be undone here.',
+        },
+        { status: 409 }
+      );
+    }
+    const week = invoice.period_start ? weekFromPeriodStart(invoice.period_start).weekLabel : null;
+    try {
+      // The payment rows are the claim that money arrived, so they go too.
+      await sb.from('payments').delete().eq('invoice_id', invoice.id);
+      await sb
+        .from('invoices')
+        .update({
+          status: 'sent',
+          notes: week
+            ? `Week of ${week}, payment undone in HQ`
+            : 'Payment undone in HQ',
+        })
+        .eq('id', invoice.id);
+      return NextResponse.json({ ok: true, status: 'sent', amount: invoice.amount });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to undo the payment';
+      return NextResponse.json({ error: message }, { status: 500 });
+    }
+  }
 
   if (invoice.status === 'paid') {
     return NextResponse.json({ ok: true, alreadyPaid: true });
@@ -152,5 +193,8 @@ export async function PATCH(request: Request, { params }: { params: { id: string
     }
   }
 
-  return NextResponse.json({ error: "Unknown action. Use 'mark_paid' or 'charge'." }, { status: 400 });
+  return NextResponse.json(
+    { error: "Unknown action. Use 'mark_paid', 'charge' or 'unmark_paid'." },
+    { status: 400 }
+  );
 }
