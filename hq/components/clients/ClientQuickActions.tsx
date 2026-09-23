@@ -62,6 +62,52 @@ export function ClientQuickActions({
     }
   }
 
+  // A client who has a Stripe customer but no saved card is usually one who
+  // paid a signup link that nobody came back to confirm. This asks Stripe,
+  // then keeps the card and marks the weeks the payment bought. It is the same
+  // endpoint the signup screen calls, and it charges nothing.
+  async function checkSignup() {
+    setBusy(true);
+    try {
+      const res = await fetch('/api/signup/confirm', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ customer_id: customerId }),
+      });
+      const data = (await res.json().catch(() => ({}))) as {
+        paid?: boolean;
+        card_saved?: boolean;
+        amount?: number;
+        weeks?: { booked: string }[];
+        problems?: string[];
+        reason?: string;
+        error?: string;
+      };
+      if (!res.ok) {
+        toast(data.error || 'Could not check with Stripe', 'error');
+        return;
+      }
+      if (!data.paid) {
+        toast(data.reason || 'No signup payment found', 'info');
+        return;
+      }
+      const marked = (data.weeks ?? []).filter((w) => w.booked !== 'already paid').length;
+      toast(
+        data.problems?.length
+          ? `Paid, but check: ${data.problems[0]}`
+          : `Signup found. ${data.card_saved ? 'Card saved' : 'Card not saved'}${
+              marked ? `, ${marked} week${marked > 1 ? 's' : ''} marked paid` : ''
+            }.`,
+        data.problems?.length ? 'error' : 'success'
+      );
+      router.refresh();
+    } catch {
+      toast('Could not check with Stripe', 'error');
+    } finally {
+      setBusy(false);
+    }
+  }
+
   async function setupLink() {
     setBusy(true);
     try {
@@ -90,6 +136,17 @@ export function ClientQuickActions({
       <Button variant="outline" size="sm" disabled={busy} onClick={setupLink}>
         {hasCard ? 'New card link' : 'Card setup link'}
       </Button>
+      {!hasCard && (
+        <Button
+          variant="outline"
+          size="sm"
+          disabled={busy}
+          onClick={checkSignup}
+          title="Did they pay a signup link? Saves their card and marks the weeks it covered."
+        >
+          Check signup payment
+        </Button>
+      )}
       {cardLink.modal}
     </div>
   );
