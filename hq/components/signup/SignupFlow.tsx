@@ -224,7 +224,7 @@ export function SignupFlow() {
           plan,
           first_visit_date: firstVisit,
           auto_charge: autoCharge,
-          dogs: dogs.split(',').map((d) => d.trim()).filter(Boolean),
+          dog_count: Number(dogs) || 0,
         }),
       });
     } catch {
@@ -816,8 +816,15 @@ export function SignupFlow() {
                 onChange={(e) => setClientField('gate_code', e.target.value)}
               />
             </FormField>
-            <FormField label="Dogs" hint="Names, separated by commas.">
-              <Input value={dogs} onChange={(e) => setDogs(e.target.value)} />
+            <FormField label="How many dogs" hint="Name them later on her page if you want.">
+              <Input
+                type="number"
+                min="0"
+                step="1"
+                inputMode="numeric"
+                value={dogs}
+                onChange={(e) => setDogs(e.target.value)}
+              />
             </FormField>
           </div>
           <FormField label="Yard notes / access">

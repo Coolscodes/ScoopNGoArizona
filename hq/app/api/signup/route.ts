@@ -68,6 +68,7 @@ export async function POST(request: Request) {
     first_visit_date?: string;
     auto_charge?: boolean;
     dogs?: unknown;
+    dog_count?: unknown;
   };
   try {
     body = (await request.json()) as typeof body;
@@ -121,13 +122,24 @@ export async function POST(request: Request) {
 
     // Dogs are a nice-to-have on a signup: a failure here must not lose the
     // client that was just created, so it is reported, not thrown.
-    const dogNames = Array.isArray(body.dogs)
+    //
+    // A count is what actually gets collected in the driveway ("she's got
+    // two"), so dog_count is the normal path and names are optional. The
+    // placeholder names match what the website signup writes, and the clients
+    // table only ever shows the row count anyway.
+    const named = Array.isArray(body.dogs)
       ? (body.dogs as unknown[])
           .map((d) => (typeof d === 'string' ? d : String((d as { name?: string })?.name ?? '')))
           .map((n) => n.trim())
           .filter(Boolean)
           .slice(0, 12)
       : [];
+    const count = Math.min(12, Math.max(0, Math.round(num(body.dog_count, 0))));
+    const dogNames = named.length
+      ? named
+      : count === 1
+      ? ['Dog']
+      : Array.from({ length: count }, (_, i) => `Dog ${i + 1}`);
     let dogsError: string | undefined;
     if (dogNames.length) {
       const { error: dogErr } = await sb
